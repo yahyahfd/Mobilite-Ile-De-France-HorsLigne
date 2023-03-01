@@ -1,3 +1,4 @@
+package controller;
 /**
  * The Controller is considered the main in our MVC
  */

@@ -1,6 +1,7 @@
+package model;
 import java.util.ArrayList;
 
-public class Map {
-    ArrayList<Line> lines;
+public class Line {
+    String name;
     ArrayList<Station> stations;
 }
