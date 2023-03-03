@@ -45,7 +45,6 @@ public class Map {
             }
             System.out.println();
         }
-        System.out.println();
         System.out.println("-------------------Map's stations------------------- ");
         for(Station s : stations){
             System.out.println("Station "+ s.getName() + " and it's neighbours : ");
