@@ -35,26 +35,6 @@ public class Map {
         return newLine;
     }
 
-    //Update line with new information about it's stations 
-    public void updateLines(Line l){
-        for(Line line : lines){
-            if((line.getName()).equals(l.getName())) {
-                line = l;
-                break;
-            }
-        }
-    }
-
-    //Update station with new information about it's neighbours 
-    public void updateStation(Station s){
-        for(Station stat : stations){
-            if((stat.getName()).equals(s.getName())) {
-                stat = s;
-                break;
-            }
-        }
-    }
-
     //Temporary test function ? 
     public void display(){
         System.out.println("-------------------Map's lines------------------- ");
@@ -68,8 +48,9 @@ public class Map {
         System.out.println();
         System.out.println("-------------------Map's stations------------------- ");
         for(Station s : stations){
-            System.out.println("Station "+ s.getName());
-        }
-    }   
+            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
+            s.display();
+    }
+}  
 
 }

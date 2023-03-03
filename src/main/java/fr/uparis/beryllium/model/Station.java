@@ -10,8 +10,9 @@ public class Station {
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */
+    //Map<Station,NeighborData> nextStations;
     
-    Map<Station,Line> nextStations = new HashMap<>();
+   private Map<Station,Line> nextStations = new HashMap<>();
 
     Station(String n){
         name = n;
@@ -22,5 +23,12 @@ public class Station {
     }
 
     public String getName(){ return name; }
+    public Map<Station,Line> getNextStations(){ return nextStations; }
+
+    public void display(){
+        for (Map.Entry<Station,Line> entry : nextStations.entrySet()){
+            System.out.println("        - " + entry.getKey().getName() +" on line " + entry.getValue().getName());
+        }
+    }
 
 }
