@@ -1,4 +1,5 @@
 package fr.uparis.beryllium.model;
+import java.util.HashMap;
 import java.util.Map;
 
 public class Station {
@@ -9,5 +10,17 @@ public class Station {
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */
-    Map<Station,NeighborData> nextStations;
+    
+    Map<Station,Line> nextStations = new HashMap<>();
+
+    Station(String n){
+        name = n;
+    }
+
+    public void addNextStation(Station s, Line l){
+        if(!nextStations.containsKey(s) || nextStations.get(s) != l) nextStations.put(s, l);
+    }
+
+    public String getName(){ return name; }
+
 }

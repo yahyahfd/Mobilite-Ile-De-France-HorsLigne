@@ -2,6 +2,74 @@ package fr.uparis.beryllium.model;
 import java.util.ArrayList;
 
 public class Map {
-    ArrayList<Line> lines;
-    ArrayList<Station> stations;
+    private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Station> stations = new ArrayList<>();
+
+    public void addLine(Line l){
+        if(!lines.contains(l)) lines.add(l);
+    }
+
+    public void addStation(Station s){
+        if(!stations.contains(s)) stations.add(s);
+    }
+
+    //Return Station if exist in the list
+    //else create and return the new Station
+    public Station searchStation(String name){
+        for(Station s : stations){
+            if ((s.getName()).equals(name)) return s;
+        }
+        Station newStation = new Station(name);
+        stations.add(newStation);
+        return newStation;
+    }
+    
+    //Return Line if exist
+    //else create and return new Line
+    public Line searchLine(String name){
+        for(Line l : lines){
+            if((l.getName()).equals(name)) return l;
+        }
+        Line newLine = new Line(name);
+        lines.add(newLine);
+        return newLine;
+    }
+
+    //Update line with new information about it's stations 
+    public void updateLines(Line l){
+        for(Line line : lines){
+            if((line.getName()).equals(l.getName())) {
+                line = l;
+                break;
+            }
+        }
+    }
+
+    //Update station with new information about it's neighbours 
+    public void updateStation(Station s){
+        for(Station stat : stations){
+            if((stat.getName()).equals(s.getName())) {
+                stat = s;
+                break;
+            }
+        }
+    }
+
+    //Temporary test function ? 
+    public void display(){
+        System.out.println("-------------------Map's lines------------------- ");
+        for(Line l : lines){
+            System.out.println("Line " + l.getName() + " contains : ");
+            for(Station s : l.getStations()){
+                System.out.println("        - "+ s.getName());
+            }
+            System.out.println();
+        }
+        System.out.println();
+        System.out.println("-------------------Map's stations------------------- ");
+        for(Station s : stations){
+            System.out.println("Station "+ s.getName());
+        }
+    }   
+
 }
