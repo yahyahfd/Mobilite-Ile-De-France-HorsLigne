@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
+import java.util.HashMap;
 
 public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
