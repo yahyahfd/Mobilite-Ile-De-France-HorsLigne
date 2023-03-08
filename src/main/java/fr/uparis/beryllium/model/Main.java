@@ -22,28 +22,42 @@ public class Main {
 		stations.add(d);
 		stations.add(e);
 		stations.add(f);
-		Line line = new Line("1",stations);
+		Line line1 = new Line("1",stations);
+		Line line2 = new Line("2",stations);
+
+		ArrayList<Line> lines1 = new ArrayList<>();
+		lines1.add(line1);
+		
+		ArrayList<Line> lines2 = new ArrayList<>();
+		lines2.add(line2);
+		
+		ArrayList<Line> lines12 = new ArrayList<>();
+		lines12.add(line1);
+		lines12.add(line2);
 		// add next stations
-		a.nextStations.put(b,1);
-		a.nextStations.put(c,1);
-		b.nextStations.put(a,1);
-		b.nextStations.put(c,1);
-		b.nextStations.put(d,1);
-		c.nextStations.put(a,1);
-		c.nextStations.put(b,1);
-		c.nextStations.put(f,1);
-		d.nextStations.put(b,1);
-		d.nextStations.put(e,1);
-		e.nextStations.put(f,1);
-		e.nextStations.put(d,1);
-		f.nextStations.put(c,1);
-		f.nextStations.put(e,1);
-		System.out.println("station :"+a.name);
-		System.out.println("voisin "+a.nextStations.size());
+		a.nextStations.put(b,lines2);
+		a.nextStations.put(c,lines1);
+		b.nextStations.put(a,lines2);
+		b.nextStations.put(c,lines1);
+		b.nextStations.put(d,lines2);
+		c.nextStations.put(a,lines1);
+		c.nextStations.put(b,lines1);
+		c.nextStations.put(f,lines2);
+		d.nextStations.put(b,lines2);
+//		d.nextStations.put(e,lines2);
+		e.nextStations.put(f,lines12);
+//		e.nextStations.put(d,lines2);
+		f.nextStations.put(c,lines2);
+		f.nextStations.put(e,lines12);
 		Function function = new Function(stations);
-		ArrayList<Station> res = function.dijsktra(/*map,*/ a, d);
-		for(Station s : res) {
-			System.out.println("RES FINAL : "+s.name);
+		HashMap<Station, Line> res = function.dijsktra(/*map,*/ a, e);
+		for(Map.Entry r : res.entrySet()) {
+			if((Line)r.getValue() == null) {
+				System.out.println("RES : "+((Station)r.getKey()).name+" Départ"); // Changer sens + écrire ligne plus clairement
+
+			}else {
+				System.out.println("RES : "+((Station)r.getKey()).name+" line"+((Line)r.getValue()).name); // faire verification ligne (prendre celle sur laquelle on est deja si elle y va
+			}
 		}
 	}
 
