@@ -42,21 +42,41 @@ public class Main {
 		b.nextStations.put(d,lines2);
 		c.nextStations.put(a,lines1);
 		c.nextStations.put(b,lines1);
-		c.nextStations.put(f,lines2);
+//		c.nextStations.put(f,lines2);
 		d.nextStations.put(b,lines2);
 //		d.nextStations.put(e,lines2);
 		e.nextStations.put(f,lines12);
 //		e.nextStations.put(d,lines2);
-		f.nextStations.put(c,lines2);
+//		f.nextStations.put(c,lines2);
 		f.nextStations.put(e,lines12);
 		Function function = new Function(stations);
-		HashMap<Station, Line> res = function.dijsktra(/*map,*/ a, e);
-		for(Map.Entry r : res.entrySet()) {
-			if((Line)r.getValue() == null) {
-				System.out.println("RES : "+((Station)r.getKey()).name+" Départ"); // Changer sens + écrire ligne plus clairement
-
-			}else {
-				System.out.println("RES : "+((Station)r.getKey()).name+" line"+((Line)r.getValue()).name); // faire verification ligne (prendre celle sur laquelle on est deja si elle y va
+		Station start = c;
+		Station dest = d;
+		HashMap<Station, Line> res = function.dijsktra(/*map,*/ start, dest);
+		ArrayList<Station> stationRes = new ArrayList<>();
+		ArrayList<Line> lineRes = new ArrayList<>();
+		if(res == null) {
+			System.out.println("Il n'existe aucun chemin");
+		}else {
+			// pour remettre dans le bon sens si c'est dans le mauvais
+			for(Map.Entry r : res.entrySet()) {
+				if((Station)r.getKey() != null)
+					System.out.println("station "+((Station)r.getKey()).name);
+				if((Line)r.getValue() != null)
+					System.out.println("line "+((Line)r.getValue()).name);
+				stationRes.add(0,(Station)r.getKey());
+				lineRes.add(0,(Line)r.getValue());
+			}
+			// afficher le chemin du depart jusqu'a dest 
+			int i=0;
+			while(i<stationRes.size()) {
+				if(lineRes.get(i) != null) {
+					System.out.println("  |");
+					System.out.println("line "+lineRes.get(i).name);
+					System.out.println("  |");
+				}
+				System.out.println("  "+stationRes.get(i).name);
+				i++;
 			}
 		}
 	}
