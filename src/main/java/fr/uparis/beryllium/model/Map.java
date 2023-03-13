@@ -5,14 +5,6 @@ public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
     private ArrayList<Station> stations = new ArrayList<>();
 
-    public void addLine(Line l){
-        if(!lines.contains(l)) lines.add(l);
-    }
-
-    public void addStation(Station s){
-        if(!stations.contains(s)) stations.add(s);
-    }
-
     //Return Station if exist in the list
     //else create and return the new Station
     public Station searchStation(String name){
@@ -34,22 +26,4 @@ public class Map {
         lines.add(newLine);
         return newLine;
     }
-
-    //Temporary test function ? 
-    public void display(){
-        System.out.println("-------------------Map's lines------------------- ");
-        for(Line l : lines){
-            System.out.println("Line " + l.getName() + " contains : ");
-            for(Station s : l.getStations()){
-                System.out.println("        - "+ s.getName());
-            }
-            System.out.println();
-        }
-        System.out.println("-------------------Map's stations------------------- ");
-        for(Station s : stations){
-            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
-            s.display();
-    }
-}  
-
 }

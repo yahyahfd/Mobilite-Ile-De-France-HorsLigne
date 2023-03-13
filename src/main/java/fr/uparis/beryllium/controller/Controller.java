@@ -7,9 +7,6 @@ import fr.uparis.beryllium.model.*;
 public class Controller {
 
     public static void main(String[] args) {
-        //Test for parser, to be deleted later
        Map m = Parser.readMap("test.csv");
-       m.display();
-       //Test for parser, to be deleted later
     }
 }
