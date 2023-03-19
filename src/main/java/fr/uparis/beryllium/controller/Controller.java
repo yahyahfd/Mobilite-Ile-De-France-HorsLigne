@@ -1,6 +1,7 @@
 package fr.uparis.beryllium.controller;
-
 import fr.uparis.beryllium.model.*;
+
+
 /**
  * The Controller is considered the main in our MVC
  */

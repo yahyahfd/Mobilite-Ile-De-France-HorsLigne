@@ -49,6 +49,7 @@ public class Parser {
                     stat1.addNextStation(stat2, line);
                     stat2.addNextStation(stat1, line);
                 }
+
             }catch(IllegalArgumentException e){
                 // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
                 System.out.println("Csv format incorrect, the map is incomplete.");
