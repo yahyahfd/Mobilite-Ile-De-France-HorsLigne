@@ -1,4 +1,4 @@
-package model;
+package fr.uparis.beryllium.model;
 
 public class Parser {
 
