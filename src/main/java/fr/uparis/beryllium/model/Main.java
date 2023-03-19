@@ -49,10 +49,10 @@ public class Main {
 //		e.nextStations.put(d,lines2);
 //		f.nextStations.put(c,lines2);
 		f.nextStations.put(e,lines12);
-		Function function = new Function(stations);
+		Itinerary Itinerary = new Itinerary(stations);
 		Station start = c;
 		Station dest = d;
-		HashMap<Station, Line> res = function.dijsktra(/*map,*/ start, dest);
+		HashMap<Station, Line> res = Itinerary.shortestWay(/*map,*/ start, dest);
 		ArrayList<Station> stationRes = new ArrayList<>();
 		ArrayList<Line> lineRes = new ArrayList<>();
 		if(res == null) {
