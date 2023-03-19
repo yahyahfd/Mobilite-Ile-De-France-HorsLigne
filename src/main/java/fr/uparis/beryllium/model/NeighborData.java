@@ -4,18 +4,18 @@ import java.time.Duration;
 
 public class NeighborData {
 
-    private final SubLine subLine;
+    private final Line line;
     private final Duration duration;
     private final Double distance;
 
-    public NeighborData(SubLine subLine, Duration duration, Double distance) {
-        this.subLine = subLine;
+    public NeighborData(Line line, Duration duration, Double distance) {
+        this.line = line;
         this.duration = duration;
         this.distance = distance;
     }
 
-    public SubLine getLine() {
-        return subLine;
+    public Line getLine() {
+        return line;
     }
 
     public Duration getDuration() {

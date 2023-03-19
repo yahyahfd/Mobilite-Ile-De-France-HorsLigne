@@ -5,6 +5,6 @@ import java.util.ArrayList;
 public class Line {
 
     private String lineName;
-    private ArrayList<SubLine> subLines;
+    private ArrayList<Station> stations;
 
 }
