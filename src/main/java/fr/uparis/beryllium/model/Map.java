@@ -27,20 +27,15 @@ public class Map {
         return newLine;
     }
 
-    //Temporary test function ? 
-    public void display(){
-        System.out.println("-------------------Map's lines------------------- ");
-        for(Line l : lines){
-            System.out.println("Line " + l.getName() + " contains : ");
-            for(Station s : l.getStations()){
-                System.out.println("        - "+ s.getName());
-            }
-            System.out.println();
-        }
-        /*System.out.println("-------------------Map's stations------------------- ");
+    /**
+     * Method used in terminal mode to check if a station name corresponds to an existing station
+     * @param name A station's name
+     * @return <code>true</code> if the station exists, <code>false</code> otherwise
+     */
+    public boolean checkStationExists(String name){
         for(Station s : stations){
-            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
-            s.display();
-        }*/
+            if ((s.getName()).equals(name)) return true;
+        }
+        return false;
     }
 }
