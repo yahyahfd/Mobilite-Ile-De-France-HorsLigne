@@ -4,12 +4,11 @@ import java.util.ArrayList;
 
 public class Line {
 
-   // private String lineName;
-    private String name;
+    private String lineName;
     private ArrayList<Station> stations = new ArrayList<>();
 
     Line(String n){
-        name = n;
+        lineName = n;
     }
 
     //Like contains method for ArrayList but with String intead of Object
@@ -24,7 +23,7 @@ public class Line {
         if(!isIn(s.getName())) stations.add(s);
     }
 
-    public String getName(){ return name; }
+    public String getName(){ return lineName; }
     public ArrayList<Station> getStations(){ return stations; }
 }
 

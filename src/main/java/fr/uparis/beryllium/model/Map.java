@@ -8,11 +8,11 @@ public class Map {
 
     //Return Station if exist in the list
     //else create and return the new Station
-    public Station searchStation(String name){
+    public Station searchStation(String name, Double x, Double y){
         for(Station s : stations){
             if ((s.getName()).equals(name)) return s;
         }
-        Station newStation = new Station(name);
+        Station newStation = new Station(name,x,y);
         stations.add(newStation);
         return newStation;
     }
@@ -26,5 +26,22 @@ public class Map {
         Line newLine = new Line(name);
         lines.add(newLine);
         return newLine;
+    }
+
+    //Temporary test function ? 
+    public void display(){
+        System.out.println("-------------------Map's lines------------------- ");
+        for(Line l : lines){
+            System.out.println("Line " + l.getName() + " contains : ");
+            for(Station s : l.getStations()){
+                System.out.println("        - "+ s.getName());
+            }
+            System.out.println();
+        }
+        /*System.out.println("-------------------Map's stations------------------- ");
+        for(Station s : stations){
+            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
+            s.display();
+        }*/
     }
 }

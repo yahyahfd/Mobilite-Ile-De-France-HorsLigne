@@ -1,4 +1,4 @@
-package model;
+package fr.uparis.beryllium.model;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -94,7 +94,9 @@ public class Itinerary {
 			}else {
 				// we remove the station from the list
 				allStations.remove(s1);
-				Map<Station,ArrayList<Line>> nextStationOfs1 = s1.nextStations;
+				//Map<Station,ArrayList<Line>> nextStationOfs1 = s1.getNextStations();
+				Map<Station,ArrayList<NeighborData>> nextStationOfs1 = s1.getNextStations();
+
 				// for all next stations of s1, we update the distance
 				for(Map.Entry s2 : nextStationOfs1.entrySet()) {
 					ArrayList<Line> ll = new ArrayList<>();
