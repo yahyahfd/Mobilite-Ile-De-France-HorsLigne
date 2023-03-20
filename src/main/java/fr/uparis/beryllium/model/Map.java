@@ -1,6 +1,5 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
@@ -8,11 +7,11 @@ public class Map {
 
     //Return Station if exist in the list
     //else create and return the new Station
-    public Station searchStation(String name){
+    public Station searchStation(String name,Localisation l){
         for(Station s : stations){
-            if ((s.getName()).equals(name)) return s;
+            if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l)) return s;
         }
-        Station newStation = new Station(name);
+        Station newStation = new Station(name,l);
         stations.add(newStation);
         return newStation;
     }
@@ -26,5 +25,22 @@ public class Map {
         Line newLine = new Line(name);
         lines.add(newLine);
         return newLine;
+    }
+
+    //Temporary test function ? 
+    public void display(){
+        System.out.println("-------------------Map's lines------------------- ");
+        for(Line l : lines){
+            System.out.println("Line " + l.getName() + " contains : ");
+            for(Station s : l.getStations()){
+                System.out.println("        - "+ s.getName());
+            }
+            System.out.println();
+        }
+        /*System.out.println("-------------------Map's stations------------------- ");
+        for(Station s : stations){
+            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
+            s.display();
+        }*/
     }
 }

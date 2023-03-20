@@ -8,6 +8,7 @@ import fr.uparis.beryllium.model.*;
 public class Controller {
 
     public static void main(String[] args) {
-       Map m = Parser.readMap("test.csv");
+       Map m = Parser.readMap("map_data.csv");
+       m.display();
     }
 }

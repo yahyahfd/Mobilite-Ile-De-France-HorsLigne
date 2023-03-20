@@ -18,4 +18,9 @@ public class Localisation {
         return longitude;
     }
 
+    //Return if both localisation has same attributes
+    public boolean sameLocalisation(Localisation l){
+        return this.latitude == l.getLatitude() && this.longitude == l.getLongitude();
+    }
+
 }
