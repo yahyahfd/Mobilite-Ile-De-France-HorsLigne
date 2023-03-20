@@ -9,7 +9,7 @@ public class Map {
     //else create and return the new Station
     public Station searchStation(String name,Localisation l){
         for(Station s : stations){
-            if ((s.getName()).equals(name) && s.getLocalisation() == l) return s;
+            if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l)) return s;
         }
         Station newStation = new Station(name,l);
         stations.add(newStation);
