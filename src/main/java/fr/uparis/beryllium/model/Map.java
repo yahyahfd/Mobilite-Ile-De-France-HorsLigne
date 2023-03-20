@@ -1,6 +1,5 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
@@ -10,7 +9,7 @@ public class Map {
     //else create and return the new Station
     public Station searchStation(String name, Double x, Double y){
         for(Station s : stations){
-            if ((s.getName()).equals(name)) return s;
+            if ((s.getName()).equals(name) && s.geLocalisation().getLatitude() == x && s.geLocalisation().getLongitude() == y) return s;
         }
         Station newStation = new Station(name,x,y);
         stations.add(newStation);

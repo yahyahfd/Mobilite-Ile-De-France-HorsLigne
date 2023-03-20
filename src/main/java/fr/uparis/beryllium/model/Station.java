@@ -1,7 +1,5 @@
 package fr.uparis.beryllium.model;
 
-import fr.uparis.beryllium.model.*;
-
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
