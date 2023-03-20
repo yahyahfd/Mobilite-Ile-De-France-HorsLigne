@@ -14,20 +14,20 @@ public class Station {
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */
-    Station(String n, Double x, Double y){
+    Station(String n, Localisation l ){
         name = n;
-        localisation = new Localisation(x, y);
+        localisation = l;
     }
 
     public String getName(){ return name; }
     public Map<Station,ArrayList<NeighborData>> getNextStations(){ return nextStations; }
-    public Localisation geLocalisation() { return localisation; }
+    public Localisation getLocalisation() { return localisation; }
 
     public void addNextStation(Station s, Line l, String[] h, Double dist){
-        Duration d = Duration.ZERO;
-        d = d.plusMinutes(Long.parseLong(h[0]));
-        d = d.plusSeconds(Long.parseLong(h[1]));
-        NeighborData n = new NeighborData(l, d, dist);
+        Duration duration = Duration.ZERO;
+        duration = duration.plusMinutes(Long.parseLong(h[0]));
+        duration = duration.plusSeconds(Long.parseLong(h[1]));
+        NeighborData n = new NeighborData(l, duration, dist);
 
        if(nextStations.containsKey(s)){
             ArrayList<NeighborData> list = nextStations.get(s);
@@ -35,7 +35,7 @@ public class Station {
             //Si oui, on considère que c est le même objet quand ? Quand y a la même ligne, même durée et même dist ? 
             //ou juste même ligne ?
             //Ou alors c'est inutile car cette situation n'arrivera jamais ?
-            if(!NeighborDataIsIn(list, d, l, dist)) list.add(n);
+            if(!NeighborDataIsIn(list, duration, l, dist)) list.add(n);
         }else {
             ArrayList<NeighborData> tmp = new ArrayList<>();
             tmp.add(n);
@@ -44,9 +44,9 @@ public class Station {
     }
 
     //Check if the Neighbor doesn't exist in the list for nextStations
-    public boolean NeighborDataIsIn(ArrayList<NeighborData> list, Duration d, Line l, Double dist){
+    public boolean NeighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist){
         for(NeighborData n : list){
-            if(n.getDuration() == d && n.getDistance() == dist && n.getLine() == l) return true;
+            if(n.getDuration() == duration && n.getDistance() == dist && n.getLine() == l) return true;
         }
         return false;
     }

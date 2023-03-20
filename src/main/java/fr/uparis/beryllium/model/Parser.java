@@ -42,8 +42,8 @@ public class Parser {
                     //Search for the stations and line
                     //If they exist, search function return their object in map's lists
                     //Else, it create a new object, put it in map's lists and return it 
-                    Station stat1 = map.searchStation(s1, Double.parseDouble(gps1[0]),Double.parseDouble(gps1[1]));
-                    Station stat2 = map.searchStation(s2, Double.parseDouble(gps2[0]),Double.parseDouble(gps2[1]));
+                    Station stat1 = map.searchStation(s1, new Localisation(Double.parseDouble(gps1[0]),Double.parseDouble(gps1[1])));
+                    Station stat2 = map.searchStation(s2,new Localisation( Double.parseDouble(gps2[0]),Double.parseDouble(gps2[1])));
                     //Add line with variant in the name
                     Line line = map.searchLine(l[0]+"."+l[2]);
 

@@ -7,11 +7,11 @@ public class Map {
 
     //Return Station if exist in the list
     //else create and return the new Station
-    public Station searchStation(String name, Double x, Double y){
+    public Station searchStation(String name,Localisation l){
         for(Station s : stations){
-            if ((s.getName()).equals(name) && s.geLocalisation().getLatitude() == x && s.geLocalisation().getLongitude() == y) return s;
+            if ((s.getName()).equals(name) && s.getLocalisation() == l) return s;
         }
-        Station newStation = new Station(name,x,y);
+        Station newStation = new Station(name,l);
         stations.add(newStation);
         return newStation;
     }
