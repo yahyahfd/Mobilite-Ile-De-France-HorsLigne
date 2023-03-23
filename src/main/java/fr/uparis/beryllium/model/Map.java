@@ -29,6 +29,10 @@ public class Map {
         return newLine;
     }
 
+    public ArrayList<Station> getAllStations(){
+        return this.stations;
+    }
+    
     /**
      * Method used in terminal mode to get all the stations with <code>name</code> as a name
      * @param name A station's name

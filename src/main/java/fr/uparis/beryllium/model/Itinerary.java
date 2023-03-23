@@ -73,14 +73,14 @@ public class Itinerary {
     		break;
     	}
     	// if dist to s1 is shortest than dist to s2
-    	System.out.println(distToStart.get(s2) +" "+ Double.sum(distToStart.get(s1),weight)+" "+distToStart.get(s1)+ " "+weight);
+    	// System.out.println(distToStart.get(s2) +" "+ Double.sum(distToStart.get(s1),weight)+" "+distToStart.get(s1)+ " "+weight);
     	if(distToStart.get(s2) > Double.sum(distToStart.get(s1),weight)) { 
     		distToStart.put(s2, (Double.sum(distToStart.get(s1),weight)));
     		// we memorize the way : station before s2 is : s1, with the line
     		HashMap<Station, Line> statLine = new HashMap<>();
     		statLine.put(s1,n.getLine());
     		stationBefore.put(s2, statLine);
-    		System.out.println("stat before "+s2.getName()+" "+s1.getName());
+    		// System.out.println("stat before "+s2.getName()+" "+s1.getName());
     	}
     }
 	
@@ -107,11 +107,11 @@ public class Itinerary {
 			// the remaining stations are not reachable
 			if(s1 == null) {
 				allStations.removeAll(allStations);
-				System.out.println("stations not reachable");
+				// System.out.println("stations not reachable");
 			}else {
 				// we remove the station from the list
 				allStations.remove(s1);
-				System.out.println("neibot of "+s1.getName());
+				// System.out.println("neibot of "+s1.getName());
 				Map<Station,ArrayList<NeighborData>> nextStationOfs1 = s1.getNextStations();
 				// for all next stations of s1, we update the distance
 				for(Map.Entry s2 : nextStationOfs1.entrySet()) {
@@ -128,10 +128,10 @@ public class Itinerary {
 						}
 					}
 					if(stayOnline) {
-						System.out.println("neihbor if"+neighbor.getLine().getName()+" "+neighbor.getDistance().toString()+" "+neighbor.getDuration().toString());
+						// System.out.println("neihbor if"+neighbor.getLine().getName()+" "+neighbor.getDistance().toString()+" "+neighbor.getDuration().toString());
 						updateDist(s1, (Station) s2.getKey(), neighbor, preference);
 					}else {
-						System.out.println("neihbor else"+neighbors.get(0).getLine().getName()+" "+neighbors.get(0).getDistance().toString()+" "+neighbors.get(0).getDuration().toString());
+						// System.out.println("neihbor else"+neighbors.get(0).getLine().getName()+" "+neighbors.get(0).getDistance().toString()+" "+neighbors.get(0).getDuration().toString());
 						lineAlreadyUse = neighbors.get(0).getLine();
 						updateDist(s1, (Station) s2.getKey(), neighbors.get(0), preference);
 					}
@@ -161,12 +161,50 @@ public class Itinerary {
 			}
 			// we add the station at the begining of the list
 			shortestPath.put(s,l);
+			// System.out.println("shortest path : "+s.getName()+" "+l.getName());
 			// we follow the path
 			s = before;
 		}
 		// add first station 
 		shortestPath.put(start,null);
+		// System.out.println("shortest path : "+s.getName()+" "+l.getName());
 		return shortestPath;
+	}
+
+	/**
+     * Show the shortest way to go from a station to another
+     * @param res Res of the algorithm
+     * @return a string of the stations and line in order
+     */
+	public String showPath(HashMap<Station, Line> res){
+		ArrayList<Station> stationRes = new ArrayList<>();
+		ArrayList<Line> lineRes = new ArrayList<>();
+		String path = "";
+		if(res == null) {
+			path += "Il n'existe aucun chemin";
+		}else {
+			// pour remettre dans le bon sens si c'est dans le mauvais
+			for(Map.Entry r : res.entrySet()) {
+				// if((Station)r.getKey() != null)
+				// 	System.out.println("print "+((Station)r.getKey()).getName());
+				// if((Line)r.getValue() != null)
+				// 	System.out.println("print "+((Line)r.getValue()).getName());
+				stationRes.add(0,(Station)r.getKey());
+				lineRes.add(0,(Line)r.getValue());
+			}
+			// afficher le chemin du depart jusqu'a dest 
+			int i=0;
+			while(i<stationRes.size()) {
+				if(lineRes.get(i) != null) {
+					path +="  |\n";
+					path +=" "+lineRes.get(i).getName()+"\n";
+					path +="  |\n";
+				}
+				path +=stationRes.get(i).getName()+"\n";
+				i++;
+			}
+		}
+		return path;
 	}
 
 }
