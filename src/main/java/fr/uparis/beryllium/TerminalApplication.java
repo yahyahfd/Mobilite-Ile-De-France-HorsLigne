@@ -26,31 +26,41 @@ public class TerminalApplication {
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
+        Station chosen_1 = null;
+        Station chosen_2 = null;
         while(true){
             System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
             System.out.print("\u001B[32mEnter your first station's name: \u001B[0m");
             String station1 = "";
-            while(station1.isEmpty()){
+            while(station1.isEmpty() || chosen_1 == null){
                 station1 = scanner.nextLine();
                 station1 = station1.trim();
                 if (station1.isEmpty()){
-                    System.out.println("Empty String");
+                    System.out.println("Empty String, try again");
+                }
+                if (station1.trim().equalsIgnoreCase("quit")) break;
+                chosen_1 = multi_choice(station1,m,scanner);
+                if(chosen_1 == null){
+                    System.out.println("Try again!");
                 }
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
-            Station chosen_1 = multi_choice(station1,m,scanner);
             
             System.out.print("\u001B[32mEnter your second station's name: \u001B[0m");
             String station2 = "";
-            while(station2.isEmpty()){
+            while(station2.isEmpty() || chosen_2 == null){
                 station2 = scanner.nextLine();
                 station2 = station2.trim();
                 if (station2.isEmpty()){
                     System.out.println("Empty String");
                 }
+                if (station2.trim().equalsIgnoreCase("quit")) break;
+                chosen_2 = multi_choice(station1,m,scanner);
+                if(chosen_2 == null){
+                    System.out.println("Try again!");
+                }
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
-            Station chosen_2 = multi_choice(station2,m,scanner);
         }
         
         //calculate route below using chosen_1 and chosen_2
