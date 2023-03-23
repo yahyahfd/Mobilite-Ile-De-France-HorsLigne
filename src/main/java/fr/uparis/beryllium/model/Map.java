@@ -1,5 +1,7 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+// import java.text.Normalizer;
 
 public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
@@ -35,7 +37,14 @@ public class Map {
     public ArrayList<Station> getStationsByName(String name){
         ArrayList<Station> result = new ArrayList<Station>();
         for(Station s : stations){
-            if ((s.getName()).equals(name)) result.add(s);
+            // String s1 = Normalizer.normalize(s.getName(), Normalizer.Form.NFD)
+            //             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+            //             .toLowerCase();
+            // String s2 = Normalizer.normalize(name, Normalizer.Form.NFD)
+            //             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+            //             .toLowerCase();
+            // if (s1.equals(s2)) result.add(s);
+            if(StringUtils.stripAccents(s.getName()).equalsIgnoreCase(StringUtils.stripAccents(name))) result.add(s);
         }
         return result;
     }

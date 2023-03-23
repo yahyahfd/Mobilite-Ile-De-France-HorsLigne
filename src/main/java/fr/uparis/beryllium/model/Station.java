@@ -47,6 +47,11 @@ public class Station {
         return false;
     }
 
+    /**
+     * Returns the station's name and localisation.
+     * @return <code>name</code> <code>localisation</code>
+     * @see Localisation
+     */
     public String toString(){
         return name + " " + localisation;
     }
