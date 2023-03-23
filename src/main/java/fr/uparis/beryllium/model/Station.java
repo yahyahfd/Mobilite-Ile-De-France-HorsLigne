@@ -46,4 +46,8 @@ public class Station {
         }
         return false;
     }
+
+    public String toString(){
+        return name + " " + localisation;
+    }
 }

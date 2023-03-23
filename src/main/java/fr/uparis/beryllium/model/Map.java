@@ -28,14 +28,16 @@ public class Map {
     }
 
     /**
-     * Method used in terminal mode to check if a station name corresponds to an existing station
+     * Method used in terminal mode to get all the stations with <code>name</code> as a name
      * @param name A station's name
-     * @return <code>true</code> if the station exists, <code>false</code> otherwise
+     * @return An ArrayList of stations with the corresponding name (can be empty if no stations found)
      */
-    public boolean checkStationExists(String name){
+    public ArrayList<Station> getStationsByName(String name){
+        ArrayList<Station> result = new ArrayList<Station>();
         for(Station s : stations){
-            if ((s.getName()).equals(name)) return true;
+            if ((s.getName()).equals(name)) result.add(s);
         }
-        return false;
+        return result;
     }
+
 }
