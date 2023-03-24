@@ -7,7 +7,6 @@
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
 	<script src="../Leaflet/leaflet.js"></script>
-
 	<script src="../Leaflet/Markercluster/dist/leaflet.markercluster.js"></script>
 	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.css" />
 	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.Default.css" />
@@ -25,65 +24,27 @@
 		</nav>
 	</header>
 	<main>
-		<h2>Rechercher un itinéraire</h2>
-		<form action="#" method="post">
-			<label for="depart">Départ:</label>
-			<input type="text" id="depart" name="depart">
-			<label for="arrivee">Arrivée:</label>
-			<input type="text" id="arrivee" name="arrivee">
-			<input type="submit" value="Rechercher">
-		</form>
-
-		<div>
-			<input type="checkbox" id="toggleMarkers" name="toggleMarkers" checked>
-			<label for="toggleMarkers">Afficher/Cacher les stations</label>
-			<button id="resetZoom">Réinitialiser la carte</button>
+		<div class="left">
+			<h2>Rechercher un itinéraire</h2>
+			<form action="#" method="post">
+				<label for="depart">Départ:</label>
+				<input type="text" id="depart" name="depart" list="depart-list">
+				<datalist id="depart-list"></datalist>
+				<label for="arrivee">Arrivée:</label>
+				<input type="text" id="arrivee" name="arrivee" list="arrivee-list">
+				<datalist id="arrivee-list"></datalist>
+				<input type="submit" value="Rechercher">
+			</form>
+	
+			<div id="hide_reset">
+				<input type="checkbox" id="toggleMarkers" name="toggleMarkers" checked>
+				<label for="toggleMarkers">Afficher/Cacher les stations</label>
+				<button id="resetZoom">Réinitialiser la carte</button>
+			</div>
 		</div>
-
-		<div id="map" style="height: 600px;"></div>
-		<script type="text/javascript">
-			var osm_humanitarian = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-				attribution: '&copy; <a href = "https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-			});
-
-			var map = L.map('map', {
-				layers: [osm_humanitarian]
-			}).setView([48.856614, 2.3522219], 12);
-
-			var markersLayer = L.markerClusterGroup();
-
-
-
-			// GET stations list and adding them to the map (to layergroup then layergroup to map)
-			fetch('http://localhost:8080/stations')
-				.then(response => response.json())
-				.then(data => {
-					data.forEach(station => {
-						var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
-						.bindPopup(station.name);
-						markersLayer.addLayer(marker);
-					});
-					map.addLayer(markersLayer);
-
-				})
-				.catch(error => console.error(error));
-
-			// When we click on checkbox we show/hide stations
-			document.getElementById('toggleMarkers').addEventListener('change', function () {
-				if (this.checked) {
-					map.addLayer(markersLayer);
-				} else {
-					map.removeLayer(markersLayer);
-				}
-			});
-
-			var resetBtn = document.getElementById('resetZoom');
-			// Reset map to initial state
-			resetBtn.addEventListener('click', function() {
-				map.setView([48.856614, 2.3522219], 12);
-			});
-
-		</script>
+		<div class="right" id="map"></div>
+		<script src="map.js"></script>
+		
 	</main>
 	<footer>
 		<p>Route Master &copy; 2023</p>
