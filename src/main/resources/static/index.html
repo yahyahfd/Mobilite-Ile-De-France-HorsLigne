@@ -1,13 +1,18 @@
 <!DOCTYPE html>
 <html lang="fr">
+
 <head>
 	<meta charset="UTF-8">
 	<title>Route Master</title>
 	<link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
-	<script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
+	<script src="../Leaflet/leaflet.js"></script>
 
+	<script src="../Leaflet/Markercluster/dist/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.css" />
+	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.Default.css" />
 </head>
+
 <body>
 	<header>
 		<h1>Route Master</h1>
@@ -28,6 +33,13 @@
 			<input type="text" id="arrivee" name="arrivee">
 			<input type="submit" value="Rechercher">
 		</form>
+
+		<div>
+			<input type="checkbox" id="toggleMarkers" name="toggleMarkers" checked>
+			<label for="toggleMarkers">Afficher/Cacher les stations</label>
+			<button id="resetZoom">Réinitialiser la carte</button>
+		</div>
+
 		<div id="map" style="height: 600px;"></div>
 		<script type="text/javascript">
 			var osm_humanitarian = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
@@ -35,25 +47,47 @@
 			});
 
 			var map = L.map('map', {
-				layers: [osm_humanitarian] //default basemap
+				layers: [osm_humanitarian]
 			}).setView([48.856614, 2.3522219], 12);
 
-			// Récupérez la liste de stations depuis votre API
+			var markersLayer = L.markerClusterGroup();
+
+
+
+			// GET stations list and adding them to the map (to layergroup then layergroup to map)
 			fetch('http://localhost:8080/stations')
 				.then(response => response.json())
 				.then(data => {
-					// Parcourez la liste de stations et ajoutez des marqueurs sur la carte
 					data.forEach(station => {
-						L.marker([station.localisation.latitude, station.localisation.longitude])
-						.addTo(map)
+						var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
 						.bindPopup(station.name);
+						markersLayer.addLayer(marker);
 					});
+					map.addLayer(markersLayer);
+
 				})
 				.catch(error => console.error(error));
+
+			// When we click on checkbox we show/hide stations
+			document.getElementById('toggleMarkers').addEventListener('change', function () {
+				if (this.checked) {
+					map.addLayer(markersLayer);
+				} else {
+					map.removeLayer(markersLayer);
+				}
+			});
+
+			var resetBtn = document.getElementById('resetZoom');
+			// Reset map to initial state
+			resetBtn.addEventListener('click', function() {
+				map.setView([48.856614, 2.3522219], 12);
+			});
+
 		</script>
 	</main>
 	<footer>
 		<p>Route Master &copy; 2023</p>
 	</footer>
 </body>
+
 </html>
