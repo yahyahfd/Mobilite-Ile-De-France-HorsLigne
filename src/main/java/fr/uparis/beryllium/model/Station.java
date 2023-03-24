@@ -5,9 +5,12 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Station {
     private String name;
     private Localisation localisation;
+    @JsonIgnore
     private Map<Station,ArrayList<NeighborData>> nextStations = new HashMap<>();
 
     /**
