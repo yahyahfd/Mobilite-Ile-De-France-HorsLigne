@@ -14,6 +14,20 @@ public class Station {
     private Map<Station,ArrayList<NeighborData>> nextStations = new HashMap<>();
 
     /**
+     * All neighboring lines
+     * @return all lines of current station to reach a neighbor station
+     */
+    public ArrayList<String> getNeighboringLines(){
+        ArrayList<String> result = new ArrayList<>();
+        nextStations.forEach((station, neighborDataList) -> {
+            for(NeighborData nd:neighborDataList){
+                result.add(nd.getLine().getName());
+            }
+        });
+        return result;
+    }
+
+    /**
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */

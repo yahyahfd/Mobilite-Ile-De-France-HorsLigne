@@ -15,13 +15,14 @@ fetch('http://localhost:8080/stations')
     .then(response => response.json())
     .then(data => {
         data.forEach(station => {
+            var lines = station.neighboringLines.join('<br>');
             var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
-                .bindPopup(station.name);
+            .bindPopup(station.name + '<br>' +" Lignes: "  + '<br>' + lines); // Ajouter les lignes voisines au nom de la station
             markersLayer.addLayer(marker);
             
             // Adding station names + localisation to datalist of both inputs
-            departList.push(station.name + " (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
-            arriveeList.push(station.name + " (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
+            departList.push(station.name + " ["+ station.neighboringLines.join('|') + "] (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
+            arriveeList.push(station.name + " ["+ station.neighboringLines.join('|') + "] (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
         });
         map.addLayer(markersLayer);
     })
