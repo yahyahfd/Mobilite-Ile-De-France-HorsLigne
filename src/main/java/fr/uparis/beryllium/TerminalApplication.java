@@ -1,10 +1,13 @@
 package fr.uparis.beryllium;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Scanner;
 
 import fr.uparis.beryllium.model.Map;
 import fr.uparis.beryllium.model.Parser;
 import fr.uparis.beryllium.model.Station;
+
+import fr.uparis.beryllium.model.*;
 /**
  * The Controller is considered the main in our MVC
  */
