@@ -55,7 +55,7 @@ public class TerminalApplication {
                     System.out.println("Empty String");
                 }
                 if (station2.trim().equalsIgnoreCase("quit")) break;
-                chosen_2 = multi_choice(station1,m,scanner);
+                chosen_2 = multi_choice(station2,m,scanner);
                 if(chosen_2 == null){
                     System.out.println("Try again!");
                 }
