@@ -23,4 +23,12 @@ public class Localisation {
         return this.latitude == l.getLatitude() && this.longitude == l.getLongitude();
     }
 
+    /**
+     * Returns latitude and longitude in a localisation
+     * @return (latitude,longitude) of localisation
+     */
+    public String toString(){
+        return "("+latitude+","+longitude+")";
+    }
+
 }

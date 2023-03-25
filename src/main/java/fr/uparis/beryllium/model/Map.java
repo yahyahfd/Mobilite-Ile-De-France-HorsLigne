@@ -1,5 +1,7 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
+import org.apache.commons.lang3.StringUtils;
+// import java.text.Normalizer;
 
 public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
@@ -27,20 +29,24 @@ public class Map {
         return newLine;
     }
 
-    //Temporary test function ? 
-    public void display(){
-        System.out.println("-------------------Map's lines------------------- ");
-        for(Line l : lines){
-            System.out.println("Line " + l.getName() + " contains : ");
-            for(Station s : l.getStations()){
-                System.out.println("        - "+ s.getName());
-            }
-            System.out.println();
-        }
-        /*System.out.println("-------------------Map's stations------------------- ");
+    /**
+     * Method used in terminal mode to get all the stations with <code>name</code> as a name
+     * @param name A station's name
+     * @return An ArrayList of stations with the corresponding name (can be empty if no stations found)
+     */
+    public ArrayList<Station> getStationsByName(String name){
+        ArrayList<Station> result = new ArrayList<Station>();
         for(Station s : stations){
-            System.out.println("Station "+ s.getName() + " and it's neighbours : ");
-            s.display();
-        }*/
+            // String s1 = Normalizer.normalize(s.getName(), Normalizer.Form.NFD)
+            //             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+            //             .toLowerCase();
+            // String s2 = Normalizer.normalize(name, Normalizer.Form.NFD)
+            //             .replaceAll("\\p{InCombiningDiacriticalMarks}+", "")
+            //             .toLowerCase();
+            // if (s1.equals(s2)) result.add(s);
+            if(StringUtils.stripAccents(s.getName()).equalsIgnoreCase(StringUtils.stripAccents(name))) result.add(s);
+        }
+        return result;
     }
+
 }
