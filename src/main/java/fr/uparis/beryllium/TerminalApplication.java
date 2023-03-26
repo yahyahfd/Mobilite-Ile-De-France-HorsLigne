@@ -2,6 +2,7 @@ package fr.uparis.beryllium;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
 import fr.uparis.beryllium.model.Itinerary;
@@ -66,10 +67,7 @@ public class TerminalApplication {
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
             // list of choice of preferences
-            ArrayList<Integer> typePreference = new ArrayList<>();
-            typePreference.add(0);
-            typePreference.add(1);
-            typePreference.add(2);
+            ArrayList typePreference = new ArrayList<>(List.of(0, 1, 2));
             // while the given preference is not right, we ask again
             Integer preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
