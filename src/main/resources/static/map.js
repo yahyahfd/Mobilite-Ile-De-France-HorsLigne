@@ -33,6 +33,7 @@ const departInput = document.getElementById('depart');
 const arriveeInput = document.getElementById('arrivee');
 
 const form = document.querySelector('#itinerary_form');
+const errorMessage = document.getElementById('error_itinerary');
 
 form.addEventListener('submit', function (event) {
     event.preventDefault();
@@ -45,33 +46,40 @@ form.addEventListener('submit', function (event) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            itineraryLayer.clearLayers();
-            var current_station = null;    
-            const latLngs = [];
-            data.forEach(station => {
-                var name = station.name;
-                var latitude = station.localisation.latitude;
-                var longitude = station.localisation.longitude;
-                latLngs.push([latitude, longitude]);
-                var lines = station.neighboringLines.join('<br>');
-                var marker = L.marker([latitude, longitude])
-                    .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
-                if(current_station != null){
-                    var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], {color: 'blue'});
-                    itineraryLayer.addLayer(polyline);
-                }
-                current_station = marker;
-                itineraryLayer.addLayer(marker);
-            });
-            map.removeLayer(markersLayer);
-            map.addLayer(itineraryLayer);
-            map.fitBounds(latLngs);
+            if(data.length == 0){
+                errorMessage.style.display = "block";
+                errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
+            }else{
+                errorMessage.style.display = "none";
+                itineraryLayer.clearLayers();
+                var current_station = null;
+                const latLngs = [];
+                data.forEach(station => {
+                    var name = station.name;
+                    var latitude = station.localisation.latitude;
+                    var longitude = station.localisation.longitude;
+                    latLngs.push([latitude, longitude]);
+                    var lines = station.neighboringLines.join('<br>');
+                    var marker = L.marker([latitude, longitude])
+                        .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
+                    if (current_station != null) {
+                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: 'blue' });
+                        itineraryLayer.addLayer(polyline);
+                    }
+                    current_station = marker;
+                    itineraryLayer.addLayer(marker);
+                });
+                map.removeLayer(markersLayer);
+                map.addLayer(itineraryLayer);
+                map.fitBounds(latLngs);
+            }
         })
-        .catch(error => console.error(error));
-
+        .catch(error => {
+            console.error(error);
+            errorMessage.style.display = "block";
+            errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+        });
 });
-
-
 
 departInput.addEventListener('input', function () {
     const departDatalist = document.getElementById('depart-list');
@@ -109,18 +117,10 @@ arriveeInput.addEventListener('input', function () {
     });
 });
 
-// When we click on checkbox we show/hide stations
-document.getElementById('toggleMarkers').addEventListener('change', function () {
-    if (this.checked) {
-        map.addLayer(markersLayer);
-    } else {
-        map.removeLayer(markersLayer);
-    }
-});
-
 var resetBtn = document.getElementById('resetZoom');
 // Reset map to initial state
 resetBtn.addEventListener('click', function () {
     map.setView([48.856614, 2.3522219], 12);
+    map.removeLayer(itineraryLayer);
+    map.addLayer(markersLayer);
 });
-

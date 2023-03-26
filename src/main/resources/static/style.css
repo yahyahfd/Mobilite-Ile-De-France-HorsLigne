@@ -8,7 +8,8 @@
 
 /* Styles généraux */
 
-html, body {
+html,
+body {
   height: 100%;
   margin: 0;
   padding: 0;
@@ -59,7 +60,7 @@ main {
 
 .left {
   width: 25%;
-  background-color:#696f75;
+  background-color: #696f75;
 }
 
 .right {
@@ -68,7 +69,8 @@ main {
 }
 
 
-h1, h2 {
+h1,
+h2 {
   text-align: center;
   margin: 10px;
 }
@@ -86,10 +88,13 @@ label {
   font-size: 1.2rem;
 }
 
-#map{
+#map {
   position: sticky;
 }
-input[type="text"], input[type="submit"], #resetZoom {
+
+input[type="text"],
+input[type="submit"],
+#resetZoom {
   padding: 10px;
   font-size: 1.2rem;
   border: none;
@@ -97,13 +102,24 @@ input[type="text"], input[type="submit"], #resetZoom {
   margin: 5px;
 }
 
-input[type="submit"], #resetZoom{
+input[type="submit"],
+#resetZoom {
   background-color: #333;
   color: #fff;
   cursor: pointer;
 }
 
-#hide_reset{
+#reset {
   justify-content: stretch;
   display: grid;
+}
+
+#error_itinerary {
+  display: none;
+  color: #333;
+  text-align: center;
+  font-weight: bold;
+  padding: 10px;
+  background-color: #ef9541;
+  margin: 10px;
 }

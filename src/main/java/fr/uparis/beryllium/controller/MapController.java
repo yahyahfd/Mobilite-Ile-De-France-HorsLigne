@@ -1,5 +1,7 @@
 package fr.uparis.beryllium.controller;
 
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -32,9 +34,19 @@ public class MapController {
     Map m = Parser.readMap("map_data.csv");
     Itinerary i = new Itinerary(m.getAllStations());
     // Convertir les valeurs des champs de saisie en instances de Station
-    Station start = m.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
-    Station dest = m.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
-    return i.getPathStations(i.shortestWay(start, dest, 0));
+    try {
+      Station start = m.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
+      Station dest = m.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
+      HashMap<Station,Line> res = i.shortestWay(start, dest, 0);
+      if(res == null){
+        return new ArrayList<>();
+      }else{
+        return i.getPathStations(res);
+      }
+      
+    } catch (Exception e) {
+      return null;
+    }
   }
 
   private static String getName(String s) {
