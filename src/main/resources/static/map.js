@@ -18,7 +18,7 @@ fetch('http://localhost:8080/stations')
         data.forEach(station => {
             var lines = station.neighboringLines.join('<br>');
             var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
-                .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); // Ajouter les lignes voisines au nom de la station
+                .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
             markersLayer.addLayer(marker);
 
             // Adding station names + localisation to datalist of both inputs
@@ -81,41 +81,28 @@ form.addEventListener('submit', function (event) {
         });
 });
 
-departInput.addEventListener('input', function () {
-    const departDatalist = document.getElementById('depart-list');
-    departDatalist.innerHTML = '';
-    const departValue = this.value;
+function autoComplete(inputElement, datalistElement, optionsList){
+    inputElement.addEventListener('input', function(){
+        datalistElement.innerHTML = '';
+        const inputValue = this.value;
+        // Filtering names in input each time user presses key (accents not handled like terminal mode)
+        const suggestions = optionsList.filter(function (option){
+            return option.toLowerCase().startsWith(inputValue.toLowerCase());
+        });
 
-    // Filtering names in input each time user presses key (accents not handled like terminal mode)
-    const departSuggestions = departList.filter(function (station) {
-        return station.toLowerCase().startsWith(departValue.toLowerCase());
-    });
+        // Adding suggestions to datalist
+        suggestions.forEach(function (suggestion) {
+            const option = document.createElement('option');
+            option.value = suggestion;
+            datalistElement.appendChild(option);
+        });
+    })
+}
 
-    // Adding suggestions to datalist
-    departSuggestions.forEach(function (suggestion) {
-        const option = document.createElement('option');
-        option.value = suggestion;
-        departDatalist.appendChild(option);
-    });
-});
-
-arriveeInput.addEventListener('input', function () {
-    const arriveeDatalist = document.getElementById('arrivee-list');
-    arriveeDatalist.innerHTML = '';
-    const arriveeValue = this.value;
-
-    // Filtre les noms de station en fonction de la saisie utilisateur pour l'arrivée
-    const arriveeSuggestions = arriveeList.filter(function (station) {
-        return station.toLowerCase().startsWith(arriveeValue.toLowerCase());
-    });
-
-    // Ajouter les suggestions à la datalist pour l'arrivée
-    arriveeSuggestions.forEach(function (suggestion) {
-        const option = document.createElement('option');
-        option.value = suggestion;
-        arriveeDatalist.appendChild(option);
-    });
-});
+const departDatalist = document.getElementById('depart-list');
+autoComplete(departInput, departDatalist, departList);
+const arriveeDatalist = document.getElementById('arrivee-list');
+autoComplete(arriveeInput, arriveeDatalist, arriveeList);
 
 var resetBtn = document.getElementById('resetZoom');
 // Reset map to initial state

@@ -1,6 +1,5 @@
 package fr.uparis.beryllium.controller;
 
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -33,31 +32,34 @@ public class MapController {
   public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee) {
     Map m = Parser.readMap("map_data.csv");
     Itinerary i = new Itinerary(m.getAllStations());
-    // Convertir les valeurs des champs de saisie en instances de Station
     try {
       Station start = m.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
       Station dest = m.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
       HashMap<Station,Line> res = i.shortestWay(start, dest, 0);
-      if(res == null){
-        return new ArrayList<>();
-      }else{
-        return i.getPathStations(res);
-      }
-      
+      return i.getPathStations(res);
     } catch (Exception e) {
       return null;
     }
   }
 
+  /**
+   * Parsing method to get the name out of depart or arrivee in shortestWay method
+   */
   private static String getName(String s) {
     return s.substring(0, s.indexOf(" ["));
   }
 
+  /**
+   * Parsing method to get the X coordinate out of depart or arrivee in shortestWay method
+   */
   private static Double getX(String s) {
     String coordonnees = s.substring(s.indexOf("(") + 1, s.indexOf(","));
     return Double.parseDouble(coordonnees);
   }
 
+  /**
+   * Parsing method to get the Y coordinate out of depart or arrivee in shortestWay method
+   */
   private static Double getY(String s) {
     String coordonnees = s.substring(s.indexOf(",") + 1, s.indexOf(")"));
     return Double.parseDouble(coordonnees);
