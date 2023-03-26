@@ -207,4 +207,12 @@ public class Itinerary {
 		return path;
 	}
 
+	public ArrayList<Station> getPathStations(HashMap<Station, Line> res){
+		ArrayList<Station> stationRes = new ArrayList<>();
+		for(Map.Entry r : res.entrySet()) {
+			stationRes.add(0,(Station)r.getKey());
+		}
+		return stationRes;
+	}
+
 }

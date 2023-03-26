@@ -2,6 +2,8 @@ package fr.uparis.beryllium.model;
 
 import java.util.ArrayList;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Line {
 
     private String lineName;
@@ -22,8 +24,9 @@ public class Line {
     public void addStation(Station s){
         if(!isIn(s.getName())) stations.add(s);
     }
-
+    
     public String getName(){ return lineName; }
+    @JsonIgnore
     public ArrayList<Station> getStations(){ return stations; }
 }
 

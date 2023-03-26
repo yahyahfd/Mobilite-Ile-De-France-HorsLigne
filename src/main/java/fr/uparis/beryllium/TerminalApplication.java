@@ -10,6 +10,7 @@ import fr.uparis.beryllium.model.Line;
 import fr.uparis.beryllium.model.Map;
 import fr.uparis.beryllium.model.Parser;
 import fr.uparis.beryllium.model.Station;
+
 /**
  * The Controller is considered the main in our MVC
  */

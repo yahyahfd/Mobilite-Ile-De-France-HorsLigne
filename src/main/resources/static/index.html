@@ -26,12 +26,12 @@
 	<main>
 		<div class="left">
 			<h2>Rechercher un itinéraire</h2>
-			<form action="#" method="post">
+			<form id= "itinerary_form" action="#" method="post" autocomplete="off">
 				<label for="depart">Départ:</label>
-				<input type="text" id="depart" name="depart" list="depart-list">
+				<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
 				<datalist id="depart-list"></datalist>
 				<label for="arrivee">Arrivée:</label>
-				<input type="text" id="arrivee" name="arrivee" list="arrivee-list">
+				<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
 				<datalist id="arrivee-list"></datalist>
 				<input type="submit" value="Rechercher">
 			</form>
