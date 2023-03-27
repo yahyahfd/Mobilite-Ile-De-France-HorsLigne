@@ -5,10 +5,27 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public class Station {
     private String name;
     private Localisation localisation;
+    @JsonIgnore
     private Map<Station,ArrayList<NeighborData>> nextStations = new HashMap<>();
+
+    /**
+     * All neighboring lines
+     * @return all lines of current station to reach a neighbor station
+     */
+    public ArrayList<String> getNeighboringLines(){
+        ArrayList<String> result = new ArrayList<>();
+        nextStations.forEach((station, neighborDataList) -> {
+            for(NeighborData nd:neighborDataList){
+                result.add(nd.getLine().getName());
+            }
+        });
+        return result;
+    }
 
     /**
      * Neighboring stations or stations reached 
@@ -47,12 +64,12 @@ public class Station {
         return false;
     }
 
-    /**
-     * Returns the station's name and localisation.
-     * @return <code>name</code> <code>localisation</code>
-     * @see Localisation
-     */
-    public String toString(){
-        return name + " " + localisation;
-    }
+    // /**
+    //  * Returns the station's name and localisation.
+    //  * @return <code>name</code> <code>localisation</code>
+    //  * @see Localisation
+    //  */
+    // public String toString(){
+    //     return name + " " + localisation;
+    // }
 }

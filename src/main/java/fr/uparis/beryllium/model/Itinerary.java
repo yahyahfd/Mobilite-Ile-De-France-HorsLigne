@@ -207,4 +207,16 @@ public class Itinerary {
 		return path;
 	}
 
+	/**
+	 * This method is used to return an ordered list of all stations in a path
+	 * @param res HashMap of the path calculated by shortestWay Method
+	 * @return An ordred list of stations in the path (can be empty)
+	 */
+	public ArrayList<Station> getPathStations(HashMap<Station, Line> res){
+		if(res == null){
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(res.keySet());
+	}
+
 }

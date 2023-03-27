@@ -7,6 +7,10 @@ public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
     private ArrayList<Station> stations = new ArrayList<>();
 
+    public ArrayList<Station> getStations(){
+        return stations;
+    }
+    
     //Return Station if exist in the list
     //else create and return the new Station
     public Station searchStation(String name,Localisation l){
