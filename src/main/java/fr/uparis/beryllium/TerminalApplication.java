@@ -1,8 +1,12 @@
 package fr.uparis.beryllium;
 
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Scanner;
 
+import fr.uparis.beryllium.model.Itinerary;
+import fr.uparis.beryllium.model.Line;
 import fr.uparis.beryllium.model.Map;
 import fr.uparis.beryllium.model.Parser;
 import fr.uparis.beryllium.model.Station;
@@ -62,6 +66,37 @@ public class TerminalApplication {
                 }
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
+            // list of choice of preferences
+            ArrayList typePreference = new ArrayList<>(List.of(0, 1, 2));
+            // while the given preference is not right, we ask again
+            Integer preference = -1;
+            while(preference < 0 || !typePreference.contains(preference)){
+                // how do they want to travel
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitaire) : \u001B[0m");
+                try{
+                    // we convert string to int
+                    preference = Integer.parseInt(scanner.nextLine());
+                }catch(NumberFormatException e){
+                    System.out.println("Veuillez renseigner un entier");
+                }
+            }
+            // remplacer par les stations passées en parametre !! 
+            Station start = m.getAllStations().get(1);
+            Station dest = m.getAllStations().get(40);
+            // instanciate itinerary with all stations of the map
+            Itinerary i = new Itinerary(m.getAllStations());
+            // get the shortest way depending on the preference
+            HashMap<Station, Line> route = i.shortestWay(start, dest, 0);
+            // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
+            // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
+            // We add the method (the algorithm) to look for the path
+            if(route == null){
+                System.out.println("Looks like there is no route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m");
+            }
+            else{
+                System.out.println("Route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m :\n");
+                System.out.println(i.showPath(route));
+            }
         }
         
         //calculate route below using chosen_1 and chosen_2
