@@ -1,10 +1,36 @@
-var osm_humanitarian = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
+var osm_online = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
     attribution: '&copy; <a href = "https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
 });
 
+// var osm_toner = L.tileLayer('Toner/{z}/{x}/{y}.png', {
+//     attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+// });
+
+// var osm_terrain = L.tileLayer('Terrain/{z}/{x}/{y}.png', {
+//     attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
+// });
+
+// var bounds = L.latLngBounds([[48.3, 1.5], [49.2, 3.5]]);
+
 var map = L.map('map', {
-    layers: [osm_humanitarian]
+    layers: [osm_online],
+    // maxBounds: bounds
 }).setView([48.856614, 2.3522219], 12);
+// map.setMaxZoom(15);
+// map.setMinZoom(10);
+
+map.on('zoomend', function () {
+    var currentZoom = map.getZoom();
+    console.log('Niveau de zoom actuel : ' + currentZoom);
+    // Mettez à jour votre interface utilisateur avec le niveau de zoom actuel ici
+});
+
+// var baseMaps = {
+//     "OSM Online": osm_online,
+//     "OSM Toner": osm_toner,
+//     "OSM Terrain": osm_terrain
+// };
+// var layerControl = L.control.layers(baseMaps).addTo(map);
 
 var markersLayer = L.markerClusterGroup();
 var itineraryLayer = L.layerGroup();
@@ -46,10 +72,10 @@ form.addEventListener('submit', function (event) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            if(data.length == 0){
+            if (data.length == 0) {
                 errorMessage.style.display = "block";
                 errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
-            }else{
+            } else {
                 errorMessage.style.display = "none";
                 itineraryLayer.clearLayers();
                 var current_station = null;
@@ -81,12 +107,12 @@ form.addEventListener('submit', function (event) {
         });
 });
 
-function autoComplete(inputElement, datalistElement, optionsList){
-    inputElement.addEventListener('input', function(){
+function autoComplete(inputElement, datalistElement, optionsList) {
+    inputElement.addEventListener('input', function () {
         datalistElement.innerHTML = '';
         const inputValue = this.value;
         // Filtering names in input each time user presses key (accents not handled like terminal mode)
-        const suggestions = optionsList.filter(function (option){
+        const suggestions = optionsList.filter(function (option) {
             return option.toLowerCase().startsWith(inputValue.toLowerCase());
         });
 
