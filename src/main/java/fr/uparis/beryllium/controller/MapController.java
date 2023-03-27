@@ -5,6 +5,7 @@ import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.model.*;
 
 @RestController
@@ -16,7 +17,7 @@ public class MapController {
    * @return a list of all stations
    */
   @GetMapping("/stations")
-  public List<Station> getStations() {
+  public List<Station> getStations() throws FormatException {
     Map m = Parser.readMap("map_data.csv");
     List<Station> stations = m.getStations();
 
@@ -29,7 +30,7 @@ public class MapController {
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee) {
+  public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
     Itinerary i = new Itinerary(m.getAllStations());
     try {
