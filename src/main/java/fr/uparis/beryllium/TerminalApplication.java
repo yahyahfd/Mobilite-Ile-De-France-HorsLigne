@@ -86,21 +86,18 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
-            // remplacer par les stations passées en parametre !! 
-            Station start = m.getAllStations().get(1);
-            Station dest = m.getAllStations().get(40);
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
             // get the shortest way depending on the preference
-            HashMap<Station, Line> route = i.shortestWay(start, dest, 0);
+            HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, 0);
             // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
             // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
             // We add the method (the algorithm) to look for the path
             if(route == null){
-                System.out.println("Looks like there is no route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m");
+                System.out.println("Looks like there is no route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m");
             }
             else{
-                System.out.println("Route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m :\n");
+                System.out.println("Route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m :\n");
                 System.out.println(i.showPath(route));
             }
         }
