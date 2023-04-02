@@ -22,7 +22,7 @@ public class Line {
         return lineName.split("\\.")[0];
     }
 
-    //Like contains method for ArrayList but with String intead of Object
+    //Like contains method for ArrayList but with String instead of Object
     private boolean isIn(String name) {
         for (Station station : stations.keySet()) {
             if (station.getName().equals(name)) {

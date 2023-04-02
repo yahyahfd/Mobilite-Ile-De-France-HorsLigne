@@ -10,6 +10,7 @@ import java.util.LinkedHashMap;
 import java.util.Map;
 
 public class Itinerary {
+
 	// all stations of the map
 	ArrayList<Station> stations;
 	// remember the way, witch station is link to the other one
@@ -39,9 +40,9 @@ public class Itinerary {
 		MutablePair<Double, Double> mp = new MutablePair<Double, Double>(0.0, 0.0);
 		distTimeToStart.put(start, mp);
 	}
-    
+
     /**
-     * Search in all stations not visited the nearest station from the start 
+     * Search in all stations not visited the nearest station from the start
      * @param notVisited
      * @return the nearest station to starting point
      */
@@ -169,7 +170,7 @@ public class Itinerary {
 		init(start);
 		// all stations of the map
 		ArrayList<Station> allStations = new ArrayList<>(stations);
-		Station s1 = null;
+		Station s1;
 		Line lineAlreadyUse = null;
 		boolean stayOnline = false;
 		// while allstation is not empty
@@ -195,25 +196,28 @@ public class Itinerary {
 				}
 			}
 		}
+		return getShortestPath(start, dest);
+	}
 
+	private HashMap<Station, Line> getShortestPath(Station start, Station dest) {
 		// linkedHashmap to preserve the order of insertion
 		HashMap<Station, Line> shortestPath = new LinkedHashMap<>();
 		Station s = dest;
 		Line l = null;
 		Station before = null;
 		// we save the path from dest to start
-		while(s != start) {
-			if(s == null) {
+		while (s != start) {
+			if (s == null) {
 				return null;
 			}
 			// for each station, we get the station before and the line between the stations
-			for(Map.Entry sb : stationBefore.entrySet()) {
-				if(( (Station) sb.getKey() ) == s) {
-					HashMap<Station, Line> statL = new HashMap<>();
-					statL = (HashMap<Station, Line>) sb.getValue();
-					for(Map.Entry sl: statL.entrySet()) {
-						l = (Line) sl.getValue();
-						before = (Station) sl.getKey();
+			for (Map.Entry<Station, HashMap<Station, Line>> sb : stationBefore.entrySet()) {
+				if ((sb.getKey()) == s) {
+					HashMap<Station, Line> statL;
+					statL = sb.getValue();
+					for (Map.Entry<Station, Line> sl : statL.entrySet()) {
+						l = sl.getValue();
+						before = sl.getKey();
 					}
 				}
 			}
@@ -288,7 +292,7 @@ public class Itinerary {
 				i++;
 			}
 		}
-		return path.toString();
+		return path;
 	}
 
 	/**

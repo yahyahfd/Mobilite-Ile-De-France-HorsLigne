@@ -120,4 +120,5 @@ public class Parser {
             s.addNextStation(station, walkingLine, time, distanceAndTime[0]);
         }
     }
+
 }

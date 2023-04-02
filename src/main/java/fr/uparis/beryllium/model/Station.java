@@ -4,6 +4,7 @@ import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -94,8 +95,16 @@ public class Station {
         }
     }
 
-    //Check if the Neighbor doesn't exist in the list for nextStations
-    public boolean NeighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
+    /**
+     * Check if the Neighbor exist in the list for nextStations
+     *
+     * @param list     the list of the neighbors
+     * @param duration the duration between 2 stations
+     * @param l        the line used between 2 stations
+     * @param dist     the distance between 2 stations
+     * @return true if the neighbor already exist in the list of nextStations
+     */
+    public boolean neighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
         for (NeighborData n : list) {
             if (n.getDuration().equals(duration) && n.getDistance().equals(dist) && n.getLine() == l) return true;
         }
@@ -103,11 +112,28 @@ public class Station {
     }
 
     /**
-     * TODO explication de fonction
+     * Add all the walking neighbors
+     *
+     * @param walkingLine the walking line
+     * @param allStations the list of all existing stations
+     */
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations) {
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, 1) && !s.equals(this)).toList();
+        for (Station s : reacheable1kmStations) {
+            double distance = s.getDistanceToAStation(this);
+            double time = s.getWalkingTimeInSecondsFromADistance(distance);
+            String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
+            this.addNextStation(s, walkingLine, stringTime, distance);
+            s.addNextStation(this, walkingLine, stringTime, distance);
+        }
+    }
+
+    /**
+     * Check if the station is in the radius we wanted
      *
      * @param reachable the station we wanted to reach
-     * @param radius    the radius we wanted to be in
-     * @return a boolean that determines if the station is radius km away or less
+     * @param radius    the radius we wanted to be in (in km)
+     * @return a boolean that determines if the station is in the radius away or less
      */
     public boolean isWithinARadius(Station reachable, int radius) {
         double distance = getDistanceToAStation(reachable);
@@ -116,7 +142,6 @@ public class Station {
 
     /**
      * Calculate the distance to the other station
-     *
      * @param station the station we wanted to reach
      * @return the distance between our station and the other station in km
      */
@@ -133,23 +158,7 @@ public class Station {
     }
 
     /**
-     * TODO explication de fonction
-     *
-     * @param station
-     * @return
-     */
-    public double[] getDistanceAndTimeFromAStation(Station station) {
-        double[] data = new double[2];
-        double distance = getDistanceToAStation(station);
-
-        data[0] = distance;
-        data[1] = getWalkingTimeInSecondsFromADistance(distance);
-        return data;
-    }
-
-    /**
      * Calculate the time it takes to cover a distance
-     *
      * @param distance the distance between 2 stations in km
      * @return the time it takes to cover the distance
      */
@@ -166,7 +175,6 @@ public class Station {
     //  * @see Localisation
     //  */
      public String toString(){
-         return getName();
+         return name;
      }
 }
-

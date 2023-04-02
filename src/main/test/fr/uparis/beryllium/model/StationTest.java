@@ -2,6 +2,9 @@ package fr.uparis.beryllium.model;
 
 import org.junit.jupiter.api.Test;
 
+import java.util.ArrayList;
+import java.util.List;
+
 class StationTest {
 
     @Test
@@ -28,4 +31,25 @@ class StationTest {
         // Assert
         assert (!result);
     }
+
+    @Test
+    void addWalkingNeighbours() {
+        // Given
+        Line walkingLine = new Line("--MARCHE--");
+        Station station1 = new Station("République", new Localisation(48.86742161002706, 2.363149406900382));
+        Station voisin1 = new Station("Filles du Calvaire", new Localisation(48.8630698834507, 2.366745297742701));
+        Station voisin2 = new Station("Saint-Sébastien - Froissart", new Localisation(48.8609681457564, 2.3672615397172687));
+        Station voisin3 = new Station("République", new Localisation(48.86748513277203, 2.3632563242479026));
+        ArrayList<Station> liste = new ArrayList<>(List.of(voisin1, voisin2, voisin3));
+
+        // When
+        station1.addWalkingNeighbours(walkingLine, liste);
+
+        // Assert
+        assert (station1.getNextStations().keySet().containsAll(liste));
+        assert (station1.getNextStations().get(voisin1).get(0).getLine().equals(walkingLine));
+        assert (station1.getNextStations().get(voisin2).get(0).getLine().equals(walkingLine));
+        assert (station1.getNextStations().get(voisin3).get(0).getLine().equals(walkingLine));
+    }
+
 }
