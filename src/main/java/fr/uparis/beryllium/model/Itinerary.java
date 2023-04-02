@@ -24,7 +24,7 @@ public class Itinerary {
 	public HashMap<Station, MutablePair<Double,Double>> getDistTime(){
 		return distTimeToStart;
 	}
-    
+
     /**
      * Initialize the graph of the distance and time between a station and the starting point
      * @param start Station from where we start
@@ -168,11 +168,10 @@ public class Itinerary {
 		// initialize the map
 		init(start);
 		// all stations of the map
-		ArrayList<Station> allStations = new ArrayList<>();
-		allStations.addAll(stations);
+		ArrayList<Station> allStations = new ArrayList<>(stations);
 		Station s1 = null;
 		Line lineAlreadyUse = null;
-		Boolean stayOnline = false;
+		boolean stayOnline = false;
 		// while allstation is not empty
 		while(allStations.size() > 0) {
 			// we get the min of all stations
@@ -186,7 +185,7 @@ public class Itinerary {
 				Map<Station,ArrayList<NeighborData>> nextStationOfs1 = s1.getNextStations();
 				// for all next stations of s1, we update the distance
 				for(Map.Entry s2 : nextStationOfs1.entrySet()) {
-					// we get all informations of the neighbors
+					// we get all information of the neighbors
 					ArrayList<NeighborData> neighbors = (ArrayList<NeighborData>) s2.getValue();
 					NeighborData neighbor = null;
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
@@ -196,6 +195,7 @@ public class Itinerary {
 				}
 			}
 		}
+
 		// linkedHashmap to preserve the order of insertion
 		HashMap<Station, Line> shortestPath = new LinkedHashMap<>();
 		Station s = dest;

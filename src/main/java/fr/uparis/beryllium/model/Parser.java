@@ -1,17 +1,17 @@
 package fr.uparis.beryllium.model;
 
+import fr.uparis.beryllium.exceptions.FormatException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import fr.uparis.beryllium.exceptions.FormatException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
+import java.util.List;
 
 public class Parser {
 
@@ -21,8 +21,8 @@ public class Parser {
      * Static method that is used to parse a file containing
      * the network data (CSV file)
      *
-     * @param file String of the path to the file
-     * @return A map of the network described by 
+     * @param csvFile String of the path to the file
+     * @return A map of the network described by
      * @throws FormatException if the appropriate format isn't respected
      */
     public static Map readMap(String csvFile) throws FormatException {
@@ -79,7 +79,10 @@ public class Parser {
         line.addStation(stat2, secondStationLocalisation);
 
         // Add neighbours
+        Line walkingLine = new Line("--MARCHE--");
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));
+        addWalkingNeighbours(map, walkingLine, stat1);
+        addWalkingNeighbours(map, walkingLine, stat2);
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
@@ -105,6 +108,16 @@ public class Parser {
             if (record.size() != format.getHeader().length) {
                 throw new FormatException("The file is not in the correct format");
             }
+        }
+    }
+
+    private static void addWalkingNeighbours(Map map, Line walkingLine, Station station) {
+        List<Station> reacheable1kmStations = map.getAllStations().stream().filter(s -> s.isWithinARadius(station, 1) && !s.equals(station)).toList();
+        for (Station s : reacheable1kmStations) {
+            double[] distanceAndTime = s.getDistanceAndTimeFromAStation(station);
+            String[] time = {"0", String.valueOf(distanceAndTime[1]).split("\\.")[0]};
+            station.addNextStation(s, walkingLine, time, distanceAndTime[0]);
+            s.addNextStation(station, walkingLine, time, distanceAndTime[0]);
         }
     }
 }

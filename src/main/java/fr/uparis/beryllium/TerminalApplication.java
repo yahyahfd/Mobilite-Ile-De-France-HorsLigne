@@ -54,12 +54,12 @@ public class TerminalApplication {
             while(station2.isEmpty() || chosen_2 == null){
                 station2 = scanner.nextLine();
                 station2 = station2.trim();
-                if (station2.isEmpty()){
+                if (station2.isEmpty()) {
                     System.out.println("Empty String");
                 }
                 if (station2.trim().equalsIgnoreCase("quit")) break;
-                chosen_2 = multi_choice(station2,m,scanner);
-                if(chosen_2 == null){
+                chosen_2 = multi_choice(station2, m, scanner);
+                if (chosen_2 == null) {
                     System.out.println("Try again!");
                 }
             }
