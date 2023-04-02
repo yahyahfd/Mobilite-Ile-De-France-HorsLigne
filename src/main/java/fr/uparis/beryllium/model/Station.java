@@ -31,35 +31,51 @@ public class Station {
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */
-    Station(String n, Localisation l ){
+    Station(String n, Localisation l) {
         name = n;
         localisation = l;
     }
 
-    public String getName(){ return name; }
-    public Map<Station,ArrayList<NeighborData>> getNextStations(){ return nextStations; }
-    public Localisation getLocalisation() { return localisation; }
+    public String getName() {
+        return name;
+    }
 
-    public void addNextStation(Station s, Line l, String[] h, Double dist){
+    public Map<Station, ArrayList<NeighborData>> getNextStations() {
+        return nextStations;
+    }
+
+    public Localisation getLocalisation() {
+        return localisation;
+    }
+
+    public void addNextStation(Station station, Line line, String[] durationArray, Double distance) {
         Duration duration = Duration.ZERO;
-        duration = duration.plusMinutes(Long.parseLong(h[0]));
-        duration = duration.plusSeconds(Long.parseLong(h[1]));
-        NeighborData n = new NeighborData(l, duration, dist);
+        duration = duration.plusMinutes(Long.parseLong(durationArray[0]));
+        duration = duration.plusSeconds(Long.parseLong(durationArray[1]));
+        NeighborData n = new NeighborData(line, duration, distance);
 
-       if(nextStations.containsKey(s)){
-            ArrayList<NeighborData> list = nextStations.get(s);
-            if(!NeighborDataIsIn(list, duration, l, dist)) list.add(n);
-        }else {
+        if (nextStations.containsKey(station)) {
+            ArrayList<NeighborData> neighborDataArrayList = nextStations.get(station);
+            //est ce que je vérifie si le neigborData est déjà dans la liste ou pas ?
+            //Si oui, on considère que c est le même objet quand ? Quand y a la même ligne, même durée et même dist ?
+            //ou juste même ligne ?
+            //Ou alors c'est inutile car cette situation n'arrivera jamais ?
+            if (!neighborDataIsIn(neighborDataArrayList, duration, line, distance)) {
+                neighborDataArrayList.add(n);
+            }
+        } else {
             ArrayList<NeighborData> tmp = new ArrayList<>();
             tmp.add(n);
-            nextStations.put(s,tmp );
+            nextStations.put(station, tmp);
         }
     }
 
     //Check if the Neighbor doesn't exist in the list for nextStations
-    public boolean NeighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist){
-        for(NeighborData n : list){
-            if(n.getDuration() == duration && n.getDistance() == dist && n.getLine() == l) return true;
+    public boolean neighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
+        for (NeighborData n : list) {
+            if (n.getDuration() == duration && n.getDistance() == dist && n.getLine() == l) {
+                return true;
+            }
         }
         return false;
     }

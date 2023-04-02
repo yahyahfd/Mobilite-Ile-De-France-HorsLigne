@@ -5,6 +5,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
 
+import fr.uparis.beryllium.exceptions.FormatException;
+import fr.uparis.beryllium.model.Map;
+import fr.uparis.beryllium.model.Parser;
+
+
 import fr.uparis.beryllium.model.Itinerary;
 import fr.uparis.beryllium.model.Line;
 import fr.uparis.beryllium.model.Map;
@@ -25,8 +30,8 @@ public class TerminalApplication {
      * Cyan: "\u001B[36m"
      * Color resetting at the end of each string: "\u001B[0m"
      */
-    public static void main(String[] args) {
-        //We parse the map
+    public static void main(String[] args) throws FormatException {
+        //we parse the map
         Map m = Parser.readMap("map_data.csv");
 
         Scanner scanner  = new Scanner(System.in);

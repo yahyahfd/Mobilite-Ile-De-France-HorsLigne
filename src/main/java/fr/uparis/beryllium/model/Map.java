@@ -7,26 +7,30 @@ public class Map {
     private ArrayList<Line> lines = new ArrayList<>();
     private ArrayList<Station> stations = new ArrayList<>();
 
-    public ArrayList<Station> getStations(){
+    public ArrayList<Line> getLines() {
+        return lines;
+    }
+
+    public ArrayList<Station> getStations() {
         return stations;
     }
-    
+
     //Return Station if exist in the list
     //else create and return the new Station
-    public Station searchStation(String name,Localisation l){
-        for(Station s : stations){
+    public Station searchStation(String name, Localisation l) {
+        for (Station s : stations) {
             if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l)) return s;
         }
-        Station newStation = new Station(name,l);
+        Station newStation = new Station(name, l);
         stations.add(newStation);
         return newStation;
     }
     
     //Return Line if exist
     //else create and return new Line
-    public Line searchLine(String name){
-        for(Line l : lines){
-            if((l.getName()).equals(name)) return l;
+    public Line searchLine(String name) {
+        for (Line l : lines) {
+            if ((l.getName()).equals(name)) return l;
         }
         Line newLine = new Line(name);
         lines.add(newLine);
@@ -36,7 +40,7 @@ public class Map {
     public ArrayList<Station> getAllStations(){
         return this.stations;
     }
-    
+
     /**
      * Method used in terminal mode to get all the stations with <code>name</code> as a name
      * @param name A station's name
@@ -56,5 +60,4 @@ public class Map {
         }
         return result;
     }
-
 }
