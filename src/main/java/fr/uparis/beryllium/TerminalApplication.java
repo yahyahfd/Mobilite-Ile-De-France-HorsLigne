@@ -67,14 +67,14 @@ public class TerminalApplication {
             // list of choice of preferences
             ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
             // while the given preference is not right, we ask again
-            Integer preference = -1;
+            int preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
                 System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());
-                }catch(NumberFormatException e){
+                } catch (NumberFormatException e) {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
