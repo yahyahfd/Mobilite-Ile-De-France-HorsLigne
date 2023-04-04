@@ -5,19 +5,21 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 
+import org.apache.commons.lang3.tuple.MutablePair;
+
 public class Itinerary {
 	// all stations of the map
 	ArrayList<Station> stations;
 	// remember the way, witch station is link to the other one
     HashMap<Station, HashMap<Station, Line>> stationBefore = new HashMap<Station, HashMap<Station,Line>> ();
  	// distance ans time between a station and the starting point
-    HashMap<Station, HashMap<Double,Double>> distTimeToStart = new HashMap<>();
+    HashMap<Station, MutablePair<Double,Double>> distTimeToStart = new HashMap<>();
     
     public Itinerary(ArrayList<Station> stations) {
     	this.stations = stations;
     }
 
-	public HashMap<Station, HashMap<Double,Double>> getDistTime(){
+	public HashMap<Station, MutablePair<Double,Double>> getDistTime(){
 		return distTimeToStart;
 	}
     
@@ -26,16 +28,14 @@ public class Itinerary {
      * @param start Station from where we start
      */
     public void init(Station start) {
-		HashMap<Double,Double> distTime = new HashMap<>();
-		HashMap<Double,Double> distTimeStart = new HashMap<>();
     	// for each station, initialize dist and time to infinite
     	for(Station s : stations) {
-			distTime.put(Double.MAX_VALUE,Double.MAX_VALUE);
-			distTimeToStart.put(s,distTime);
+			MutablePair<Double,Double> mp = new MutablePair<Double,Double> (Double.MAX_VALUE,Double.MAX_VALUE);
+			distTimeToStart.put(s,mp);
     	}
     	// except for start where dist adn time from start is 0
-		distTimeStart.put(0.0, 0.0);
-    	distTimeToStart.put(start, distTimeStart);
+		MutablePair<Double,Double> mp = new MutablePair<Double,Double> (0.0,0.0);
+    	distTimeToStart.put(start, mp);
     }
     
     /**
@@ -51,30 +51,28 @@ public class Itinerary {
 		// for all station not yet visited
 		for(Station s : notVisited) {
 			// we keep the nearest station
-			HashMap<Double, Double> distTime = distTimeToStart.get(s);
-			for(Map.Entry statistics: distTime.entrySet()) {
-				// we get the time and the dist
-				dist = (Double) statistics.getKey();
-				time = (Double) statistics.getValue();
-				// depending on the preference, we get the next nearest station...
-				switch(preference) {
-					// ... in dist
-					case 0 : 
-					if(dist < min) {
-						min = dist;
+			MutablePair<Double, Double> distTime = distTimeToStart.get(s);
+			// we get the time and the dist
+			dist = distTime.getLeft();
+			time = distTime.getRight();
+			// depending on the preference, we get the next nearest station...
+			switch(preference) {
+				// ... in dist
+				case 0 : 
+				if(dist < min) {
+					min = dist;
+					station = s;
+				}
+				break;
+				// ... in time
+				case 1 :
+					if(time < min) {
+						min = time;
 						station = s;
 					}
 					break;
-					// ... in time
-					case 1 :
-						if(time < min) {
-							min = time;
-							station = s;
-						}
-						break;
-					default :
-						break;
-					}
+				default :
+					break;
 				}
 			}
     	return station;
@@ -90,49 +88,47 @@ public class Itinerary {
     public void updateDist(Station s1, Station s2, NeighborData n, Integer preference) {
 		// we get all time and dist of the two stations
     	Double weight=null, dist1=null, dist2=null, time1=null, time2=null;
-		HashMap<Double, Double> distTimeS1 = distTimeToStart.get(s1);
-		HashMap<Double, Double> distTimeS2 = distTimeToStart.get(s2);
-		HashMap<Double, Double> distTime = new HashMap<>();
-		for(Map.Entry statistics1: distTimeS1.entrySet()) {
-			// we get the time and the dist of s1
-			dist1 = (Double) statistics1.getKey();
-			time1 = (Double) statistics1.getValue();
-			for(Map.Entry statistics2: distTimeS2.entrySet()) {
-				// we get the time and the dist of s2
-				dist2 = (Double) statistics2.getKey();
-				time2 = (Double) statistics2.getValue();
-				// we chose the weight depending on the preference	
-				switch(preference) {
-					// update time and dist if the path preference is the shortest dist 
-					case 0 : 
-						weight = n.getDistance();
-						// if dist to s1 is shortest than dist to s2
-						if(dist2 > Double.sum(dist1,weight)) {
-							distTime.put(Double.sum(dist1,weight), Double.sum(time1,(double) n.getDuration().toSeconds()));
-							distTimeToStart.put(s2, distTime);
-							// we memorize the way : station before s2 is : s1, with the line
-							HashMap<Station, Line> statLine = new HashMap<>();
-							statLine.put(s1,n.getLine());
-							stationBefore.put(s2, statLine);
-						}
-						break;
-					// update time and dist if the path preference is the shortest time 
-					case 1 :
-						weight = (double) n.getDuration().toSeconds();
-						// if time to s1 is shortest than time to s2
-						if(time2 > Double.sum(time1,weight)) {
-							distTime.put(Double.sum(dist1,n.getDistance()), Double.sum(time1,weight));
-							distTimeToStart.put(s2, distTime);
-							// we memorize the way : station before s2 is : s1, with the line
-							HashMap<Station, Line> statLine = new HashMap<>();
-							statLine.put(s1,n.getLine());
-							stationBefore.put(s2, statLine);
-						}
-					break;
-				default :
-					break;
+		MutablePair<Double, Double> distTimeS1 = distTimeToStart.get(s1);
+		MutablePair<Double, Double> distTimeS2 = distTimeToStart.get(s2);
+		MutablePair<Double, Double> distTime = new MutablePair<>();
+		// we get the time and the dist of s1
+		dist1 = distTimeS1.getLeft();
+		time1 = distTimeS1.getRight();
+		// we get the time and the dist of s2
+		dist2 = distTimeS2.getLeft();
+		time2 = distTimeS2.getRight();
+		// we chose the weight depending on the preference	
+		switch(preference) {
+			// update time and dist if the path preference is the shortest dist 
+			case 0 : 
+				weight = n.getDistance();
+				// if dist to s1 is shortest than dist to s2
+				if(dist2 > Double.sum(dist1,weight)) {
+					distTime.setLeft(Double.sum(dist1,weight));
+					distTime.setRight(Double.sum(time1,(double) n.getDuration().toSeconds()));
+					distTimeToStart.put(s2, distTime);
+					// we memorize the way : station before s2 is : s1, with the line
+					HashMap<Station, Line> statLine = new HashMap<>();
+					statLine.put(s1,n.getLine());
+					stationBefore.put(s2, statLine);
 				}
-			}
+				break;
+			// update time and dist if the path preference is the shortest time 
+			case 1 :
+				weight = (double) n.getDuration().toSeconds();
+				// if time to s1 is shortest than time to s2
+				if(time2 > Double.sum(time1,weight)) {
+					distTime.setLeft(Double.sum(dist1,n.getDistance()));
+					distTime.setRight(Double.sum(time1,weight));
+					distTimeToStart.put(s2, distTime);
+					// we memorize the way : station before s2 is : s1, with the line
+					HashMap<Station, Line> statLine = new HashMap<>();
+					statLine.put(s1,n.getLine());
+					stationBefore.put(s2, statLine);
+				}
+			break;
+			default :
+				break;
 		}
     }
 	
@@ -237,7 +233,7 @@ public class Itinerary {
 			}
 			// afficher le chemin du depart jusqu'a dest 
 			int i=0;
-			HashMap<Double, Double> distTime = new HashMap<>();
+			MutablePair<Double, Double> distTime = new MutablePair<>();
 			while(i<stationRes.size()) {
 				if(lineRes.get(i) != null) {
 					path +="  |\n";
@@ -246,10 +242,8 @@ public class Itinerary {
 				}
 				path +=stationRes.get(i).getName()+"\n";
 				distTime = distTimeToStart.get(stationRes.get(i));
-				for(Map.Entry dt: distTime.entrySet()) {
-					path +="dist :"+(Double) dt.getValue()+"s \n";
-					path +="time :"+(Double) dt.getKey()+"m \n";
-				}
+				path +="dist :"+distTime.getLeft()+"s \n";
+				path +="time :"+distTime.getRight()+"m \n";
 				i++;
 			}
 		}
