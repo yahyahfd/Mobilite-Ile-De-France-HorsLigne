@@ -66,11 +66,18 @@ public class Itinerary {
 				break;
 				// ... in time
 				case 1 :
-					if(time < min) {
-						min = time;
-						station = s;
-					}
-					break;
+				if(time < min) {
+					min = time;
+					station = s;
+				}
+				break;
+				// ... in dist unitary
+				case 2 : 
+				if(dist < min) {
+					min = dist;
+					station = s;
+				}
+				break;
 				default :
 					break;
 				}
@@ -120,6 +127,20 @@ public class Itinerary {
 				if(time2 > Double.sum(time1,weight)) {
 					distTime.setLeft(Double.sum(dist1,n.getDistance()));
 					distTime.setRight(Double.sum(time1,weight));
+					distTimeToStart.put(s2, distTime);
+					// we memorize the way : station before s2 is : s1, with the line
+					HashMap<Station, Line> statLine = new HashMap<>();
+					statLine.put(s1,n.getLine());
+					stationBefore.put(s2, statLine);
+				}
+			break;
+			// update time and dist if the path preference is unitary dist (+1)  
+			case 2 :
+				weight = 1.0;
+				// if time to s1 is shortest than time to s2
+				if(dist2 > Double.sum(dist1,weight)) {
+					distTime.setLeft(Double.sum(dist1,weight));
+					distTime.setRight(Double.sum(time1,(double) n.getDuration().toSeconds()));
 					distTimeToStart.put(s2, distTime);
 					// we memorize the way : station before s2 is : s1, with the line
 					HashMap<Station, Line> statLine = new HashMap<>();
@@ -219,7 +240,6 @@ public class Itinerary {
      * @return a string of the stations and line in order
      */
 	public String showPath(HashMap<Station, Line> res){
-		System.out.println("distTime "+distTimeToStart.size());
 		ArrayList<Station> stationRes = new ArrayList<>();
 		ArrayList<Line> lineRes = new ArrayList<>();
 		String path = "";
@@ -242,8 +262,8 @@ public class Itinerary {
 				}
 				path +=stationRes.get(i).getName()+"\n";
 				distTime = distTimeToStart.get(stationRes.get(i));
-				path +="dist :"+distTime.getLeft()+"s \n";
-				path +="time :"+distTime.getRight()+"m \n";
+				path +="dist :"+distTime.getLeft()+"m \n";
+				path +="time :"+distTime.getRight()+"s \n";
 				i++;
 			}
 		}
