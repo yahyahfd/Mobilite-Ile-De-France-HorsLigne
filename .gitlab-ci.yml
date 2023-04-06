@@ -1,0 +1,68 @@
+stages:
+  - build
+  - release
+  - sonar
+  - cleanup
+
+image: maven:latest
+
+cache:
+  paths:
+    - ~/.m2/repository
+  policy: pull
+
+before_script:
+  - apt update
+
+build-job:
+  stage: build
+  script:
+    - echo "Building project"
+    - mvn clean package
+    - apt-get install -y zip
+    - zip -r beryllium-${CI_COMMIT_TAG}.zip *
+    - chmod 777 beryllium-${CI_COMMIT_TAG}.zip
+  artifacts:
+    paths:
+      - beryllium-${CI_COMMIT_TAG}.zip
+    expire_in: 1 day
+
+  tags:
+    - br
+
+
+release-job:
+  stage: release
+  dependencies:
+    - build-job
+
+  only:
+    - tags
+
+  script:
+    - echo "Release to Gitlab releases"
+    - |
+      curl --request POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases"\
+           --header "Content-Type: application/json" \
+           --header "PRIVATE-TOKEN: ${br_token}" \
+           --data "{
+              \"tag_name\": \"${CI_COMMIT_TAG}\",
+              \"name\": \"${CI_COMMIT_TAG}\",
+              \"ref\": \"${CI_COMMIT_TAG}\",
+              \"description\": \"## release n: ${CI_COMMIT_TAG}\",
+              \"assets\": {}
+              }" 
+
+  tags:
+    - br
+
+
+cleanup-job:
+  stage: cleanup
+  dependencies:
+    - release-job
+  script:
+    - echo "Cleanup"
+    - rm -rf beryllium-${CI_COMMIT_TAG}.zip
+  tags:
+    - br

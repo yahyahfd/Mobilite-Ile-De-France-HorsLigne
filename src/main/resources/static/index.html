@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="fr">
+
+<head>
+	<meta charset="UTF-8">
+	<title>Route Master</title>
+	<link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
+	<script src="../Leaflet/leaflet.js"></script>
+	<script src="../Leaflet/Markercluster/dist/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.css" />
+	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
+	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.Default.css" />
+</head>
+
+<body>
+	<main>
+		<div class="left">
+			<h2>Rechercher un itinéraire</h2>
+			<form id="itinerary_form" action="#" method="post" autocomplete="off">
+				<label for="depart">Départ:</label>
+				<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
+				<datalist id="depart-list"></datalist>
+				<label for="arrivee">Arrivée:</label>
+				<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
+				<datalist id="arrivee-list"></datalist>
+				<select id="options" name="options">
+					<option value="default">Par défaut</option>
+					<option value="dist">Meilleure distance</option>
+					<option value="time">Meilleur temps</option>
+				</select>
+				<input type="submit" value="Rechercher">
+			</form>
+			<div id="error_itinerary"></div>
+
+			<div id="reset">
+				<button id="resetZoom">Réinitialiser la carte</button>
+			</div>
+		</div>
+		<div class="right" id="map"></div>
+		<script src="map.js"></script>
+
+	</main>
+</body>
+
+</html>
