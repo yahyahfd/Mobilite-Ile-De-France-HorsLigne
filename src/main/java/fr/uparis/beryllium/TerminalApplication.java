@@ -32,8 +32,8 @@ public class TerminalApplication {
         Station chosen_1 = null;
         Station chosen_2 = null;
         while(true){
-            System.out.println("\u001B[34mLet's check if there is a route for you\u001B[0m");
-            System.out.print("\u001B[32mEnter your first station's name: \u001B[0m");
+            System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
+            System.out.print("\u001B[32mEnter your first station's name: (vp : votre position) \u001B[0m");
             String station1 = "";
             while(station1.isEmpty() || chosen_1 == null){
                 station1 = scanner.nextLine();
@@ -42,13 +42,42 @@ public class TerminalApplication {
                     System.out.println("Empty String, try again");
                 }
                 if (station1.trim().equalsIgnoreCase("quit")) break;
+                if (station1.trim().equalsIgnoreCase("vp")) break;
                 chosen_1 = multi_choice(station1,m,scanner);
                 if(chosen_1 == null){
                     System.out.println("Try again!");
                 }
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
-            
+            // we start from our position, not a existing station
+            if (station1.trim().equalsIgnoreCase("vp")){
+                Double longitude = null;
+                Double latitude = null;
+                System.out.print("\u001B[32mEnter your position : \u001B[0m");
+                while(longitude == null){
+                    System.out.print("\u001B[32mLongitude : \u001B[0m");
+                    // how do they want to travel
+                    try {
+                        // we convert string to int
+                        longitude = Double.parseDouble(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Veuillez renseigner un double");
+                    }
+                }
+                while(latitude == null){
+                    System.out.print("\u001B[32mLatitude : \u001B[0m");
+                    // how do they want to travel
+                    try {
+                        // we convert string to int
+                        latitude = Double.parseDouble(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Veuillez renseigner un double");
+                    }
+                }
+                // we add the station to the map
+                m.addStation(latitude, longitude);
+            };
+
             System.out.print("\u001B[32mEnter your second station's name: \u001B[0m");
             String station2 = "";
             while(station2.isEmpty() || chosen_2 == null){
@@ -78,18 +107,24 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
+            // remplacer par les stations passées en parametre !!
+            Station start = chosen_1;
+            Station dest = chosen_2;
+            // TODO explication
+            if(start.getName() == "localPosition"){
+                start.addWalkingNeighbours(null, m.getAllStations(), start.);
+            }
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
             // get the shortest way depending on the preference
-            HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference);
+            HashMap<Station, Line> route = i.shortestWay(start, dest, 0);
             // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
             // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
             // We add the method (the algorithm) to look for the path
-            if(route == null){
-                System.out.println("Looks like there is no route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m");
-            }
-            else{
-                System.out.println("Route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m :\n");
+            if (route == null) {
+                System.out.println("Looks like there is no route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m");
+            } else {
+                System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
                 System.out.println(i.showPath(route));
             }
         }

@@ -67,6 +67,12 @@ public class Map {
         return this.stations;
     }
 
+    public void addStation(Double latitude, Double longitude) {
+        Station s = new Station("localPosition",new Localisation(latitude, longitude));
+        // we add the station to the list of stations
+        this.stations.add(s);
+    }
+
     /**
      * Method used in terminal mode to get all the stations with <code>name</code> as a name
      * @param name A station's name

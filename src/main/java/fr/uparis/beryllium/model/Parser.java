@@ -11,7 +11,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.util.Iterator;
-import java.util.List;
 
 public class Parser {
 
@@ -80,9 +79,10 @@ public class Parser {
 
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
+        int radius1km = 1;
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));
-        addWalkingNeighbours(map, walkingLine, stat1);
-        addWalkingNeighbours(map, walkingLine, stat2);
+        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km);
+        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km);
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
@@ -110,15 +110,4 @@ public class Parser {
             }
         }
     }
-
-    private static void addWalkingNeighbours(Map map, Line walkingLine, Station station) {
-        List<Station> reacheable1kmStations = map.getAllStations().stream().filter(s -> s.isWithinARadius(station, 1) && !s.equals(station)).toList();
-        for (Station s : reacheable1kmStations) {
-            double[] distanceAndTime = s.getDistanceAndTimeFromAStation(station);
-            String[] time = {"0", String.valueOf(distanceAndTime[1]).split("\\.")[0]};
-            station.addNextStation(s, walkingLine, time, distanceAndTime[0]);
-            s.addNextStation(station, walkingLine, time, distanceAndTime[0]);
-        }
-    }
-
 }

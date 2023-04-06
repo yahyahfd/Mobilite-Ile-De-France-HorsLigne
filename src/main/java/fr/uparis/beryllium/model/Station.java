@@ -116,9 +116,10 @@ public class Station {
      *
      * @param walkingLine the walking line
      * @param allStations the list of all existing stations
+     * @param radius the distance we want the neighbors to be in
      */
-    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations) {
-        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, 1) && !s.equals(this)).toList();
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, int radius) {
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
         for (Station s : reacheable1kmStations) {
             double distance = s.getDistanceToAStation(this);
             double time = s.getWalkingTimeInSecondsFromADistance(distance);
@@ -137,7 +138,7 @@ public class Station {
      */
     public boolean isWithinARadius(Station reachable, int radius) {
         double distance = getDistanceToAStation(reachable);
-        return distance < radius;
+        return distance <= radius;
     }
 
     /**
