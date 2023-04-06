@@ -65,8 +65,8 @@ public class Parser {
         // Search for the stations and line
         // If they exist, search function return their object in map's lists
         // Else, it create a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, new Localisation(Double.parseDouble(gpsFirstStation[0]), Double.parseDouble(gpsFirstStation[1])));
-        Station stat2 = map.searchStation(secondStation, new Localisation(Double.parseDouble(gpsSecondStation[0]), Double.parseDouble(gpsSecondStation[1])));
+        Station stat1 = map.searchStation(firstStation, new Localisation(Double.parseDouble(gpsFirstStation[1]), Double.parseDouble(gpsFirstStation[0])));
+        Station stat2 = map.searchStation(secondStation, new Localisation(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0])));
         // Add line with variant in the name
         Line line = map.searchLine(lineInCsv[0] + "." + lineInCsv[2]);
 
@@ -77,7 +77,6 @@ public class Parser {
 
         // Add neighbours
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));
-        stat2.addNextStation(stat1, line, duration, Double.parseDouble(distance));
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
@@ -94,7 +93,7 @@ public class Parser {
 
         checkCsvFileFormat(records, format);
 
-
+        parser.close();
         return records.iterator();
     }
 

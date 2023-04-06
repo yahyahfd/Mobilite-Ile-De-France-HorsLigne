@@ -71,7 +71,7 @@ public class TerminalApplication {
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
             // list of choice of preferences
-            ArrayList typePreference = new ArrayList<>(List.of(0, 1, 2));
+            ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
             // while the given preference is not right, we ask again
             Integer preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
