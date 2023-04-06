@@ -85,7 +85,7 @@ public class Station {
     //  * @return <code>name</code> <code>localisation</code>
     //  * @see Localisation
     //  */
-    // public String toString(){
-    //     return name + " " + localisation;
-    // }
+     public String toString(){
+         return name + " " + localisation;
+     }
 }
