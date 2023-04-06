@@ -64,22 +64,46 @@ const errorMessage = document.getElementById('error_itinerary');
 form.addEventListener('submit', function (event) {
     event.preventDefault();
 
+    if (selectedOption === 'plus-rapide') {
+      // Code pour trouver l'itinéraire le plus rapide
+    } else if (selectedOption === 'plus-court') {
+      // Code pour trouver l'itinéraire le plus court
+    } else if (selectedOption === 'moins-marche') {
+      // Code pour trouver l'itinéraire avec moins de marche
+    }
+
+    // We get out selected travel option
+    var optionsSelect = document.getElementById('options');
+    var selectedOption = optionsSelect.value;
+    var travel_option = 2;
+    switch(selectedOption){
+        case 'dist':
+            travel_option = 0
+            break;
+        case 'time':
+            travel_option = 1
+            break;
+        default:
+            travel_option = 2;
+    }
+
+    // We calculate a path (make a request to get a path)
     const departValue = encodeURIComponent(departInput.value);
     const arriveeValue = encodeURIComponent(arriveeInput.value);
-    const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}`;
-
+    const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
     console.log(url);
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            if (data.length == 0) {
+            if (data.length == 0) { // No path found
                 errorMessage.style.display = "block";
                 errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
-            } else {
+            } else {// We draw a path on our map (need to add a written path later here)
                 errorMessage.style.display = "none";
                 itineraryLayer.clearLayers();
                 var current_station = null;
                 const latLngs = [];
+                // We place each station on the map and draw a line between each two consecutive stations
                 data.forEach(station => {
                     var name = station.name;
                     var latitude = station.localisation.latitude;
@@ -100,7 +124,7 @@ form.addEventListener('submit', function (event) {
                 map.fitBounds(latLngs);
             }
         })
-        .catch(error => {
+        .catch(error => { // Bad syntax or empty inputs
             console.error(error);
             errorMessage.style.display = "block";
             errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
