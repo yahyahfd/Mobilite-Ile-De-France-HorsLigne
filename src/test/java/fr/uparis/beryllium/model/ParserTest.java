@@ -28,10 +28,10 @@ public class ParserTest {
         assertEquals("Lourmel",firstStation.getName());
         assertEquals("Boucicaut",secondStation.getName());
         assertEquals("8", line.getLineNameWithoutVariant());
-        assertEquals(2.2822419598550767, firstStationLocalisation.getLatitude());
-        assertEquals(48.83866086365992, firstStationLocalisation.getLongitude());
-        assertEquals(2.2879184311245595, secondStationLocalisation.getLatitude());
-        assertEquals(48.841024160993214, secondStationLocalisation.getLongitude());
+        assertEquals(2.2822419598550767, firstStationLocalisation.getLongitude());
+        assertEquals(48.83866086365992, firstStationLocalisation.getLatitude());
+        assertEquals(2.2879184311245595, secondStationLocalisation.getLongitude());
+        assertEquals(48.841024160993214, secondStationLocalisation.getLatitude());
         assertEquals(Duration.ofSeconds(254), duration);
         assertEquals(15.93935780373747, distance);
 
