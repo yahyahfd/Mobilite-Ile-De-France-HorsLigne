@@ -12,8 +12,6 @@ import fr.uparis.beryllium.model.Parser;
 
 import fr.uparis.beryllium.model.Itinerary;
 import fr.uparis.beryllium.model.Line;
-import fr.uparis.beryllium.model.Map;
-import fr.uparis.beryllium.model.Parser;
 import fr.uparis.beryllium.model.Station;
 
 /**
@@ -78,7 +76,7 @@ public class TerminalApplication {
             Integer preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
-                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitaire) : \u001B[0m");
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2= unitary : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());
@@ -86,38 +84,21 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
-            // remplacer par les stations passées en parametre !! 
-            Station start = m.getAllStations().get(1);
-            Station dest = m.getAllStations().get(40);
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
             // get the shortest way depending on the preference
-            HashMap<Station, Line> route = i.shortestWay(start, dest, 0);
+            HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference);
             // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
             // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
             // We add the method (the algorithm) to look for the path
             if(route == null){
-                System.out.println("Looks like there is no route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m");
+                System.out.println("Looks like there is no route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m");
             }
             else{
-                System.out.println("Route to go from \u001B[31m"+start.getName()+"\u001B[0m to \u001B[31m"+dest.getName()+"\u001B[0m :\n");
+                System.out.println("Route to go from \u001B[31m"+chosen_1.getName()+"\u001B[0m to \u001B[31m"+chosen_2.getName()+"\u001B[0m :\n");
                 System.out.println(i.showPath(route));
             }
         }
-        
-        //calculate route below using chosen_1 and chosen_2
-        //  HERE calculate (waiting for Algorithm)
-        // String route = "";
-        // route.trim();
-        // station1 = exists_1?"\u001B[32m"+station1.trim()+"\u001B[0m":"\u001B[31m"+station1.trim()+"\u001B[0m";
-        // station2 = exists_2?"\u001B[32m"+station2.trim()+"\u001B[0m":"\u001B[31m"+station2.trim()+"\u001B[0m";
-        // if(route.isEmpty()){
-        //     System.out.println("Looks like there is no route to go from "+station1+" to "+station2);   
-        // }else{
-        //     System.out.println("Here is your route going from "+station1+" to "+station2);
-        //     //Print de la route
-        // }
-
         scanner.close();
     }
 

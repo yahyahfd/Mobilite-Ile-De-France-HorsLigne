@@ -56,10 +56,6 @@ public class Station {
 
         if (nextStations.containsKey(station)) {
             ArrayList<NeighborData> neighborDataArrayList = nextStations.get(station);
-            //est ce que je vérifie si le neigborData est déjà dans la liste ou pas ?
-            //Si oui, on considère que c est le même objet quand ? Quand y a la même ligne, même durée et même dist ?
-            //ou juste même ligne ?
-            //Ou alors c'est inutile car cette situation n'arrivera jamais ?
             if (!neighborDataIsIn(neighborDataArrayList, duration, line, distance)) {
                 neighborDataArrayList.add(n);
             }
@@ -73,7 +69,7 @@ public class Station {
     //Check if the Neighbor doesn't exist in the list for nextStations
     public boolean neighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
         for (NeighborData n : list) {
-            if (n.getDuration() == duration && n.getDistance() == dist && n.getLine() == l) {
+            if (n.getLine() == l) {
                 return true;
             }
         }
@@ -85,7 +81,7 @@ public class Station {
     //  * @return <code>name</code> <code>localisation</code>
     //  * @see Localisation
     //  */
-    // public String toString(){
-    //     return name + " " + localisation;
-    // }
+     public String toString(){
+         return name + " " + localisation;
+     }
 }
