@@ -7,18 +7,23 @@ import java.util.HashMap;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.junit.jupiter.api.Test;
 
+import ch.qos.logback.classic.Logger;
 import fr.uparis.beryllium.exceptions.FormatException;
-
+import org.apache.logging.log4j.LogManager;
 public class ItineraryTest {
+
+    private static final org.apache.logging.log4j.Logger LOGGER = LogManager.getLogger(ItineraryTest.class);
+
     @Test
     public void testShortestWay() throws FormatException  {
-        Map map = Parser.readMap("src/test/resources/testItinerary.csv");
+        Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
         Station olympiade = map.getStations().get(0);
-        Station bercy = map.getStations().get(3);
+        Station bercy = map.getStations().get(4);
         Itinerary itinerary = new Itinerary(map.getAllStations());
         //Test with equal weight
-        HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 0);
+        HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2);
         //List is reverse, first element is the end of the path found
+        LOGGER.info(itinerary.showPath(path_1));
         ArrayList<Station> stations_1 = new ArrayList<>(path_1.keySet());
         assertEquals(4, stations_1.size());
         assertEquals("Cour Saint-Emilion", stations_1.get(1).getName());
@@ -40,7 +45,7 @@ public class ItineraryTest {
 
     @Test
     public void testShortestDist() throws FormatException  {
-        Map map = Parser.readMap("src/test/resources/testItinerary.csv");
+        Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
         Itinerary itinerary = new Itinerary(map.getAllStations());
         Station station1 = map.getStations().get(0);
         Station station2 = map.getStations().get(3);
