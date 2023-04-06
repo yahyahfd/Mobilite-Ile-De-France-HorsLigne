@@ -77,7 +77,6 @@ public class Parser {
 
         // Add neighbours
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));
-        stat2.addNextStation(stat1, line, duration, Double.parseDouble(distance));
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
