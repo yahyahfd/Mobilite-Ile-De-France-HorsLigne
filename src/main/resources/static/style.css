@@ -125,3 +125,37 @@ input[type="submit"],
   background-color: #ef9541;
   margin: 10px;
 }
+
+#itinerary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+}
+
+#itinerary div:not(:last-child) {
+  border-right: 2px solid #333;
+}
+
+.station_name {
+  display: flex;
+  align-items: center;
+}
+
+.separator {
+   display: flex;
+   align-items: center;
+   margin: 0 10px;
+}
+
+.fa-map-marker-alt {
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
+
+.fa-long-arrow-alt-down {
+  font-size: 1.2rem;
+  margin: 0 5px;
+}
+

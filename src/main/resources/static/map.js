@@ -61,6 +61,9 @@ const arriveeInput = document.getElementById('arrivee');
 const form = document.querySelector('#itinerary_form');
 const errorMessage = document.getElementById('error_itinerary');
 
+const itinerary = document.getElementById('itinerary');
+let isItineraryDrawn = false;
+
 form.addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -105,7 +108,15 @@ form.addEventListener('submit', function (event) {
                 const latLngs = [];
                 // We place each station on the map and draw a line between each two consecutive stations
                 data.forEach(station => {
+
                     var name = station.name;
+
+
+                    if(!isItineraryDrawn){
+                       itinerary.innerHTML += "<span class='station_name'><i class='fas fa-map-marker-alt'></i>" +name + '</span>';
+                       if(station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fas fa-long-arrow-alt-down'></i></span>";
+                    }
+
                     var latitude = station.localisation.latitude;
                     var longitude = station.localisation.longitude;
                     latLngs.push([latitude, longitude]);
@@ -119,6 +130,8 @@ form.addEventListener('submit', function (event) {
                     current_station = marker;
                     itineraryLayer.addLayer(marker);
                 });
+
+                isItineraryDrawn = true;
                 map.removeLayer(markersLayer);
                 map.addLayer(itineraryLayer);
                 map.fitBounds(latLngs);

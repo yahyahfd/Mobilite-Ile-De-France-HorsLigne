@@ -31,13 +31,13 @@ public class MapController {
    */
   @GetMapping("/shortest-way")
   public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
-    Map m = Parser.readMap("map_data.csv");
-    Itinerary i = new Itinerary(m.getAllStations());
+    Map map = Parser.readMap("map_data.csv");
+    Itinerary itinerary = new Itinerary(map.getAllStations());
     try {
-      Station start = m.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
-      Station dest = m.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
-      HashMap<Station,Line> res = i.shortestWay(start, dest, preference);
-      return i.getPathStations(res);
+      Station startStation = map.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
+      Station destStation = map.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
+      HashMap<Station,Line> shortestWay = itinerary.shortestWay(startStation, destStation, 0);
+      return itinerary.getPathStations(shortestWay);
     } catch (Exception e) {
       return null;
     }
