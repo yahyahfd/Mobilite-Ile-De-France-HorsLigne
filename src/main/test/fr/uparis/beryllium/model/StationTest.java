@@ -51,5 +51,4 @@ class StationTest {
         assert (station1.getNextStations().get(voisin2).get(0).getLine().equals(walkingLine));
         assert (station1.getNextStations().get(voisin3).get(0).getLine().equals(walkingLine));
     }
-
 }

@@ -26,7 +26,7 @@ public class NeighborData {
         return distance;
     }
 
-   
+
     public String toString(){
         return line.getLineName() + " " ;
     }

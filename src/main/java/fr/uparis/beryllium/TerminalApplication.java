@@ -54,16 +54,6 @@ public class TerminalApplication {
                 Double longitude = null;
                 Double latitude = null;
                 System.out.print("\u001B[32mEnter your position : \u001B[0m");
-                while(longitude == null){
-                    System.out.print("\u001B[32mLongitude : \u001B[0m");
-                    // how do they want to travel
-                    try {
-                        // we convert string to int
-                        longitude = Double.parseDouble(scanner.nextLine());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Veuillez renseigner un double");
-                    }
-                }
                 while(latitude == null){
                     System.out.print("\u001B[32mLatitude : \u001B[0m");
                     // how do they want to travel
@@ -74,8 +64,19 @@ public class TerminalApplication {
                         System.out.println("Veuillez renseigner un double");
                     }
                 }
+                while(longitude == null){
+                    System.out.print("\u001B[32mLongitude : \u001B[0m");
+                    // how do they want to travel
+                    try {
+                        // we convert string to int
+                        longitude = Double.parseDouble(scanner.nextLine());
+                    } catch (NumberFormatException e) {
+                        System.out.println("Veuillez renseigner un double");
+                    }
+                }
                 // we add the station to the map
                 m.addStation(latitude, longitude);
+                chosen_1 = (m.getStationsByName("localPosition")).get(0);
             };
 
             System.out.print("\u001B[32mEnter your second station's name: \u001B[0m");
@@ -107,12 +108,11 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
-            // remplacer par les stations passées en parametre !!
             Station start = chosen_1;
             Station dest = chosen_2;
-            // TODO explication
+            // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
             if(start.getName() == "localPosition"){
-                start.addWalkingNeighbours(null, m.getAllStations(), start.);
+                m.walkToBestStation(start,dest);
             }
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());

@@ -168,6 +168,12 @@ public class Itinerary {
 	public HashMap<Station, Line> shortestWay(Station start, Station dest, Integer preference) {
 		// initialize the map
 		init(start);
+		Map<Station, ArrayList<NeighborData>> nextStationOfStart = start.getNextStations();
+		for (Map.Entry<Station, ArrayList<NeighborData>> entry : nextStationOfStart.entrySet()) {
+			Station s = entry.getKey();
+			System.out.println("Station voisine "+s.getName());
+			System.out.println("dist : "+start.getDistanceToAStation(s));
+		}
 		// all stations of the map
 		ArrayList<Station> allStations = new ArrayList<>(stations);
 		Station s1;
