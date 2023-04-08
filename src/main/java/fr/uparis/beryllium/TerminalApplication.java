@@ -33,7 +33,7 @@ public class TerminalApplication {
         Station chosen_2 = null;
         while(true){
             System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
-            System.out.print("\u001B[32mEnter your first station's name: (vp : votre position) \u001B[0m");
+            System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
             String station1 = "";
             while(station1.isEmpty() || chosen_1 == null){
                 station1 = scanner.nextLine();
@@ -42,7 +42,7 @@ public class TerminalApplication {
                     System.out.println("Empty String, try again");
                 }
                 if (station1.trim().equalsIgnoreCase("quit")) break;
-                if (station1.trim().equalsIgnoreCase("vp")) break;
+                if (station1.trim().equalsIgnoreCase("lp")) break;
                 chosen_1 = multi_choice(station1,m,scanner);
                 if(chosen_1 == null){
                     System.out.println("Try again!");
@@ -50,36 +50,13 @@ public class TerminalApplication {
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
             // we start from our position, not a existing station
-            if (station1.trim().equalsIgnoreCase("vp")){
-                Double longitude = null;
-                Double latitude = null;
-                System.out.print("\u001B[32mEnter your position : \u001B[0m");
-                while(latitude == null){
-                    System.out.print("\u001B[32mLatitude : \u001B[0m");
-                    // how do they want to travel
-                    try {
-                        // we convert string to int
-                        latitude = Double.parseDouble(scanner.nextLine());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Veuillez renseigner un double");
-                    }
-                }
-                while(longitude == null){
-                    System.out.print("\u001B[32mLongitude : \u001B[0m");
-                    // how do they want to travel
-                    try {
-                        // we convert string to int
-                        longitude = Double.parseDouble(scanner.nextLine());
-                    } catch (NumberFormatException e) {
-                        System.out.println("Veuillez renseigner un double");
-                    }
-                }
-                // we add the station to the map
-                m.addStation(latitude, longitude);
-                chosen_1 = (m.getStationsByName("localPosition")).get(0);
+            if (station1.trim().equalsIgnoreCase("lp")){
+                String name = "localPositionStart";
+                addStationByCoordonnees(scanner, m, name);
+                chosen_1 = (m.getStationsByName(name)).get(0);
             };
-
-            System.out.print("\u001B[32mEnter your second station's name: \u001B[0m");
+            
+            System.out.print("\u001B[32mEnter your second station's name: (lp : local position)\u001B[0m");
             String station2 = "";
             while(station2.isEmpty() || chosen_2 == null){
                 station2 = scanner.nextLine();
@@ -88,12 +65,19 @@ public class TerminalApplication {
                     System.out.println("Empty String");
                 }
                 if (station2.trim().equalsIgnoreCase("quit")) break;
+                if (station2.trim().equalsIgnoreCase("lp")) break;
                 chosen_2 = multi_choice(station2, m, scanner);
                 if (chosen_2 == null) {
                     System.out.println("Try again!");
                 }
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
+            // we start from our position, not a existing station
+            if (station2.trim().equalsIgnoreCase("lp")){
+                String name = "localPositionDest";
+                addStationByCoordonnees(scanner, m, name);
+                chosen_2 = (m.getStationsByName(name)).get(0);
+            };
             // list of choice of preferences
             ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
             // while the given preference is not right, we ask again
@@ -111,8 +95,12 @@ public class TerminalApplication {
             Station start = chosen_1;
             Station dest = chosen_2;
             // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
-            if(start.getName() == "localPosition"){
+            if(start.getName() == "localPositionStart"){
                 m.walkToBestStation(start,dest);
+            }
+            // we add the neighbors for the destination station
+            if(dest.getName() == "localPositionDest"){
+                m.walkToBestStation(dest,start);
             }
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
@@ -173,5 +161,32 @@ public class TerminalApplication {
         }else{
             return stations.get(0);
         }
+    }
+    public static void addStationByCoordonnees(Scanner scanner, Map m, String name){
+        Double longitude = null;
+            Double latitude = null;
+            System.out.print("\u001B[32mEnter your position : \u001B[0m");
+            while(latitude == null){
+                System.out.print("\u001B[32mLatitude : \u001B[0m");
+                // how do they want to travel
+                try {
+                    // we convert string to int
+                    latitude = Double.parseDouble(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Veuillez renseigner un double");
+                }
+            }
+            while(longitude == null){
+                System.out.print("\u001B[32mLongitude : \u001B[0m");
+                // how do they want to travel
+                try {
+                    // we convert string to int
+                    longitude = Double.parseDouble(scanner.nextLine());
+                } catch (NumberFormatException e) {
+                    System.out.println("Veuillez renseigner un double");
+                }
+            }
+            // we add the station to the map
+            m.addStation(latitude, longitude, name);
     }
 }

@@ -66,9 +66,9 @@ public class Map {
     public ArrayList<Station> getAllStations() {
         return this.stations;
     }
-
-    public void addStation(Double latitude, Double longitude) {
-        Station s = new Station("localPosition",new Localisation(latitude, longitude));
+    
+    public void addStation(Double latitude, Double longitude, String name) {
+        Station s = new Station(name,new Localisation(latitude, longitude));
         // we add the station to the list of stations
         this.stations.add(s);
     }
@@ -87,7 +87,7 @@ public class Map {
     }
 
     /**
-     * Search for all station inbetween dist (start to dest) andd add these stations as neighbors of the initial position
+     * Search for all station inbetween dist (start to dest) and add these stations as neighbors of the initial position
      * @param start The starting station (coordonnees)
      * @param dest The destination Station
      */
