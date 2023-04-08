@@ -105,7 +105,7 @@ public class TerminalApplication {
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
             // get the shortest way depending on the preference
-            HashMap<Station, Line> route = i.shortestWay(start, dest, 0);
+            HashMap<Station, Line> route = i.shortestWay(start, dest, preference);
             // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
             // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
             // We add the method (the algorithm) to look for the path

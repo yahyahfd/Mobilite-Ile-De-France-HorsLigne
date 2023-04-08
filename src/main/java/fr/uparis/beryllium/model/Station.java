@@ -35,7 +35,7 @@ public class Station {
     }
 
     /**
-     * Neighboring stations or stations reached 
+     * Neighboring stations or stations reached
      * directly after the current one (this)
      */
     Station(String n, Localisation localisation, String lineNumber) {
@@ -77,10 +77,23 @@ public class Station {
         return false;
     }
 
+    /**
+     * Add station as a neighbor
+     *
+     * @param s    the neighbor station
+     * @param l    the line with which you can reach s
+     * @param h    the time with which you can reach s
+     * @param dist the distance between these stations
+     */
     public void addNextStation(Station station, Line line, String[] durationArray, Double distance) {
+        String temps = durationArray[0].concat(String.valueOf(durationArray[1].charAt(0)));
         Duration duration = Duration.ZERO;
-        duration = duration.plusMinutes(Long.parseLong(durationArray[0]));
-        duration = duration.plusSeconds(Long.parseLong(durationArray[1]));
+        duration = duration.plusSeconds(Long.parseLong(temps));
+        String milli = durationArray[1].substring(1);
+        if(milli == ""){
+            milli = "0";
+        }
+        duration = duration.plusMillis(Long.parseLong(milli));
         NeighborData n = new NeighborData(line, duration, distance);
 
         if (nextStations.containsKey(station)) {
@@ -118,7 +131,7 @@ public class Station {
      * @param allStations the list of all existing stations
      * @param radius the distance we want the neighbors to be in
      */
-    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, Double radius) {
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius) {
         List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
         for (Station s : reacheable1kmStations) {
             double distance = s.getDistanceToAStation(this);
@@ -136,7 +149,7 @@ public class Station {
      * @param radius    the radius we wanted to be in (in km)
      * @return a boolean that determines if the station is in the radius away or less
      */
-    public boolean isWithinARadius(Station reachable, Double radius) {
+    public boolean isWithinARadius(Station reachable, double radius) {
         double distance = getDistanceToAStation(reachable);
         return distance <= radius;
     }
@@ -149,12 +162,10 @@ public class Station {
     public double getDistanceToAStation(Station station) {
         Localisation localisationStart = station.localisation;
         Localisation reacheableLocalisation = this.localisation;
-
         double x0 = localisationStart.getLongitude() * 111;
         double y0 = localisationStart.getLatitude() * (111.11 * Math.cos(Math.toRadians(localisationStart.getLongitude())));
         double x = reacheableLocalisation.getLongitude() * 111;
         double y = reacheableLocalisation.getLatitude() * (111.11 * Math.cos(Math.toRadians(reacheableLocalisation.getLongitude())));
-
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
@@ -171,11 +182,12 @@ public class Station {
     }
 
     /**
-    //  * Returns the station's name and localisation.
-    //  * @return <code>name</code> <code>localisation</code>
-    //  * @see Localisation
-    //  */
-     public String toString(){
-         return name;
-     }
+     * Returns the station's name and localisation.
+     *
+     * @return <code>name</code> <code>localisation</code>
+     * @see Localisation
+     **/
+    public String toString() {
+        return name;
+    }
 }
