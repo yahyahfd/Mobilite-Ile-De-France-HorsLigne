@@ -36,7 +36,7 @@ public class MapController {
     try {
       Station startStation = map.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
       Station destStation = map.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
-      HashMap<Station,Line> shortestWay = itinerary.shortestWay(startStation, destStation, 0);
+      HashMap<Station,Line> shortestWay = itinerary.shortestWay(startStation, destStation, preference);
       return itinerary.getPathStations(shortestWay);
     } catch (Exception e) {
       return null;
