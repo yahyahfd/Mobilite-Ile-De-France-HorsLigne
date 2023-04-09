@@ -4,9 +4,7 @@
 <head>
 	<meta charset="UTF-8">
 	<title>Route Master</title>
-	<link rel="stylesheet" href="../fontawesome-free-6.4.0-web/css/all.min.css"
-		integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw=="
-		crossorigin="anonymous" referrerpolicy="no-referrer" />
+	<link rel="stylesheet" href="../fontawesome-free-6.4.0-web/css/all.min.css"/>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
 	<script src="../Leaflet/leaflet.js"></script>
@@ -19,41 +17,41 @@
 <body>
 	<main>
 		<div class="left">
-
-			<h2>Rechercher un itinéraire</h2>
-			<form id="itinerary_form" action="#" method="post" autocomplete="off">
-				<label for="depart">Départ:</label>
-				<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
-				<datalist id="depart-list"></datalist>
-				<label for="arrivee">Arrivée:</label>
-				<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
-				<datalist id="arrivee-list"></datalist>
-				<select id="options" name="options">
-					<option value="default">Par défaut</option>
-					<option value="dist">Meilleure distance</option>
-					<option value="time">Meilleur temps</option>
-				</select>
-				<input type="submit" value="Rechercher">
-			</form>
-			<div id="error_itinerary"></div>
-		</div>
-		<div id="second_left">
-			<button id="back_button" class="btn-icon"><i class="fas fa-chevron-left"></i></button>
-
-			<div id="itinerary">
-
+			<div id="first_left">
+				<h2>Rechercher un itinéraire</h2>
+				<form id="itinerary_form" action="#" method="post" autocomplete="off">
+					<label for="depart">Départ:</label>
+					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
+					<datalist id="depart-list"></datalist>
+					<label for="arrivee">Arrivée:</label>
+					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
+					<datalist id="arrivee-list"></datalist>
+					<select id="options" name="options">
+						<option value="default">Par défaut</option>
+						<option value="dist">Meilleure distance</option>
+						<option value="time">Meilleur temps</option>
+					</select>
+					<input type="submit" value="Rechercher">
+				</form>
+				<div id="error_itinerary"></div>
 			</div>
-			<!-- <script type="text/javascript">
-					for (let i = 1; i <= 99; i++) {
-					  itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + i + '</span>';
-					  itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>"
-					}
-					itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 99+ '</span>';
-				  </script> -->
-			<!-- <div id="reset">
-					<button id="resetZoom">Réinitialiser la carte</button>
-				</div> -->
-		</div>
+			<div id="second_left">
+				<button id="back_button" class="btn-icon"><i class="fas fa-chevron-left"></i></button>
+
+				<div id="itinerary">
+
+				</div>
+				<!-- <script type="text/javascript">
+						for (let i = 1; i <= 99; i++) {
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + i + '</span>';
+						itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>"
+						}
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 99+ '</span>';
+					</script> -->
+				<!-- <div id="reset">
+						<button id="resetZoom">Réinitialiser la carte</button>
+					</div> -->
+			</div>
 		</div>
 		<div class="right" id="map"></div>
 		<script src="map.js"></script>
