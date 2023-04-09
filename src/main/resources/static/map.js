@@ -1,11 +1,3 @@
-var osm_online = L.tileLayer('http://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href = "https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-});
-
-var osm_toner = L.tileLayer('Toner/{z}/{x}/{y}.png', {
-    attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
-});
-
 var osm_terrain = L.tileLayer('Terrain/{z}/{x}/{y}.png', {
     attribution: 'Map tiles by Stamen Design, under CC BY 3.0. Data by OpenStreetMap, under ODbL.'
 });
@@ -13,7 +5,7 @@ var osm_terrain = L.tileLayer('Terrain/{z}/{x}/{y}.png', {
 var bounds = L.latLngBounds([[48.3, 1.5], [49.2, 3.5]]);
 
 var map = L.map('map', {
-    layers: [osm_online],
+    layers: [osm_terrain],
     maxBounds: bounds
 }).setView([48.856614, 2.3522219], 12);
 map.setMaxZoom(15);
@@ -22,15 +14,7 @@ map.setMinZoom(10);
 map.on('zoomend', function () {
     var currentZoom = map.getZoom();
     console.log('Niveau de zoom actuel : ' + currentZoom);
-    // Mettez à jour votre interface utilisateur avec le niveau de zoom actuel ici
 });
-
-var baseMaps = {
-    "OSM Online": osm_online,
-    "OSM Toner": osm_toner,
-    "OSM Terrain": osm_terrain
-};
-var layerControl = L.control.layers(baseMaps).addTo(map);
 
 var markersLayer = L.markerClusterGroup();
 var itineraryLayer = L.layerGroup();
