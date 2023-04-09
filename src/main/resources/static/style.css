@@ -60,7 +60,9 @@ main {
 
 .left {
   width: 25%;
-  background-color: #696f75;
+  background-color: #4c4f52;
+  display: flex;
+  flex-direction: column;
 }
 
 .right {
@@ -132,10 +134,17 @@ input[type="submit"],
   justify-content: center;
   flex-direction: column;
   padding: 10px;
+  background-color: #696f75;
+  border: 2px solid #a8a8a8;
+  margin: 10px 50px;
 }
 
 #itinerary div:not(:last-child) {
   border-right: 2px solid #333;
+}
+
+#back_button {
+  margin: 5px 0px 0px 5px;
 }
 
 .station_name {
@@ -144,18 +153,45 @@ input[type="submit"],
 }
 
 .separator {
-   display: flex;
-   align-items: center;
-   margin: 0 10px;
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
 }
 
-.fa-map-marker-alt {
+.fa-location-dot {
   font-size: 1.2rem;
   margin-right: 5px;
 }
 
-.fa-long-arrow-alt-down {
+.fa-chevron-left,
+.fa-down-long {
   font-size: 1.2rem;
   margin: 0 5px;
 }
 
+#first_left {
+  margin-bottom: 1rem;
+}
+
+#second_left {
+  display: none;
+  overflow-y: scroll;
+}
+
+#second_left.show {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-icon {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #000;
+}
+
+.btn-icon:hover {
+  color: #aaa;
+}
