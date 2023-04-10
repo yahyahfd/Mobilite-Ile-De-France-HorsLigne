@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,13 +31,27 @@ public class MapController {
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public HashMap<Station, Line> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
+  public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
     Itinerary i = new Itinerary(m.getAllStations());
     try {
       Station start = m.searchStationByName(depart);
       Station dest = m.searchStationByName(arrivee);
       HashMap<Station,Line> res = i.shortestWay(start, dest, preference);
+      return i.getPathStations(res);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @GetMapping("/shortest-way/lines")
+  public HashMap<Station,Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
+    Map m = Parser.readMap("map_data.csv");
+    Itinerary i = new Itinerary(m.getAllStations());
+    try {
+      Station start = m.searchStationByName(depart);
+      Station dest = m.searchStationByName(arrivee);
+      HashMap<Station, Line> res = i.shortestWay(start, dest, preference);
       return res;
     } catch (Exception e) {
       return null;

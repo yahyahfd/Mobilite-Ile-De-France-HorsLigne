@@ -308,4 +308,17 @@ public class Itinerary {
 		return stationRes;
 	}
 
+	/**
+	 * This method is used to return an ordered list of all lines in a path
+	 * @param res HashMap of the path calculated by shortestWay Method
+	 * @return An ordred list of lines in the path (can be empty)
+	 */
+
+	public ArrayList<Line> getPathLines(HashMap<Station, Line> res){
+		if(res == null){
+			return new ArrayList<>();
+		}
+		return new ArrayList<>(res.values());
+	}
+
 }

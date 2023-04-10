@@ -110,21 +110,7 @@ public class Station {
     //  * @see Localisation
     //  */
      public String toString(){
-         return "{\n" +
-                 "\t\"name\": \"" + name + "\",\n" +
-                 "\t\"localisation\": " + localisation + "\n" +
-                 "\t\"neighboringLines\": " + affiche(getNeighboringLines()) + "\n" +
-                    "}";
-     }
-
-     public String affiche(ArrayList<String> neighboringLines) {
-         String result = "[\n";
-         for (String line : neighboringLines) {
-             result += line + ", \n";
-         }
-         result = result.substring(0, result.length() - 2);
-         result += "]\n";
-         return result;
+         return getName();
      }
 }
 

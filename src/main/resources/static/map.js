@@ -111,7 +111,19 @@ form.addEventListener('submit', function (event) {
     const departValue = encodeURIComponent(departInput.value);
     const arriveeValue = encodeURIComponent(arriveeInput.value);
     const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
-    console.log(url);
+
+
+    var urlLines = `/shortest-way/lines?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
+
+    var linesItinerary = null;
+
+    fetch(urlLines)
+        .then(response => response.json())
+        .then(dataLines => {
+            linesItinerary = dataLines;
+        })
+        .catch(error => console.error(error));
+
     fetch(url)
         .then(response => response.json())
         .then(data => {
@@ -125,50 +137,47 @@ form.addEventListener('submit', function (event) {
                 itineraryLayer.clearLayers();
                 var current_station = null;
                 const latLngs = [];
-                // We place each station on the map and draw a line between each two consecutive stations
 
-                console.log(data);
-
-
-                for(let station in data) {
-                    var name = station.name;
-                    var line = data[station];
-
-                    console.log(station.localisation);
-                    console.log(line);
-
-                    var latitude = station.localisation.latitude;
-                    var longitude = station.localisation.longitude;
-                    latLngs.push([latitude, longitude]);
-                    var lines = station.neighboringLines.join('<br>');
-                    var marker = L.marker([latitude, longitude])
-                        .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
-
-                    if (current_station != null) {
-                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(line) });
-                        itineraryLayer.addLayer(polyline);
-                    }
-                    current_station = marker;
-                    itineraryLayer.addLayer(marker);
-                }
-
-                // data.forEach((station, line) => {
+                // for(let station in data) {
                 //     var name = station.name;
-                //     console.log(station);
+                //     var line = data[station];
+
                 //     console.log(line);
+
                 //     var latitude = station.localisation.latitude;
                 //     var longitude = station.localisation.longitude;
                 //     latLngs.push([latitude, longitude]);
                 //     var lines = station.neighboringLines.join('<br>');
                 //     var marker = L.marker([latitude, longitude])
                 //         .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
+
                 //     if (current_station != null) {
-                //         var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: 'blue' });
+                //         var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(line) });
                 //         itineraryLayer.addLayer(polyline);
                 //     }
                 //     current_station = marker;
                 //     itineraryLayer.addLayer(marker);
-                // });
+                // }
+
+                console.log(linesItinerary);
+
+                // We place each station on the map and draw a line between each two consecutive stations
+                data.forEach(station => {
+                    var stationName = station.name;
+
+                    var latitude = station.localisation.latitude;
+                    var longitude = station.localisation.longitude;
+                    latLngs.push([latitude, longitude]);
+                    var lines = station.neighboringLines.join('<br>');
+                    var marker = L.marker([latitude, longitude])
+                        .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
+                    if (current_station != null) {
+                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(linesItinerary[stationName].lineNameWithoutVariant) });
+                        itineraryLayer.addLayer(polyline);
+                    }
+                    current_station = marker;
+                    itineraryLayer.addLayer(marker);
+                });
                 map.removeLayer(markersLayer);
                 map.addLayer(itineraryLayer);
                 map.fitBounds(latLngs);
