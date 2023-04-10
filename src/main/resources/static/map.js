@@ -172,7 +172,7 @@ form.addEventListener('submit', function (event) {
                     var marker = L.marker([latitude, longitude])
                         .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
                     if (current_station != null) {
-                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(linesItinerary[stationName].lineNameWithoutVariant) });
+                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(linesItinerary[stationName].lineNameWithoutVariant), weight: 10, opacity:3 });
                         itineraryLayer.addLayer(polyline);
                     }
                     current_station = marker;
