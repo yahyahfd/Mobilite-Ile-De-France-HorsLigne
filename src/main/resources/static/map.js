@@ -32,7 +32,7 @@ fetch('http://localhost:8080/stations')
 
             for(let i in localisations){
                 var marker = L.marker([localisations[i].latitude, localisations[i].longitude])
-                    .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
+                    .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
                 markers.push(marker);
             }
 
@@ -142,7 +142,8 @@ form.addEventListener('submit', function (event) {
                         latLngs.push([latitude, longitude]);
                         var lines = station.neighboringLines.join('<br>');
                         var marker = L.marker([latitude, longitude])
-                            .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
+                            .bindPopup(
+                                stationName + getLinesLogoColor(lines));
                         if (current_station != null) {
                             var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 });
                             itineraryLayer.addLayer(polyline);
@@ -167,13 +168,14 @@ form.addEventListener('submit', function (event) {
                     map.invalidateSize();
                 }
             })
-            .catch(error => console.error(error));
+            .catch(error => { // Bad syntax or empty inputs
+                console.error(error);
+                errorMessage.style.display = "block";
+                errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+            });
         })
-        .catch(error => { // Bad syntax or empty inputs
-            console.error(error);
-            errorMessage.style.display = "block";
-            errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
-        });
+        .catch(error => console.error(error));
+
 });
 
 function autoComplete(inputElement, datalistElement, optionsList) {
@@ -231,6 +233,14 @@ function getColorByLineName(lineName) {
         default:
             return 'blue';
     }
+}
+
+function getLinesLogoColor(lines){
+    var result = '';
+    lines.split('<br>').forEach(line => {
+        result += '<br> <i class="fa-solid fa-train fa-beat fa-xl" style="color: '+getColorByLineName(line)+ ';"></i> &emsp;' + line+'<br>';
+    });
+    return result;
 }
 
 const departDatalist = document.getElementById('depart-list');
