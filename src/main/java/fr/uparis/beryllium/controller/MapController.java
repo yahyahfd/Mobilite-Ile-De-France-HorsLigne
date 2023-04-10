@@ -30,14 +30,14 @@ public class MapController {
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
-    Map map = Parser.readMap("map_data.csv");
-    Itinerary itinerary = new Itinerary(map.getAllStations());
+  public HashMap<Station, Line> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
+    Map m = Parser.readMap("map_data.csv");
+    Itinerary i = new Itinerary(m.getAllStations());
     try {
-      Station startStation = map.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
-      Station destStation = map.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
-      HashMap<Station,Line> shortestWay = itinerary.shortestWay(startStation, destStation, preference);
-      return itinerary.getPathStations(shortestWay);
+      Station start = m.searchStationByName(depart);
+      Station dest = m.searchStationByName(arrivee);
+      HashMap<Station,Line> res = i.shortestWay(start, dest, preference);
+      return res;
     } catch (Exception e) {
       return null;
     }

@@ -62,18 +62,21 @@ public class Parser {
         String[] duration = record.get("duration").split(":");
         String distance = record.get("dist");
 
+        Localisation firstStationLocalisation = new Localisation(Double.parseDouble(gpsFirstStation[1]), Double.parseDouble(gpsFirstStation[0]));
+        Localisation secondStationLocalisation = new Localisation(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0]));
         // Search for the stations and line
-        // If they exist, search function return their object in map's lists
-        // Else, it create a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, new Localisation(Double.parseDouble(gpsFirstStation[1]), Double.parseDouble(gpsFirstStation[0])));
-        Station stat2 = map.searchStation(secondStation, new Localisation(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0])));
         // Add line with variant in the name
         Line line = map.searchLine(lineInCsv[0] + "." + lineInCsv[2]);
 
+        // If they exist, search function return their object in map's lists
+        // Else, it create a new object, put it in map's lists and return it
+        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0]);
+        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0]);
+
         // Add station to line's list
         // addStation verify if the station is already in the list or not
-        line.addStation(stat1);
-        line.addStation(stat2);
+        line.addStation(stat1,firstStationLocalisation);
+        //=line.addStation(stat2);
 
         // Add neighbours
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));

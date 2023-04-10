@@ -227,13 +227,16 @@ public class Itinerary {
 					}
 				}
 			}
+			s.setLocalisation(s.getLocalisations().get(l.getLineNameWithoutVariant()));
+			//System.out.println(s.getLocalisation().getLatitude());
 			// we add the station at the begining of the list
 			shortestPath.put(s, l);
 			// we follow the path
 			s = before;
 		}
 		// add first station
-		shortestPath.put(start,null);
+		start.setLocalisation(start.getLocalisations().get(l.getLineNameWithoutVariant()));
+		shortestPath.put(start,l);
 		return shortestPath;
 	}
 

@@ -27,13 +27,23 @@ fetch('http://localhost:8080/stations')
     .then(data => {
         data.forEach(station => {
             var lines = station.neighboringLines.join('<br>');
-            var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
-                .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
-            markersLayer.addLayer(marker);
+            var localisations = station.localisations;
+            var markers = [];
+
+            for(let i in localisations){
+                var marker = L.marker([localisations[i].latitude, localisations[i].longitude])
+                    .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
+                markers.push(marker);
+            }
+
+            markersLayer.addLayer(L.layerGroup(markers));
+            // var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
+            //     .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
+            //markersLayer.addLayer(marker);
 
             // Adding station names + localisation to datalist of both inputs
-            departList.push(station.name + " [" + station.neighboringLines.join('|') + "] (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
-            arriveeList.push(station.name + " [" + station.neighboringLines.join('|') + "] (" + station.localisation.latitude + "," + station.localisation.longitude + ")");
+            departList.push(station.name);
+            arriveeList.push(station.name);
         });
         map.addLayer(markersLayer);
     })
@@ -116,12 +126,16 @@ form.addEventListener('submit', function (event) {
                 var current_station = null;
                 const latLngs = [];
                 // We place each station on the map and draw a line between each two consecutive stations
-                data.forEach(station => {
 
+                console.log(data);
+
+
+                for(let station in data) {
                     var name = station.name;
+                    var line = data[station];
 
-                    itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + name + '</span>';
-                    if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+                    console.log(station.localisation);
+                    console.log(line);
 
                     var latitude = station.localisation.latitude;
                     var longitude = station.localisation.longitude;
@@ -129,14 +143,32 @@ form.addEventListener('submit', function (event) {
                     var lines = station.neighboringLines.join('<br>');
                     var marker = L.marker([latitude, longitude])
                         .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
+
                     if (current_station != null) {
-                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: 'blue' });
+                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(line) });
                         itineraryLayer.addLayer(polyline);
                     }
                     current_station = marker;
                     itineraryLayer.addLayer(marker);
-                });
+                }
 
+                // data.forEach((station, line) => {
+                //     var name = station.name;
+                //     console.log(station);
+                //     console.log(line);
+                //     var latitude = station.localisation.latitude;
+                //     var longitude = station.localisation.longitude;
+                //     latLngs.push([latitude, longitude]);
+                //     var lines = station.neighboringLines.join('<br>');
+                //     var marker = L.marker([latitude, longitude])
+                //         .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
+                //     if (current_station != null) {
+                //         var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: 'blue' });
+                //         itineraryLayer.addLayer(polyline);
+                //     }
+                //     current_station = marker;
+                //     itineraryLayer.addLayer(marker);
+                // });
                 map.removeLayer(markersLayer);
                 map.addLayer(itineraryLayer);
                 map.fitBounds(latLngs);
@@ -174,6 +206,45 @@ function autoComplete(inputElement, datalistElement, optionsList) {
             datalistElement.appendChild(option);
         });
     })
+}
+
+function getColorByLineName(lineName) {
+    switch (lineName) {
+        case '1':
+            return '#FFBE00';
+        case '2':
+            return '#0055C8';
+        case '3':
+            return '#6E6E00';
+        case '3bis':
+            return '#82C8E6';
+        case '4':
+            return '#A0006E';
+        case '5':
+            return '#FF5A00';
+        case '6':
+            return '#82DC73';
+        case '7':
+            return '#FF82B4';
+        case '7bis':
+            return '#82DC73';
+        case '8':
+            return '#D282BE';
+        case '9':
+            return '#D2D200';
+        case '10':
+            return '#DC9600';
+        case '11':
+            return '#6E491E';
+        case '12':
+            return '#00643C';
+        case '13':
+            return '#82C8E6';
+        case '14':
+            return '#640082';
+        default:
+            return 'blue';
+    }
 }
 
 const departDatalist = document.getElementById('depart-list');
