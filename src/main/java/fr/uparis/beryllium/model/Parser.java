@@ -80,9 +80,9 @@ public class Parser {
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
         int radius1km = 1;
-        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance)/10);
-        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km);
-        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km);
+        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance)/10, false);
+        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false);
+        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false);
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {

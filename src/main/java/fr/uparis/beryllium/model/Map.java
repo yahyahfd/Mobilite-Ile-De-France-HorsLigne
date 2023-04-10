@@ -66,6 +66,14 @@ public class Map {
     public ArrayList<Station> getAllStations() {
         return this.stations;
     }
+
+    /**
+     * Method used to remove a station from the list of all stations
+     * @param station The station to remove from the list
+     */
+    public void removeStation(Station station) {
+        this.stations.remove(station);
+    }
     
     public void addStation(Double latitude, Double longitude, String name) {
         Station s = new Station(name,new Localisation(latitude, longitude));
@@ -96,9 +104,8 @@ public class Map {
         Line walkingLine = this.searchLine("--MARCHE--");
         // we get the distance from the starting point to the final destination (it will be our aera of search)
         Double radius = start.getDistanceToAStation(dest);
-        System.out.println("RADIUS "+radius);
         // we add the stations that are un this perimeter as neighbors of the position
-        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius);
+        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, true);
     }
 
 }

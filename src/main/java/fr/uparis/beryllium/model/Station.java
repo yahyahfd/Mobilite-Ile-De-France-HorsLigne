@@ -85,15 +85,21 @@ public class Station {
      * @param h    the time with which you can reach s
      * @param dist the distance between these stations
      */
-    public void addNextStation(Station station, Line line, String[] durationArray, Double distance) {
-        String temps = durationArray[0].concat(String.valueOf(durationArray[1].charAt(0)));
+    public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig) {
         Duration duration = Duration.ZERO;
-        duration = duration.plusSeconds(Long.parseLong(temps));
-        String milli = durationArray[1].substring(1);
-        if(milli == ""){
-            milli = "0";
+        // we get the duration from the csv
+        if(!addWalkingNeig){
+            String temps = durationArray[0].concat(String.valueOf(durationArray[1].charAt(0)));
+            duration = duration.plusSeconds(Long.parseLong(temps));
+            String milli = durationArray[1].substring(1);
+            if(milli == ""){
+                milli = "0";
+            }
+            duration = duration.plusMillis(Long.parseLong(milli));
+        }else{
+            // we get the duration from calculation when walking
+            duration = duration.plusSeconds(Long.parseLong(durationArray[1]));
         }
-        duration = duration.plusMillis(Long.parseLong(milli));
         NeighborData n = new NeighborData(line, duration, distance);
 
         if (nextStations.containsKey(station)) {
@@ -131,14 +137,17 @@ public class Station {
      * @param allStations the list of all existing stations
      * @param radius the distance we want the neighbors to be in
      */
-    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius) {
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius, Boolean addFirstStation) {
         List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
         for (Station s : reacheable1kmStations) {
             double distance = s.getDistanceToAStation(this);
             double time = s.getWalkingTimeInSecondsFromADistance(distance);
             String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
-            this.addNextStation(s, walkingLine, stringTime, distance);
-            s.addNextStation(this, walkingLine, stringTime, distance);
+            // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)
+            this.addNextStation(s, walkingLine, stringTime, distance, true);
+            if(!addFirstStation){
+                s.addNextStation(this, walkingLine, stringTime, distance, true);
+            }
         }
     }
 

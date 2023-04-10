@@ -31,6 +31,8 @@ public class TerminalApplication {
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
         Station chosen_1 = null;
         Station chosen_2 = null;
+        Boolean localpositionStart = false;
+        Boolean localpositionDest = false;
         while(true){
             System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
             System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
@@ -54,6 +56,7 @@ public class TerminalApplication {
                 String name = "localPositionStart";
                 addStationByCoordonnees(scanner, m, name);
                 chosen_1 = (m.getStationsByName(name)).get(0);
+                localpositionStart = true;
             };
             
             System.out.print("\u001B[32mEnter your second station's name: (lp : local position)\u001B[0m");
@@ -77,6 +80,7 @@ public class TerminalApplication {
                 String name = "localPositionDest";
                 addStationByCoordonnees(scanner, m, name);
                 chosen_2 = (m.getStationsByName(name)).get(0);
+                localpositionDest = true;
             };
             // list of choice of preferences
             ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
@@ -94,12 +98,20 @@ public class TerminalApplication {
             }
             Station start = chosen_1;
             Station dest = chosen_2;
+
+            for(java.util.Map.Entry<Station, ArrayList<NeighborData>> entry : start.getNextStations().entrySet()){
+                Station s2 = entry.getKey();
+                ArrayList<NeighborData> neig = entry.getValue();
+                for(NeighborData n : neig){
+                    System.out.println(n.getLine().getName()+", "+n.getDuration().toMillis()+" --- "+n.getDistance());
+                }
+            }
             // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
-            if(start.getName() == "localPositionStart"){
+            if(localpositionStart){
                 m.walkToBestStation(start,dest);
             }
             // we add the neighbors for the destination station
-            if(dest.getName() == "localPositionDest"){
+            if(localpositionDest){
                 m.walkToBestStation(dest,start);
             }
             // instanciate itinerary with all stations of the map
@@ -114,6 +126,13 @@ public class TerminalApplication {
             } else {
                 System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
                 System.out.println(i.showPath(route));
+            }
+            // if we added temporary station, we remove them of the list of station
+            if(localpositionStart){
+                m.removeStation(start);
+            }
+            if(localpositionDest){
+                m.removeStation(dest);
             }
         }
         scanner.close();
