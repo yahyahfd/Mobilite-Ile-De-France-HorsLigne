@@ -121,54 +121,53 @@ form.addEventListener('submit', function (event) {
         .then(response => response.json())
         .then(dataLines => {
             linesItinerary = dataLines;
-        })
-        .catch(error => console.error(error));
+            fetch(url)
+            .then(response => response.json())
+            .then(data => {
+                if (data.length == 0) { // No path found
+                    errorMessage.style.display = "block";
+                    errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
+                } else {// We draw a path on our map (need to add a written path later here)
+                    errorMessage.style.display = "none";
+                    itineraryLayer.clearLayers();
+                    var current_station = null;
+                    const latLngs = [];
 
-    fetch(url)
-        .then(response => response.json())
-        .then(data => {
-            if (data.length == 0) { // No path found
-                errorMessage.style.display = "block";
-                errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
-            } else {// We draw a path on our map (need to add a written path later here)
-                errorMessage.style.display = "none";
-                main_menu.style.display = "none";
-                drawing_menu.style.display = "block";
-                itineraryLayer.clearLayers();
-                var current_station = null;
-                const latLngs = [];
-
-                // We place each station on the map and draw a line between each two consecutive stations
-                data.forEach(station => {
-                    var stationName = station.name;
-                    var lineName = linesItinerary[stationName].lineNameWithoutVariant;
-                    var latitude = station.localisation.latitude;
-                    var longitude = station.localisation.longitude;
-                    latLngs.push([latitude, longitude]);
-                    var lines = station.neighboringLines.join('<br>');
-                    var marker = L.marker([latitude, longitude])
-                        .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
-                    if (current_station != null) {
-                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 });
-                        itineraryLayer.addLayer(polyline);
-                        polyline.bindTooltip(lineName, {permanent: false, direction: "center"});
-                    }
-                    current_station = marker;
-                    itineraryLayer.addLayer(marker);
-                });
-                map.removeLayer(markersLayer);
-                map.addLayer(itineraryLayer);
-                map.fitBounds(latLngs);
-                map.setZoom(13);
-                document.getElementById("tab2").classList.add("active");
-                document.getElementById("tab1").classList.remove("active");
-                document.getElementById("menu2").classList.add("active");
-                document.getElementById("menu1").classList.remove("active");
-                tab1.innerHTML = "Textuel";
-                tab2.innerHTML = "Visuel";
-                map.invalidateSize();
-
-            }
+                    // We place each station on the map and draw a line between each two consecutive stations
+                    data.forEach(station => {
+                        var stationName = station.name;
+                        var lineName = linesItinerary[stationName].lineNameWithoutVariant;
+                        var latitude = station.localisation.latitude;
+                        var longitude = station.localisation.longitude;
+                        latLngs.push([latitude, longitude]);
+                        var lines = station.neighboringLines.join('<br>');
+                        var marker = L.marker([latitude, longitude])
+                            .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
+                        if (current_station != null) {
+                            var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 });
+                            itineraryLayer.addLayer(polyline);
+                            polyline.bindTooltip(lineName, {permanent: false, direction: "center"});
+                        }
+                        current_station = marker;
+                        itineraryLayer.addLayer(marker);
+                    });
+                    map.removeLayer(markersLayer);
+                    map.addLayer(itineraryLayer);
+                    map.fitBounds(latLngs);
+                    map.removeLayer(markersLayer);
+                    map.addLayer(itineraryLayer);
+                    map.fitBounds(latLngs);
+                    map.setZoom(13);
+                    document.getElementById("tab2").classList.add("active");
+                    document.getElementById("tab1").classList.remove("active");
+                    document.getElementById("menu2").classList.add("active");
+                    document.getElementById("menu1").classList.remove("active");
+                    tab1.innerHTML = "Textuel";
+                    tab2.innerHTML = "Visuel";
+                    map.invalidateSize();
+                }
+            })
+            .catch(error => console.error(error));
         })
         .catch(error => { // Bad syntax or empty inputs
             console.error(error);
