@@ -186,8 +186,23 @@ public class Station {
     private double getWalkingTimeInSecondsFromADistance(double distance) {
         double speedHumanWalk = 8.0;
         double timeHumanWalk = 3600;
-
+        
         return (distance * timeHumanWalk) / speedHumanWalk;
+    }
+    
+    /**
+     * Remove all occurences of the temporary station which was added
+     * @param walkingLine the line used between the two stations
+     * @param allStations all the stations
+     * @param radius distance between the two stations
+     */
+    public void removeWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius){
+        // get all stations where we added the temporary station 
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
+        // for all these stations, we remove the temporary station from nextstation
+        for (Station s : reacheable1kmStations) {
+            s.nextStations.remove(this);
+        }
     }
 
     /**

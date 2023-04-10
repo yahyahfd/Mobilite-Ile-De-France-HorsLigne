@@ -99,13 +99,13 @@ public class Map {
      * @param start The starting station (coordonnees)
      * @param dest The destination Station
      */
-    public void walkToBestStation(Station start, Station dest){
+    public void walkToBestStation(Station start, Station dest, Boolean addFirstStation){
         // we get the walking line, create it if it doesn't exists
         Line walkingLine = this.searchLine("--MARCHE--");
         // we get the distance from the starting point to the final destination (it will be our aera of search)
         Double radius = start.getDistanceToAStation(dest);
         // we add the stations that are un this perimeter as neighbors of the position
-        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, true);
+        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, addFirstStation);
     }
 
 }

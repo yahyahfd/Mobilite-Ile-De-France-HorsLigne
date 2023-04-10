@@ -108,11 +108,11 @@ public class TerminalApplication {
             }
             // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
             if(localpositionStart){
-                m.walkToBestStation(start,dest);
+                m.walkToBestStation(start,dest, true);
             }
             // we add the neighbors for the destination station
             if(localpositionDest){
-                m.walkToBestStation(dest,start);
+                m.walkToBestStation(dest,start, false);
             }
             // instanciate itinerary with all stations of the map
             Itinerary i = new Itinerary(m.getAllStations());
@@ -127,11 +127,12 @@ public class TerminalApplication {
                 System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
                 System.out.println(i.showPath(route));
             }
-            // if we added temporary station, we remove them of the list of station
+            // if we added temporary station, we remove them of the list of stations
             if(localpositionStart){
                 m.removeStation(start);
             }
             if(localpositionDest){
+                dest.removeWalkingNeighbours(m.searchLine("--MARCHE--"), m.getAllStations(), start.getDistanceToAStation(dest));
                 m.removeStation(dest);
             }
         }
