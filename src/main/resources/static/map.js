@@ -138,33 +138,10 @@ form.addEventListener('submit', function (event) {
                 var current_station = null;
                 const latLngs = [];
 
-                // for(let station in data) {
-                //     var name = station.name;
-                //     var line = data[station];
-
-                //     console.log(line);
-
-                //     var latitude = station.localisation.latitude;
-                //     var longitude = station.localisation.longitude;
-                //     latLngs.push([latitude, longitude]);
-                //     var lines = station.neighboringLines.join('<br>');
-                //     var marker = L.marker([latitude, longitude])
-                //         .bindPopup(name + '<br>' + " Lignes: " + '<br>' + lines);
-
-                //     if (current_station != null) {
-                //         var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(line) });
-                //         itineraryLayer.addLayer(polyline);
-                //     }
-                //     current_station = marker;
-                //     itineraryLayer.addLayer(marker);
-                // }
-
-                console.log(linesItinerary);
-
                 // We place each station on the map and draw a line between each two consecutive stations
                 data.forEach(station => {
                     var stationName = station.name;
-
+                    var lineName = linesItinerary[stationName].lineNameWithoutVariant;
                     var latitude = station.localisation.latitude;
                     var longitude = station.localisation.longitude;
                     latLngs.push([latitude, longitude]);
@@ -172,8 +149,9 @@ form.addEventListener('submit', function (event) {
                     var marker = L.marker([latitude, longitude])
                         .bindPopup(stationName + '<br>' + " Lignes: " + '<br>' + lines);
                     if (current_station != null) {
-                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(linesItinerary[stationName].lineNameWithoutVariant), weight: 10, opacity:3 });
+                        var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 });
                         itineraryLayer.addLayer(polyline);
+                        polyline.bindTooltip(lineName, {permanent: false, direction: "center"});
                     }
                     current_station = marker;
                     itineraryLayer.addLayer(marker);
