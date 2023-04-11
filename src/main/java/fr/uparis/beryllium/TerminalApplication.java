@@ -111,7 +111,12 @@ public class TerminalApplication {
             System.out.println("Multiple stations with the name "+name+" found. Choose one from the list below:");
             int i = 1;
             for(Station s : stations){
-                System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
+                ArrayList<String> neighborLines = s.getNeighboringLines();
+                if (neighborLines.isEmpty()) {
+                    System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
+                } else {
+                    System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
+                }
                 i++;
             }
             
