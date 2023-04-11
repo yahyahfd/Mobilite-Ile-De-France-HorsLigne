@@ -61,6 +61,29 @@ const arriveeInput = document.getElementById('arrivee');
 const form = document.querySelector('#itinerary_form');
 const errorMessage = document.getElementById('error_itinerary');
 
+const itinerary = document.getElementById('itinerary');
+
+const drawing_menu = document.getElementById('second_left');
+const main_menu = document.getElementById('first_left');
+
+const back_button = document.getElementById('back_button');
+back_button.addEventListener('click', function () {
+    main_menu.style.display = 'block';
+    drawing_menu.style.display = 'none';
+    itinerary.innerHTML = '';
+    map.setView([48.856614, 2.3522219], 12);
+    map.removeLayer(itineraryLayer);
+    map.addLayer(markersLayer);
+});
+
+// var resetBtn = document.getElementById('resetZoom');
+// // Reset map to initial state
+// resetBtn.addEventListener('click', function () {
+//     map.setView([48.856614, 2.3522219], 12);
+//     map.removeLayer(itineraryLayer);
+//     map.addLayer(markersLayer);
+// });
+
 form.addEventListener('submit', function (event) {
     event.preventDefault();
 
@@ -100,12 +123,19 @@ form.addEventListener('submit', function (event) {
                 errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
             } else {// We draw a path on our map (need to add a written path later here)
                 errorMessage.style.display = "none";
+                main_menu.style.display = "none";
+                drawing_menu.style.display = "block";
                 itineraryLayer.clearLayers();
                 var current_station = null;
                 const latLngs = [];
                 // We place each station on the map and draw a line between each two consecutive stations
                 data.forEach(station => {
+
                     var name = station.name;
+
+                    itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + name + '</span>';
+                    if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+
                     var latitude = station.localisation.latitude;
                     var longitude = station.localisation.longitude;
                     latLngs.push([latitude, longitude]);
@@ -119,6 +149,7 @@ form.addEventListener('submit', function (event) {
                     current_station = marker;
                     itineraryLayer.addLayer(marker);
                 });
+
                 map.removeLayer(markersLayer);
                 map.addLayer(itineraryLayer);
                 map.fitBounds(latLngs);
@@ -154,10 +185,3 @@ autoComplete(departInput, departDatalist, departList);
 const arriveeDatalist = document.getElementById('arrivee-list');
 autoComplete(arriveeInput, arriveeDatalist, arriveeList);
 
-var resetBtn = document.getElementById('resetZoom');
-// Reset map to initial state
-resetBtn.addEventListener('click', function () {
-    map.setView([48.856614, 2.3522219], 12);
-    map.removeLayer(itineraryLayer);
-    map.addLayer(markersLayer);
-});

@@ -3,6 +3,7 @@ package fr.uparis.beryllium.model;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
@@ -297,7 +298,11 @@ public class Itinerary {
 		if(res == null){
 			return new ArrayList<>();
 		}
-		return new ArrayList<>(res.keySet());
+
+		ArrayList<Station> stationRes = new ArrayList<>(res.keySet());
+		Collections.reverse(stationRes);
+
+		return stationRes;
 	}
 
 }

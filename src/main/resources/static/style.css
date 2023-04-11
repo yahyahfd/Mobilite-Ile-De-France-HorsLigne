@@ -6,6 +6,19 @@
   box-sizing: border-box;
 }
 
+/* Ajout des nouveaux fonts */
+:root, :host {
+  --fa-style-family-classic: 'Font Awesome 6 Free';
+  --fa-font-solid: normal 900 1em/1 'Font Awesome 6 Free'; }
+
+@font-face {
+	font-family: "Font Awesome 6 Free";
+	font-style: normal;
+	font-weight: 900;
+	font-display: block;
+	src: url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.woff2) format("woff2"), url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.ttf) format("truetype")
+}
+
 /* Styles généraux */
 
 html,
@@ -60,7 +73,9 @@ main {
 
 .left {
   width: 25%;
-  background-color: #696f75;
+  background-color: #4c4f52;
+  display: flex;
+  flex-direction: column;
 }
 
 .right {
@@ -124,4 +139,89 @@ input[type="submit"],
   padding: 10px;
   background-color: #ef9541;
   margin: 10px;
+}
+
+#itinerary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #696f75;
+  border: 2px solid #a8a8a8;
+  margin: 10px 50px;
+}
+
+#itinerary div:not(:last-child) {
+  border-right: 2px solid #333;
+}
+
+#back_button {
+  margin: 5px 0px 0px 5px;
+}
+
+.station_name {
+  display: flex;
+  align-items: center;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+
+.fa-location-dot:before{content:"\f3c5"}
+.fa-chevron-left:before{content:"\f053"}
+.fa-down-long:before{content:"\f309"}
+
+.fa-location-dot {
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
+
+.fa-chevron-left,
+.fa-down-long {
+  font-size: 1.2rem;
+  margin: 0 5px;
+}
+
+.fa-solid{
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	display: var(--fa-display, inline-block);
+	font-style: normal;
+	font-variant: normal;
+	line-height: 1;
+	text-rendering: auto;
+	font-family: "Font Awesome 6 Free";
+	font-weight: 900
+}
+
+#first_left {
+  margin-bottom: 1rem;
+}
+
+#second_left {
+  display: none;
+  overflow-y: scroll;
+}
+
+#second_left.show {
+  display: flex;
+  flex-direction: column;
+}
+
+.btn-icon {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #000;
+}
+
+.btn-icon:hover {
+  color: #aaa;
 }
