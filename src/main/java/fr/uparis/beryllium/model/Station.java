@@ -1,11 +1,11 @@
 package fr.uparis.beryllium.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Station {
     private String name;
@@ -82,6 +82,6 @@ public class Station {
     //  * @see Localisation
     //  */
      public String toString(){
-         return name + " " + localisation;
+         return name;
      }
 }

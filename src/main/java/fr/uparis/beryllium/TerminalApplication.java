@@ -1,18 +1,12 @@
 package fr.uparis.beryllium;
 
+import fr.uparis.beryllium.exceptions.FormatException;
+import fr.uparis.beryllium.model.*;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
-
-import fr.uparis.beryllium.exceptions.FormatException;
-import fr.uparis.beryllium.model.Map;
-import fr.uparis.beryllium.model.Parser;
-
-
-import fr.uparis.beryllium.model.Itinerary;
-import fr.uparis.beryllium.model.Line;
-import fr.uparis.beryllium.model.Station;
 
 /**
  * The Controller is considered the main in our MVC
@@ -117,7 +111,12 @@ public class TerminalApplication {
             System.out.println("Multiple stations with the name "+name+" found. Choose one from the list below:");
             int i = 1;
             for(Station s : stations){
-                System.out.println(i+") "+s);
+                ArrayList<String> neighborLines = s.getNeighboringLines();
+                if (neighborLines.isEmpty()) {
+                    System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
+                } else {
+                    System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
+                }
                 i++;
             }
             
