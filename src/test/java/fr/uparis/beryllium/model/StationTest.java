@@ -2,7 +2,7 @@ package fr.uparis.beryllium.model;
 
 import org.junit.jupiter.api.Test;
 
-import ch.qos.logback.core.util.Duration;
+import java.time.Duration;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -63,10 +63,16 @@ class StationTest {
         Station station2 = new Station("Commerce", new Localisation(48.84461151236847, 2.293796842192864));
         Station station3 = new Station("Opéra", new Localisation(48.87059812248669, 2.332135072925294));
         ArrayList<Station> allStations = new ArrayList<>(List.of(station1, station2, station3));
-        Map<Station, ArrayList<NeighborData>> nextS = new HashMap<>();
-        nextS.put(station2, new NeighborData(line, new Duration(1), 10.0));
-        nextS.put(station3, new NeighborData(line, new Duration(1), 10.0));
-        station1.nextStation = nextS;
+        java.util.Map<Station, ArrayList<NeighborData>> nextS = new HashMap<>();
+        ArrayList<NeighborData> nei = new ArrayList<>();
+        Duration duration = Duration.ZERO;
+        duration.plusSeconds(45);
+        String[] h = {"0","45"};
+        Double dist = 10.0;
+        nei.add(new NeighborData(line, duration, dist));
+        nextS.put(station2, nei);
+        nextS.put(station3, nei);
+        station1.addNextStation(station3, line, h, dist, false);
         
         // When
         station1.removeWalkingNeighbours(line, allStations, 1);
