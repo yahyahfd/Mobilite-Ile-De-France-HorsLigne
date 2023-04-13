@@ -22,7 +22,6 @@ public class Map {
     //else create and return the new Station
     public Station searchStation(String name, Localisation localisation, String lineNumber) {
         for (Station s : stations) {
-            //if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l)) return s;
             if(s.getName().equals(name)){
                 if(!s.hasThisLocalisation(localisation)) {
                     s.getLocalisations().put(lineNumber, localisation);

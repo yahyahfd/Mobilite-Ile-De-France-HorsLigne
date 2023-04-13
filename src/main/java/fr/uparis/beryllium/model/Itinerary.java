@@ -318,7 +318,10 @@ public class Itinerary {
 		if(res == null){
 			return new ArrayList<>();
 		}
-		return new ArrayList<>(res.values());
+		ArrayList<Line> lineRes = new ArrayList<>(res.values());
+		Collections.reverse(lineRes);
+
+		return lineRes;
 	}
 
 }

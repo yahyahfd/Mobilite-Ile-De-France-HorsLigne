@@ -10,7 +10,7 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Station {
     private String name;
-    private Localisation localisation;
+    private Localisation usedLocalisation;
 
     private HashMap<String,Localisation> localisations = new HashMap<>();
     @JsonIgnore
@@ -52,11 +52,11 @@ public class Station {
     }
 
     public Localisation getLocalisation() {
-        return localisation;
+        return usedLocalisation;
     }
 
     public void setLocalisation(Localisation localisation) {
-        this.localisation = localisation;
+        this.usedLocalisation = localisation;
     }
 
     public HashMap<String,Localisation> getLocalisations() {

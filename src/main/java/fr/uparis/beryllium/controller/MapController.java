@@ -52,6 +52,8 @@ public class MapController {
       Station start = m.searchStationByName(depart);
       Station dest = m.searchStationByName(arrivee);
       HashMap<Station, Line> res = i.shortestWay(start, dest, preference);
+      HashMap<Station, Line> resReversed = new HashMap<>();
+      ArrayList<Station> stations = i.getPathStations(res);
       return res;
     } catch (Exception e) {
       return null;
