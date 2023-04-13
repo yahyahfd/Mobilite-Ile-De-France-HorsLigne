@@ -76,7 +76,7 @@ public class Parser {
         // Add station to line's list
         // addStation verify if the station is already in the list or not
         line.addStation(stat1,firstStationLocalisation);
-        //=line.addStation(stat2);
+        line.addStation(stat2, secondStationLocalisation);
 
         // Add neighbours
         stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance));

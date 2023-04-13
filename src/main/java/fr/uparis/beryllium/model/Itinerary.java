@@ -190,18 +190,7 @@ public class Itinerary {
 					NeighborData neighbor = null;
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
 					for(NeighborData n : neighbors) {
-						if(n.getLine() == lineAlreadyUse) {
-							stayOnline = true;
-							neighbor = n;
-						}else {
-							stayOnline = false;
-						}
-					}
-					if(stayOnline) {
-						updateDist(s1, (Station) s2.getKey(), neighbor, preference);
-					}else {
-						lineAlreadyUse = neighbors.get(0).getLine();
-						updateDist(s1, (Station) s2.getKey(), neighbors.get(0), preference);
+						updateDist(s1, (Station) s2.getKey(), n, preference);
 					}
 				}
 			}
