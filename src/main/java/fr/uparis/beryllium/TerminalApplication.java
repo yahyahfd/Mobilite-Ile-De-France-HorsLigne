@@ -99,13 +99,6 @@ public class TerminalApplication {
             Station start = chosen_1;
             Station dest = chosen_2;
 
-            for(java.util.Map.Entry<Station, ArrayList<NeighborData>> entry : start.getNextStations().entrySet()){
-                Station s2 = entry.getKey();
-                ArrayList<NeighborData> neig = entry.getValue();
-                for(NeighborData n : neig){
-                    System.out.println(n.getLine().getName()+", "+n.getDuration().toMillis()+" --- "+n.getDistance());
-                }
-            }
             // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
             if(localpositionStart){
                 m.walkToBestStation(start,dest, true);

@@ -116,7 +116,7 @@ public class Itinerary {
 				// if dist to s1 is shortest than dist to s2
 				if (dist2 > Double.sum(dist1, weight)) {
 					distTime.setLeft(Double.sum(dist1, weight));
-					distTime.setRight(Double.sum(time1, (double) n.getDuration().toSeconds()));
+					distTime.setRight(Double.sum(time1, (double) n.getDuration().toMillis()));
 					distTimeToStart.put(s2, distTime);
 					// we memorize the way : station before s2 is : s1, with the line
 					HashMap<Station, Line> statLine = new HashMap<>();
@@ -155,17 +155,30 @@ public class Itinerary {
 			default:
 				break;
 		}
-	}
-
-	/**
-	 * Search for the shortest way to go from a station to another
-	 *
-	 * @param start      Station from where we start
-	 * @param dest       Station of destination
-	 * @param preference Integer : 0 = shortest distance / 1 = shortest time / 2 = unitaire
-	 * @return all stations and lines from start to destination
-	 */
-	public HashMap<Station, Line> shortestWay(Station start, Station dest, Integer preference) {
+		// if dist to s1 is shorter than dist to s2
+		if (distToStart.get(s2) > Double.sum(distToStart.get(s1), weight)) {
+			// if there is already a station to go to s2, we don't update with the station s1 if the line between them is --Marche--
+			HashMap<Station, Line> statB = stationBefore.get(s2);
+			if((statB == null) || (!n.getLine().getName().equals("--MARCHE--"))){
+				distToStart.put(s2, (Double.sum(distToStart.get(s1), weight)));
+				// we memorize the way : station before s2 is : s1, with the line
+				HashMap<Station, Line> statLine = new HashMap<>();
+				statLine.put(s1, n.getLine());
+				stationBefore.put(s2, statLine);
+			}
+		}
+    }
+	
+    /**
+     * Search for the shortest way to go from a station to another
+     * @param start Station from where we start
+     * @param dest Station of destination
+     * @param preference Integer : 0 = shortest distance / 1 = shortest time / 2 = unitaire
+     * @return all stations and lines from start to destination
+     */
+	public HashMap<Station, Line> shortestWay(Station start, Station dest, Integer preference) { 
+		// boolean a true / false -> si il existe un chemin avec une autre ligne que la marche, ignorer marche
+		// sinon prendre marche si c'est la seule possibilité
 		// initialize the map
 		init(start);
 		Map<Station, ArrayList<NeighborData>> nextStationOfStart = start.getNextStations();
@@ -184,9 +197,9 @@ public class Itinerary {
 			// we get the min of all stations
 			s1 = shortestDist(allStations, preference);
 			// the remaining stations are not reachable
-			if(s1 == null) {
-				allStations.removeAll(allStations);
-			}else {
+			if (s1 == null) {
+				allStations.clear();
+			} else {
 				// we remove the station from the list
 				allStations.remove(s1);
 				Map<Station,ArrayList<NeighborData>> nextStationOfs1 = s1.getNextStations();
