@@ -28,11 +28,11 @@ public class TerminalApplication {
 
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
-        System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
+        System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
         Station chosen_1 = null;
         Station chosen_2 = null;
         while(true){
-            System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
+            System.out.println("\u001B[34mLet's check if there is a route for you\u001B[0m");
             System.out.print("\u001B[32mEnter your first station's name: \u001B[0m");
             String station1 = "";
             while(station1.isEmpty() || chosen_1 == null){
@@ -70,7 +70,7 @@ public class TerminalApplication {
             Integer preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
-                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2= unitary : \u001B[0m");
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());

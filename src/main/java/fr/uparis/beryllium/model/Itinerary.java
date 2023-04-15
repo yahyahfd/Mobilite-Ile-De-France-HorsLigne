@@ -2,6 +2,7 @@ package fr.uparis.beryllium.model;
 
 import org.apache.commons.lang3.tuple.MutablePair;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -247,17 +248,26 @@ public class Itinerary {
 				lineRes.add(0, (Line) r.getValue());
 			}
 			// afficher le chemin du depart jusqu'a dest
-			int i = 1;
+			int i = 0;
 			String downArrow = "↓";
 
 			String normalColor = "\033[0m";
 			String blue_bold = "\033[1;34m";
 			String purple_bold = "\033[1;35m";
+			String yellow_bold = "\033[1;33m";
+			MutablePair<Double, Long> distTime = new MutablePair<>(0.0, (long)(0));
 			while (i < stationRes.size()) {
-				if (i != 1) {
-					if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
-						path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": \n");
-						path.append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName()).append("\n");
+				if (i == 0 ){
+					distTime = getDistTimeForALine(stationRes, lineRes, i);
+					path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
+					path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+				} else {
+					if (i != 1) {
+						if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
+							MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i);
+							path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
+							path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName()).append("\n");
+						}
 					}
 					if (i + 1 < stationRes.size()) {
 						if (lineRes.get(i) != lineRes.get(i + 1) && lineRes.get(i) != null) {
@@ -270,15 +280,38 @@ public class Itinerary {
 					} else {
 						path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
 					}
-				} else if (lineRes.get(i) != null) {
-					path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": \n");
-					path.append("|     ").append(blue_bold).append(stationRes.get(0).getName()).append("\n");
-					path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
 				}
 				i++;
 			}
 		}
 		return path.toString();
+	}
+
+	/**
+	 * Get distance and time traveled on a line
+	 * @param stationRes list of all the station
+	 * @param lineRes list of all the line
+	 * @param position the position of the station in the stationRes
+	 * @return a couple of distance/time which represent the distance and time to travel the line of the station at the position
+	 */
+	private MutablePair<Double, Long> getDistTimeForALine(ArrayList<Station> stationRes, ArrayList<Line> lineRes, int position) {
+
+		MutablePair<Double, Double> distTimeStart = new MutablePair<>(0.0, 0.0);
+		if (position != 0) {
+			distTimeStart = distTimeToStart.get(stationRes.get(position));
+		}
+		int tempPos = position + 2;
+		while (tempPos < stationRes.size()) {
+			if (lineRes.get(position + 1) != lineRes.get(tempPos)) break;
+			tempPos++;
+		}
+		MutablePair<Double, Double> distTimeDestination = distTimeToStart.get(stationRes.get(tempPos - 1));
+		MutablePair<Double, Long> result = new MutablePair<>();
+		result.setLeft(distTimeDestination.getLeft() - distTimeStart.getLeft());
+		Duration d = Duration.ZERO;
+		d = d.plusSeconds((long) (distTimeDestination.getRight() - distTimeStart.getRight()));
+		result.setRight(d.toMinutes() + 1); // 40s => 1min pour arrondir
+		return result;
 	}
 
 	/**
