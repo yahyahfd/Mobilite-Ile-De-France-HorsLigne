@@ -129,6 +129,8 @@ form.addEventListener('submit', function (event) {
                     errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
                 } else {// We draw a path on our map (need to add a written path later here)
                     errorMessage.style.display = "none";
+                    main_menu.style.display = "none";
+                    drawing_menu.style.display = "block";
                     itineraryLayer.clearLayers();
                     var current_station = null;
                     const latLngs = [];
@@ -137,6 +139,8 @@ form.addEventListener('submit', function (event) {
                     data.forEach(station => {
                         var stationName = station.name;
                         var lineName = linesItinerary[stationName].lineNameWithoutVariant;
+                        itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + stationName + '</span>';
+                        if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
                         var latitude = station.localisation.latitude;
                         var longitude = station.localisation.longitude;
                         latLngs.push([latitude, longitude]);
@@ -152,9 +156,6 @@ form.addEventListener('submit', function (event) {
                         current_station = marker;
                         itineraryLayer.addLayer(marker);
                     });
-                    map.removeLayer(markersLayer);
-                    map.addLayer(itineraryLayer);
-                    map.fitBounds(latLngs);
                     map.removeLayer(markersLayer);
                     map.addLayer(itineraryLayer);
                     map.fitBounds(latLngs);
