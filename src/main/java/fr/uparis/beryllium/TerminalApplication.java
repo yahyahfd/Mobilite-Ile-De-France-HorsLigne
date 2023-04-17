@@ -2,11 +2,14 @@ package fr.uparis.beryllium;
 
 import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.model.*;
+import fr.uparis.beryllium.model.Map;
+import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+import static java.lang.Character.toLowerCase;
 
 /**
  * The Controller is considered the main in our MVC
@@ -59,7 +62,7 @@ public class TerminalApplication {
                 chosen_1 = (m.getStationsByName(name)).get(0);
                 localpositionStart = true;
             }
-            
+
             System.out.print("\u001B[32mEnter your second station's name: (lp : local position) \u001B[0m");
             String station2 = "";
             while(station2.isEmpty() || chosen_2 == null){
@@ -137,7 +140,6 @@ public class TerminalApplication {
     /**
      * This method is used twice in terminal mode to either propose all the stations
      * that have the same name, or just choose the single station with the name specified.
-     *
      * @param name Name of the station to look for
      * @param m The map used in this app
      * @param scanner Same scanner for the whole app.
@@ -170,9 +172,11 @@ public class TerminalApplication {
                     System.out.println("You need to choose a valid number ! Try again ! ");
                 }
             }
-            return stations.get(num_chosen - 1);
-        } else if (stations.size() == 0) {
-            System.out.println("No station with the name " + name + " was found !");
+            return stations.get(num_chosen-1);
+        }else if(stations.size() == 0){
+            System.out.println("No station with the name "+name+ " was found !");
+            ArrayList<Station> s = similar_names(name,m);
+            System.out.println(s);
             return null;
         } else {
             return stations.get(0);
@@ -212,5 +216,52 @@ public class TerminalApplication {
         }
         // we add the station to the map
         m.addStation(latitude, longitude, name);
+    }
+
+     /**
+     * This method is used to find stations who has similar name in case the user didn't spell correctly
+     * @param name Name of the station to look for
+     * @param m The map used in this app
+     * @return List of all the stations (with numbers to choose from) that have similar name <code>name</code>,
+     * or a single station or nothing if no station found.
+     */
+    public static ArrayList<Station> similar_names(String name, Map m){
+        ArrayList<Station> similar = new ArrayList<>();
+        ArrayList<Station> stations = m.getAllStations();
+        for( Station s : stations) {
+            String nameS = s.getName();
+            if (nameS.length() >= name.length() && nameS.substring(0, name.length()).toLowerCase().contains(name.toLowerCase())) {
+                similar.add(s);
+            } else {
+                int sameLetters = 0;
+                int diff = 0;
+                boolean notTheSameWordAnymore = false;
+                int index = 0;
+                while (index != name.length() && index != nameS.length()) {
+                    if (!notTheSameWordAnymore) {
+                        if (toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index))) sameLetters++;
+                        else {
+                            notTheSameWordAnymore = true;
+                            diff ++;
+                        }
+                    } else {
+                        if (index + 1 < nameS.length() && toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index+1))
+                                || toLowerCase(name.charAt(index - 1)) == toLowerCase(nameS.charAt(index))) {
+                            sameLetters++;
+                        }else{
+                            diff ++;
+                        }
+                    }
+                    index++;
+                }
+                if(sameLetters != 0)
+                System.out.println("même lettre : "+  diff + " et same : " + sameLetters  + " "+ s.getName() + " "+ (diff - sameLetters));
+
+                if (sameLetters != 0   && diff - sameLetters < 3  && diff - sameLetters > 0){
+                    similar.add(s);
+                }
+            }
+        }
+        return similar;
     }
 }
