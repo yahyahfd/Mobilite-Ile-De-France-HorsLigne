@@ -169,13 +169,12 @@ form.addEventListener('submit', function (event) {
                     map.invalidateSize();
                 }
             })
-            .catch(error => { // Bad syntax or empty inputs
-                console.error(error);
-                errorMessage.style.display = "block";
-                errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
-            });
         })
-        .catch(error => console.error(error));
+        .catch(error => { // Bad syntax or empty inputs
+               console.log(error);
+               errorMessage.style.display = "block";
+               errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+        });
 
 });
 
