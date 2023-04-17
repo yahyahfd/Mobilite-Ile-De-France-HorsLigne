@@ -19,7 +19,8 @@ public class Station {
 
     /**
      * All neighboring lines
-     * @return all lines of current station to reach a neighbor station
+     *
+     * @return all lines of the current station to reach a neighbor station
      */
     public ArrayList<String> getNeighboringLines(){
         ArrayList<String> result = new ArrayList<>();
@@ -80,10 +81,10 @@ public class Station {
     /**
      * Add station as a neighbor
      *
-     * @param s    the neighbor station
-     * @param l    the line with which you can reach s
-     * @param h    the time with which you can reach s
-     * @param dist the distance between these stations
+     * @param station    the neighbor station
+     * @param line    the line with which you can reach s
+     * @param durationArray    the time with which you can reach s
+     * @param distance the distance between these stations
      */
     public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig) {
         Duration duration = Duration.ZERO;
@@ -92,7 +93,7 @@ public class Station {
             String temps = durationArray[0].concat(String.valueOf(durationArray[1].charAt(0)));
             duration = duration.plusSeconds(Long.parseLong(temps));
             String milli = durationArray[1].substring(1);
-            if(milli == ""){
+            if (milli.equals("")) {
                 milli = "0";
             }
             duration = duration.plusMillis(Long.parseLong(milli));
@@ -192,11 +193,11 @@ public class Station {
     
     /**
      * Remove all occurences of the temporary station which was added
-     * @param walkingLine the line used between the two stations
+     *
      * @param allStations all the stations
-     * @param radius distance between the two stations
+     * @param radius      distance between the two stations
      */
-    public void removeWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius){
+    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius) {
         // get all stations where we added the temporary station 
         List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
         // for all these stations, we remove the temporary station from nextstation

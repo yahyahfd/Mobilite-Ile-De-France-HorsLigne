@@ -15,7 +15,7 @@ public class TerminalApplication {
 
     /**
      * No arguments are needed.
-     * Unicodes used for colors here: 
+     * Unicodes used for colors here:
      * Red: "\u001B[31m"
      * Green: "\u001B[32m"
      * Blue: "\u001B[34m"
@@ -31,16 +31,16 @@ public class TerminalApplication {
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
         Station chosen_1 = null;
         Station chosen_2 = null;
-        Boolean localpositionStart = false;
-        Boolean localpositionDest = false;
-        while(true){
+        boolean localpositionStart = false;
+        boolean localpositionDest = false;
+        while (true) {
             System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
             System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
             String station1 = "";
-            while(station1.isEmpty() || chosen_1 == null){
+            while (station1.isEmpty() || chosen_1 == null) {
                 station1 = scanner.nextLine();
                 station1 = station1.trim();
-                if (station1.isEmpty()){
+                if (station1.isEmpty()) {
                     System.out.println("Empty String, try again");
                 }
                 if (station1.trim().equalsIgnoreCase("quit")) break;
@@ -51,13 +51,13 @@ public class TerminalApplication {
                 }
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
-            // we start from our position, not a existing station
+            // we start from our position, not an existing station
             if (station1.trim().equalsIgnoreCase("lp")){
                 String name = "localPositionStart";
                 addStationByCoordonnees(scanner, m, name);
                 chosen_1 = (m.getStationsByName(name)).get(0);
                 localpositionStart = true;
-            };
+            }
             
             System.out.print("\u001B[32mEnter your second station's name: (lp : local position)\u001B[0m");
             String station2 = "";
@@ -75,13 +75,13 @@ public class TerminalApplication {
                 }
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
-            // we start from our position, not a existing station
+            // we start from our position, not an existing station
             if (station2.trim().equalsIgnoreCase("lp")){
                 String name = "localPositionDest";
                 addStationByCoordonnees(scanner, m, name);
                 chosen_2 = (m.getStationsByName(name)).get(0);
                 localpositionDest = true;
-            };
+            }
             // list of choice of preferences
             ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
             // while the given preference is not right, we ask again
@@ -96,37 +96,39 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
-            Station start = chosen_1;
-            Station dest = chosen_2;
+            if (chosen_1 != null && chosen_2 != null) {
+                Station start = chosen_1;
+                Station dest = chosen_2;
 
-            // we search for all stations that we can go by feet whithin a certan perimeter (dist from start to dest)
-            if(localpositionStart){
-                m.walkToBestStation(start,dest, true);
-            }
-            // we add the neighbors for the destination station
-            if(localpositionDest){
-                m.walkToBestStation(dest,start, false);
-            }
-            // instanciate itinerary with all stations of the map
-            Itinerary i = new Itinerary(m.getAllStations());
-            // get the shortest way depending on the preference
-            HashMap<Station, Line> route = i.shortestWay(start, dest, preference);
-            // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
-            // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
-            // We add the method (the algorithm) to look for the path
-            if (route == null) {
-                System.out.println("Looks like there is no route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m");
-            } else {
-                System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
-                System.out.println(i.showPath(route));
-            }
-            // if we added temporary station, we remove them of the list of stations
-            if(localpositionStart){
-                m.removeStation(start);
-            }
-            if(localpositionDest){
-                dest.removeWalkingNeighbours(m.searchLine("--MARCHE--"), m.getAllStations(), start.getDistanceToAStation(dest));
-                m.removeStation(dest);
+                // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
+                if (localpositionStart) {
+                    m.walkToBestStation(start, dest, true);
+                }
+                // we add the neighbors for the destination station
+                if (localpositionDest) {
+                    m.walkToBestStation(dest, start, false);
+                }
+                // instanciate itinerary with all stations of the map
+                Itinerary i = new Itinerary(m.getAllStations());
+                // get the shortest way depending on the preference
+                HashMap<Station, Line> route = i.shortestWay(start, dest, preference);
+                // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
+                // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
+                // We add the method (the algorithm) to look for the path
+                if (route == null) {
+                    System.out.println("Looks like there is no route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m");
+                } else {
+                    System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
+                    System.out.println(i.showPath(route));
+                }
+                // if we added temporary station, we remove them of the list of stations
+                if (localpositionStart) {
+                    m.removeStation(start);
+                }
+                if (localpositionDest) {
+                    dest.removeWalkingNeighbours(m.getAllStations(), start.getDistanceToAStation(dest));
+                    m.removeStation(dest);
+                }
             }
         }
         scanner.close();
