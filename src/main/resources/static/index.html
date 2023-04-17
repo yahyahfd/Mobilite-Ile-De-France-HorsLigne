@@ -13,16 +13,21 @@
 </head>
 
 <body>
+
+	<div class="tabs">
+		<button id="tab1" class="tab active ">Menu</button>
+		<button id="tab2" class="tab ">Map</button>
+	  </div>
 	<main>
-		<div class="left">
+		<div id="menu1" class="menu left active">
 			<div id="first_left">
 				<h2>Rechercher un itinéraire</h2>
 				<form id="itinerary_form" action="#" method="post" autocomplete="off">
 					<label for="depart">Départ:</label>
-					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
+					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="Départ">
 					<datalist id="depart-list"></datalist>
 					<label for="arrivee">Arrivée:</label>
-					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
+					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="Arrivée">
 					<datalist id="arrivee-list"></datalist>
 					<select id="options" name="options">
 						<option value="default">Par défaut</option>
@@ -41,17 +46,17 @@
 				</div>
 				<!-- <script type="text/javascript">
 						for (let i = 1; i <= 99; i++) {
-						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + i + '</span>';
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + i+i+i+i+i+i+i + '</span>';
 						itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>"
 						}
-						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 99+ '</span>';
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>sqdddddddddddddddddddddddd</span>";
 					</script> -->
 				<!-- <div id="reset">
 						<button id="resetZoom">Réinitialiser la carte</button>
 					</div> -->
 			</div>
 		</div>
-		<div class="right" id="map"></div>
+		<div class="menu right " id="menu2"></div>
 		<script src="map.js"></script>
 
 	</main>

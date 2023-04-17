@@ -4,10 +4,10 @@ var osm_terrain = L.tileLayer('Terrain/{z}/{x}/{y}.png', {
 
 var bounds = L.latLngBounds([[48.3, 1.5], [49.2, 3.5]]);
 
-var map = L.map('map', {
+var map = L.map('menu2', {
     layers: [osm_terrain],
-    maxBounds: bounds
-}).setView([48.856614, 2.3522219], 12);
+    maxBounds: bounds,
+}).setView([48.856614, 2.3522219], 13);
 map.setMaxZoom(15);
 map.setMinZoom(10);
 
@@ -55,9 +55,12 @@ back_button.addEventListener('click', function () {
     main_menu.style.display = 'block';
     drawing_menu.style.display = 'none';
     itinerary.innerHTML = '';
-    map.setView([48.856614, 2.3522219], 12);
+    map.setView([48.856614, 2.3522219], 13);
     map.removeLayer(itineraryLayer);
     map.addLayer(markersLayer);
+
+    tab1.innerHTML = "Menu";
+    tab2.innerHTML = "Map";
 });
 
 // var resetBtn = document.getElementById('resetZoom');
@@ -71,13 +74,13 @@ back_button.addEventListener('click', function () {
 form.addEventListener('submit', function (event) {
     event.preventDefault();
 
-    if (selectedOption === 'plus-rapide') {
-      // Code pour trouver l'itinéraire le plus rapide
-    } else if (selectedOption === 'plus-court') {
-      // Code pour trouver l'itinéraire le plus court
-    } else if (selectedOption === 'moins-marche') {
-      // Code pour trouver l'itinéraire avec moins de marche
-    }
+    // if (selectedOption === 'plus-rapide') {
+    //   // Code pour trouver l'itinéraire le plus rapide
+    // } else if (selectedOption === 'plus-court') {
+    //   // Code pour trouver l'itinéraire le plus court
+    // } else if (selectedOption === 'moins-marche') {
+    //   // Code pour trouver l'itinéraire avec moins de marche
+    // }
 
     // We get out selected travel option
     var optionsSelect = document.getElementById('options');
@@ -137,6 +140,15 @@ form.addEventListener('submit', function (event) {
                 map.removeLayer(markersLayer);
                 map.addLayer(itineraryLayer);
                 map.fitBounds(latLngs);
+                map.setZoom(13);
+                document.getElementById("tab2").classList.add("active");
+                document.getElementById("tab1").classList.remove("active");
+                document.getElementById("menu2").classList.add("active");
+                document.getElementById("menu1").classList.remove("active");
+                tab1.innerHTML = "Textuel";
+                tab2.innerHTML = "Visuel";
+                map.invalidateSize();
+
             }
         })
         .catch(error => { // Bad syntax or empty inputs
@@ -169,3 +181,18 @@ autoComplete(departInput, departDatalist, departList);
 const arriveeDatalist = document.getElementById('arrivee-list');
 autoComplete(arriveeInput, arriveeDatalist, arriveeList);
 
+const tabs = document.querySelectorAll('.tabs button');
+const menus = document.querySelectorAll('.menu');
+
+tabs.forEach(tab => {
+  tab.addEventListener('click', () => {
+    // Retirer la classe "active" de tous les boutons et menus
+    tabs.forEach(tab => tab.classList.remove('active'));
+    menus.forEach(menu => menu.classList.remove('active'));
+    // Ajouter la classe "active" au bouton cliqué et au menu correspondant
+    tab.classList.add('active');
+    const menu = document.querySelector(`#${tab.id.replace('tab', 'menu')}`);
+    menu.classList.add('active');
+    map.invalidateSize();
+  });
+});
