@@ -255,16 +255,20 @@ public class Itinerary {
 			String blue_bold = "\033[1;34m";
 			String purple_bold = "\033[1;35m";
 			String yellow_bold = "\033[1;33m";
-			MutablePair<Double, Long> distTime = new MutablePair<>(0.0, (long)(0));
+			MutablePair<Double, Long> distTime;
 			while (i < stationRes.size()) {
-				if (i == 0 ){
+				if (i == 0 ) {
+					MutablePair<Double, Double> distTimeFromDestination = distTimeToStart.get(stationRes.get(stationRes.size() - 1));
+					Duration d = Duration.ZERO;
+					d = d.plusSeconds((long) (distTimeFromDestination.getRight() - 0));
+					path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTimeFromDestination.getLeft()).append("km.\n");
 					distTime = getDistTimeForALine(stationRes, lineRes, i);
 					path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
 					path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
 				} else {
 					if (i != 1) {
 						if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
-							MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i);
+							MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i - 1);
 							path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
 							path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName()).append("\n");
 						}
