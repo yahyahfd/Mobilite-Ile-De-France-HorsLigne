@@ -1,5 +1,8 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
+
 import org.apache.commons.lang3.StringUtils;
 // import java.text.Normalizer;
 
@@ -17,13 +20,30 @@ public class Map {
 
     //Return Station if exist in the list
     //else create and return the new Station
-    public Station searchStation(String name, Localisation l) {
+    public Station searchStation(String name, Localisation localisation, String lineNumber) {
         for (Station s : stations) {
-            if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l)) return s;
+            if(s.getName().equals(name)){
+                if(!s.hasThisLocalisation(localisation)) {
+                    s.getLocalisations().put(lineNumber, localisation);
+                }
+                return s;
+            }
         }
-        Station newStation = new Station(name, l);
-        stations.add(newStation);
-        return newStation;
+
+        Station newstation = new Station(name, localisation, lineNumber);
+        stations.add(newstation);
+        return newstation;
+
+    }
+
+    public Station searchStationByName(String name){
+        for(Station station : stations) {
+            if(station.getName().equals(name)) {
+                return station;
+            }
+        }
+
+        return null;
     }
     
     //Return Line if exist

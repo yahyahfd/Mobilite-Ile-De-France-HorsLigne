@@ -190,18 +190,7 @@ public class Itinerary {
 					NeighborData neighbor = null;
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
 					for(NeighborData n : neighbors) {
-						if(n.getLine() == lineAlreadyUse) {
-							stayOnline = true;
-							neighbor = n;
-						}else {
-							stayOnline = false;
-						}
-					}
-					if(stayOnline) {
-						updateDist(s1, (Station) s2.getKey(), neighbor, preference);
-					}else {
-						lineAlreadyUse = neighbors.get(0).getLine();
-						updateDist(s1, (Station) s2.getKey(), neighbors.get(0), preference);
+						updateDist(s1, (Station) s2.getKey(), n, preference);
 					}
 				}
 			}
@@ -227,13 +216,16 @@ public class Itinerary {
 					}
 				}
 			}
+			s.setLocalisation(s.getLocalisations().get(l.getLineNameWithoutVariant()));
+			//System.out.println(s.getLocalisation().getLatitude());
 			// we add the station at the begining of the list
 			shortestPath.put(s, l);
 			// we follow the path
 			s = before;
 		}
 		// add first station
-		shortestPath.put(start,null);
+		start.setLocalisation(start.getLocalisations().get(l.getLineNameWithoutVariant()));
+		shortestPath.put(start,l);
 		return shortestPath;
 	}
 
@@ -303,6 +295,22 @@ public class Itinerary {
 		Collections.reverse(stationRes);
 
 		return stationRes;
+	}
+
+	/**
+	 * This method is used to return an ordered list of all lines in a path
+	 * @param res HashMap of the path calculated by shortestWay Method
+	 * @return An ordred list of lines in the path (can be empty)
+	 */
+
+	public ArrayList<Line> getPathLines(HashMap<Station, Line> res){
+		if(res == null){
+			return new ArrayList<>();
+		}
+		ArrayList<Line> lineRes = new ArrayList<>(res.values());
+		Collections.reverse(lineRes);
+
+		return lineRes;
 	}
 
 }

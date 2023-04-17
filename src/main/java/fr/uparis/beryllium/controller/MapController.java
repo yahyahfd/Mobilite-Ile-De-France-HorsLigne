@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.controller;
 
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -30,14 +31,30 @@ public class MapController {
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public List<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
-    Map map = Parser.readMap("map_data.csv");
-    Itinerary itinerary = new Itinerary(map.getAllStations());
+  public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
+    Map m = Parser.readMap("map_data.csv");
+    Itinerary i = new Itinerary(m.getAllStations());
     try {
-      Station startStation = map.searchStation(getName(depart), new Localisation(getX(depart), getY(depart)));
-      Station destStation = map.searchStation(getName(arrivee), new Localisation(getX(arrivee), getY(arrivee)));
-      HashMap<Station,Line> shortestWay = itinerary.shortestWay(startStation, destStation, preference);
-      return itinerary.getPathStations(shortestWay);
+      Station start = m.searchStationByName(depart);
+      Station dest = m.searchStationByName(arrivee);
+      HashMap<Station,Line> res = i.shortestWay(start, dest, preference);
+      return i.getPathStations(res);
+    } catch (Exception e) {
+      return null;
+    }
+  }
+
+  @GetMapping("/shortest-way/lines")
+  public HashMap<Station,Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
+    Map m = Parser.readMap("map_data.csv");
+    Itinerary i = new Itinerary(m.getAllStations());
+    try {
+      Station start = m.searchStationByName(depart);
+      Station dest = m.searchStationByName(arrivee);
+      HashMap<Station, Line> res = i.shortestWay(start, dest, preference);
+      HashMap<Station, Line> resReversed = new HashMap<>();
+      ArrayList<Station> stations = i.getPathStations(res);
+      return res;
     } catch (Exception e) {
       return null;
     }
