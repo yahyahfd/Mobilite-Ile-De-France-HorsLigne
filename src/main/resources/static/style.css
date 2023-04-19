@@ -1,12 +1,71 @@
-/* Réinitialisation des styles */
+/* Part of this code is imported from fontawesome: (imported) in the comment */
+/*!
+ * Font Awesome Free 6.4.0 by @fontawesome - https://fontawesome.com
+ * License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License)
+ * Copyright 2023 Fonticons, Inc.
+ */
 
+/* Adding fontawesome fonts (imported) */
+:root, :host {
+  --fa-style-family-classic: 'Font Awesome 6 Free';
+  --fa-font-solid: normal 900 1em/1 'Font Awesome 6 Free'; }
+
+@font-face {
+	font-family: "Font Awesome 6 Free";
+	font-style: normal;
+	font-weight: 900;
+	font-display: block;
+	src: url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.woff2) format("woff2"), url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.ttf) format("truetype")
+}
+
+/* Styling fontawesome SVGs (imported) */
+.fa-location-dot:before{content:"\f3c5"}
+.fa-chevron-left:before{content:"\f053"}
+.fa-down-long:before{content:"\f309"}
+
+.fa-location-dot {
+  font-size: 1.2rem;
+  margin-right: 5px;
+}
+
+.fa-chevron-left,
+.fa-down-long {
+  font-size: 1.2rem;
+  margin: 0 5px;
+}
+
+.fa-solid{
+	-moz-osx-font-smoothing: grayscale;
+	-webkit-font-smoothing: antialiased;
+	display: var(--fa-display, inline-block);
+	font-style: normal;
+	font-variant: normal;
+	line-height: 1;
+	text-rendering: auto;
+	font-family: "Font Awesome 6 Free";
+	font-weight: 900
+}
+
+/* Style reset and other stylings */
 * {
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-}
+  overflow-wrap: break-word;
+  word-wrap: break-word;
 
-/* Styles généraux */
+  -ms-word-break: break-all;
+  /* This is the dangerous one in WebKit, as it breaks things wherever */
+  word-break: break-all;
+  /* Instead use this non-standard one: */
+  word-break: break-word;
+
+  /* Adds a hyphen where the word breaks, if supported (No Blink) */
+  -ms-hyphens: auto;
+  -moz-hyphens: auto;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+}
 
 html,
 body {
@@ -16,71 +75,134 @@ body {
   font-family: Arial, sans-serif;
 }
 
-header {
-  background-color: #333;
-  color: #fff;
-  padding: 20px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-
-nav ul {
-  list-style: none;
-  display: flex;
-}
-
-nav ul li {
-  margin-left: 20px;
-}
-
-nav a {
-  color: #fff;
-  text-decoration: none;
-  font-size: 1.2rem;
-}
-
-footer {
-  background-color: #333;
-  color: #fff;
-  padding: 10px;
+h2{
   text-align: center;
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
+  margin: 2vw;
+  color: white;
 }
 
-/* 2 divs principales (menu gauche et map) */
-main {
+/* Main div (We divide screen) */
+main{
   height: 100%;
+  display: grid;
+  grid-template-columns: 25% 75%;
+}
+
+.left{
+  background-color: #4c4f52;
   display: flex;
-  flex-direction: row;
+  flex-direction: column;
+  overflow-y: auto;
 }
 
-.left {
-  width: 25%;
-  background-color: #696f75;
-}
-
-.right {
-  flex-grow: 1;
+.right{
   background-color: #8cb0d4;
+  height: 100%;
 }
 
-
-h1,
-h2 {
+.tab {
+  padding: 10px;
+  border: none;
+  background-color: #767a7e;
+  cursor: pointer;
+  color: white;
+  display: inline-block;
+  width: 50%;
   text-align: center;
-  margin: 10px;
+  font-size: 18px;
 }
 
+.tab.active {
+  background-color: #4c4f52;
+  font-weight: bold;
+  font-size: larger;
+  text-shadow: 2px 2px 6px rgba(255, 255, 255, 0.5);
+}
+
+.tab-content.active {
+  display: block;
+}
+
+
+.left, .rigt{
+  display: none;
+}
+
+.left.active, .right.active{
+  display: block;
+}
+
+
+.tabs {
+  background-color: #333;
+  display: flex;
+}
+
+@media screen and (max-width: 767px) {
+  .tabs {
+    display: flex;
+    height: 10%;
+  }
+  main {
+    grid-template-columns: 1fr;
+    height: 90%;
+  }
+
+  .left,.right{
+    display: none;
+  }
+  
+  .left.active, .right.active{
+    display: block;
+  }
+
+  label{
+    display: none;
+  }
+}
+
+
+/* Masquer les onglets sur les grands écrans */
+@media screen and (min-width: 768px) {
+  .tabs {
+    display: none;
+  }
+  main {
+    grid-template-columns: 25% 75%;
+    height: 100%;
+  }
+  .left,.right{
+    display: block;
+  }
+  label{
+    display: inherit;
+  }
+
+}
+
+/* 
+si taille< x:
+90% height main
+10% height tabs?
+active = menu
+switch entre les 2 
+*/
+
+
+
+
+
+
+
+
+
+
+/* Form */
 form {
   display: grid;
   justify-content: stretch;
-  margin-bottom: 20px;
+  grid-template-columns: 100%;
 }
-
 
 label {
   margin: 5px;
@@ -88,34 +210,30 @@ label {
   font-size: 1.2rem;
 }
 
-#map {
-  position: sticky;
-}
-
+/* Inputs */
 input[type="text"],
 input[type="submit"],
-#resetZoom,
 #options{
-  padding: 10px;
+  padding: 15px;
   font-size: 1.2rem;
   border: none;
   border-radius: 10px;
   margin: 5px;
 }
 
-
-input[type="submit"],
-#resetZoom {
+input[type="submit"]{
   background-color: #333;
   color: #fff;
   cursor: pointer;
 }
 
-#reset {
-  justify-content: stretch;
-  display: grid;
+input[type="submit"]:hover{
+  color: #333;
+  background-color: #fff;
+  cursor: pointer;
 }
 
+/* Error div */
 #error_itinerary {
   display: none;
   color: #333;
@@ -124,4 +242,56 @@ input[type="submit"],
   padding: 10px;
   background-color: #ef9541;
   margin: 10px;
+}
+
+/* Text Itinerary */
+#itinerary {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-direction: column;
+  padding: 10px;
+  background-color: #696f75;
+  border: 2px solid #a8a8a8;
+  margin: 10px 1vw;
+}
+
+#back_button {
+  margin: 5px 0px 0px 5px;
+}
+
+.station_name {
+  display: flex;
+  align-items: center;
+  margin: 10px;
+}
+
+.separator {
+  display: flex;
+  align-items: center;
+  margin: 0 10px;
+}
+
+.btn-icon {
+  border: none;
+  background: none;
+  padding: 0;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #000;
+}
+
+.btn-icon:hover {
+  color: #aaa;
+}
+
+/* Switching between main left menu and the right one */
+#second_left {
+  display: none;
+  width: 100%;
+} 
+
+#second_left.show {
+  display: flex;
+  flex-direction: column;
 }

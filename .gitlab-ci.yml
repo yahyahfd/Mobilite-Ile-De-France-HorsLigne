@@ -18,9 +18,10 @@ build-job:
   stage: build
   script:
     - echo "Building project"
-    - mvn clean package
     - apt-get install -y zip
-    - zip -r beryllium-${CI_COMMIT_TAG}.zip *
+    - mvn clean package
+    - cp target/beryllium-*.jar beryllium-${CI_COMMIT_TAG}.jar
+    - zip -r beryllium-${CI_COMMIT_TAG}.zip beryllium-${CI_COMMIT_TAG}.jar $(git ls-files)
     - chmod 777 beryllium-${CI_COMMIT_TAG}.zip
   artifacts:
     paths:
@@ -49,9 +50,18 @@ release-job:
               \"tag_name\": \"${CI_COMMIT_TAG}\",
               \"name\": \"${CI_COMMIT_TAG}\",
               \"ref\": \"${CI_COMMIT_TAG}\",
-              \"description\": \"## release n: ${CI_COMMIT_TAG}\",
+              \"description\": \"## release ${CI_COMMIT_TAG}\",
               \"assets\": {}
-              }" 
+              }"
+    - |
+      curl --request POST "${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/releases/${CI_COMMIT_TAG}/assets/links"\
+           --header "Content-Type: application/json" \
+           --header "PRIVATE-TOKEN: ${br_token}" \
+           --data "{
+              \"name\": \"release-${CI_COMMIT_TAG}.zip\",
+              \"url\": \"${CI_API_V4_URL}/projects/${CI_PROJECT_ID}/jobs/artifacts/${CI_COMMIT_TAG}/download?job=build-job\",
+              \"filepath\": \"/release-${CI_COMMIT_TAG}.zip\"
+              }"
 
   tags:
     - br
@@ -63,6 +73,6 @@ cleanup-job:
     - release-job
   script:
     - echo "Cleanup"
-    - rm -rf beryllium-${CI_COMMIT_TAG}.zip
+    - mvn clean
   tags:
     - br

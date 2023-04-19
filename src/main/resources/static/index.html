@@ -7,37 +7,57 @@
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
 	<script src="../Leaflet/leaflet.js"></script>
-	<script src="../Leaflet/Markercluster/dist/leaflet.markercluster.js"></script>
-	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.css" />
-	<script src='//api.tiles.mapbox.com/mapbox.js/plugins/leaflet-omnivore/v0.3.1/leaflet-omnivore.min.js'></script>
-	<link rel="stylesheet" href="../Leaflet/Markercluster/dist/MarkerCluster.Default.css" />
+	<script src="../Leaflet/leaflet.markercluster.js"></script>
+	<link rel="stylesheet" href="../Leaflet/MarkerCluster.css" />
+	<link rel="stylesheet" href="../Leaflet/MarkerCluster.Default.css" />
+	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
-	<main>
-		<div class="left">
-			<h2>Rechercher un itinéraire</h2>
-			<form id="itinerary_form" action="#" method="post" autocomplete="off">
-				<label for="depart">Départ:</label>
-				<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off">
-				<datalist id="depart-list"></datalist>
-				<label for="arrivee">Arrivée:</label>
-				<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off">
-				<datalist id="arrivee-list"></datalist>
-				<select id="options" name="options">
-					<option value="default">Par défaut</option>
-					<option value="dist">Meilleure distance</option>
-					<option value="time">Meilleur temps</option>
-				</select>
-				<input type="submit" value="Rechercher">
-			</form>
-			<div id="error_itinerary"></div>
 
-			<div id="reset">
-				<button id="resetZoom">Réinitialiser la carte</button>
+	<div class="tabs">
+		<button id="tab1" class="tab active ">Menu</button>
+		<button id="tab2" class="tab ">Map</button>
+	  </div>
+	<main>
+		<div id="menu1" class="menu left active">
+			<div id="first_left">
+				<h2>Rechercher un itinéraire</h2>
+				<form id="itinerary_form" action="#" method="post" autocomplete="off">
+					<label for="depart">Départ:</label>
+					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="Départ">
+					<datalist id="depart-list"></datalist>
+					<label for="arrivee">Arrivée:</label>
+					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="Arrivée">
+					<datalist id="arrivee-list"></datalist>
+					<select id="options" name="options">
+						<option value="default">Par défaut</option>
+						<option value="dist">Meilleure distance</option>
+						<option value="time">Meilleur temps</option>
+					</select>
+					<input type="submit" value="Rechercher">
+				</form>
+				<div id="error_itinerary"></div>
+			</div>
+			<div id="second_left">
+				<button id="back_button" class="btn-icon"><i class="fa-solid fa-chevron-left"></i></button>
+
+				<div id="itinerary">
+
+				</div>
+				<!-- <script type="text/javascript">
+						for (let i = 1; i <= 99; i++) {
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + i+i+i+i+i+i+i + '</span>';
+						itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>"
+						}
+						itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>sqdddddddddddddddddddddddd</span>";
+					</script> -->
+				<!-- <div id="reset">
+						<button id="resetZoom">Réinitialiser la carte</button>
+					</div> -->
 			</div>
 		</div>
-		<div class="right" id="map"></div>
+		<div class="menu right " id="menu2"></div>
 		<script src="map.js"></script>
 
 	</main>

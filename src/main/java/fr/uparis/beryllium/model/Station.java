@@ -3,13 +3,16 @@ package fr.uparis.beryllium.model;
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedList;
 import java.util.Map;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Station {
     private String name;
-    private Localisation localisation;
+    private Localisation usedLocalisation;
+
+    private HashMap<String,Localisation> localisations = new HashMap<>();
     @JsonIgnore
     private Map<Station,ArrayList<NeighborData>> nextStations = new HashMap<>();
 
@@ -21,7 +24,10 @@ public class Station {
         ArrayList<String> result = new ArrayList<>();
         nextStations.forEach((station, neighborDataList) -> {
             for(NeighborData nd:neighborDataList){
-                result.add(nd.getLine().getName());
+                String lineName = nd.getLine().getLineNameWithoutVariant();
+                if(!result.contains(lineName)){
+                    result.add(lineName);
+                }
             }
         });
         return result;
@@ -31,9 +37,10 @@ public class Station {
      * Neighboring stations or stations reached 
      * directly after the current one (this)
      */
-    Station(String n, Localisation l) {
+    Station(String n, Localisation localisation, String lineNumber) {
         name = n;
-        localisation = l;
+        //localisation = localisation;
+        localisations.put(lineNumber, localisation);
     }
 
     public String getName() {
@@ -45,7 +52,28 @@ public class Station {
     }
 
     public Localisation getLocalisation() {
-        return localisation;
+        return usedLocalisation;
+    }
+
+    public void setLocalisation(Localisation localisation) {
+        this.usedLocalisation = localisation;
+    }
+
+    public HashMap<String,Localisation> getLocalisations() {
+        return localisations;
+    }
+
+    public void setLocalisations(HashMap<String,Localisation> localisations) {
+        this.localisations = localisations;
+    }
+
+    public boolean hasThisLocalisation(Localisation localisation){
+        for (Localisation localisationI : localisations.values()){
+            if(localisationI.sameLocalisation(localisation)){
+                return true;
+            }
+        }
+        return false;
     }
 
     public void addNextStation(Station station, Line line, String[] durationArray, Double distance) {
@@ -82,6 +110,7 @@ public class Station {
     //  * @see Localisation
     //  */
      public String toString(){
-         return name + " " + localisation;
+         return getName();
      }
 }
+

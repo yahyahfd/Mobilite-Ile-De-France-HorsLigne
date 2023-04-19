@@ -18,7 +18,7 @@ public class ItineraryTest {
     public void testShortestWay() throws FormatException  {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
         Station olympiade = map.getStations().get(0);
-        Station bercy = map.getStations().get(4);
+        Station bercy = map.getStations().get(3);
         Itinerary itinerary = new Itinerary(map.getAllStations());
         //Test with equal weight
         HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2);
@@ -31,14 +31,15 @@ public class ItineraryTest {
 
         //Test with preference dist
         HashMap<Station, Line> path_2 = itinerary.shortestWay(olympiade,bercy, 0);
-        HashMap<Station, MutablePair<Double,Double>> timeDist = itinerary.getDistTime();
+          HashMap<Station, MutablePair<Double,Double>> timeDist = itinerary.getDistTime();
         //Find a way to calculate dist total
         ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
-        assertEquals(85.98552886278773,timeDist.get(stations_2.get(0)).getLeft());;
+        assertEquals(85.98552886278773,timeDist.get(stations_2.get(0)).getLeft());
 
 
         //Test with preference time
         HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1);
+        timeDist = itinerary.getDistTime();
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
         assertEquals(1328.0, timeDist.get(stations_3.get(0)).getRight());
     }
