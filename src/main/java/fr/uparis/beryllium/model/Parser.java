@@ -4,7 +4,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
@@ -30,7 +29,10 @@ public class Parser {
      */
     public static Map readMap(String csvFile) throws FormatException {
 
-        Map map = new Map();
+        Map map = Map.getMapInstance();
+        if(map.isMapLoaded()){
+            return map;
+        }
         try {
 
             String[] HEADERS = {"station1", "gps1", "station2", "gps2", "line", "duration", "dist"};
@@ -52,7 +54,7 @@ public class Parser {
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
         }
-
+        map.setMapLoaded();
         return map;
 
     }

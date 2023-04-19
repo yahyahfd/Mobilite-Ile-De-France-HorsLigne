@@ -1,15 +1,30 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 import org.apache.commons.lang3.StringUtils;
-
-import java.util.ArrayList;
+import fr.uparis.beryllium.exceptions.FormatException;
 
 public class Map {
-    private ArrayList<Line> lines = new ArrayList<>();
-    private ArrayList<Station> stations = new ArrayList<>();
+
+    private final ArrayList<Line> lines = new ArrayList<>();
+    private final ArrayList<Station> stations = new ArrayList<>();
+    // Singleton
+    private static Map mapInstance = null;
+    private boolean isMapLoaded = false;
+    private Map(){}
+    public static Map getMapInstance() throws FormatException {
+        if(mapInstance == null){
+            mapInstance = new Map();
+        }
+        return mapInstance;
+    }
+    
+    public boolean isMapLoaded() {
+        return isMapLoaded;
+    }
+
+    public void setMapLoaded() {
+        isMapLoaded = true;
+    }
 
     public ArrayList<Line> getLines() {
         return lines;
