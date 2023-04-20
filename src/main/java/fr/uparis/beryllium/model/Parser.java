@@ -19,7 +19,7 @@ public class Parser {
     private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
     /**
-     * Static method that is used to parse a file containing
+     * Static method that is used to parse the map data file containing
      * the network data (CSV file)
      *
      * @param csvFile String of the path to the file
@@ -55,6 +55,14 @@ public class Parser {
 
     }
 
+    /**
+     * Static method that is used to parse the timetables data file containing
+     * @param csvFile
+     * @param map
+     * @return
+     * @throws FormatException
+     */
+
     public static Map readMapHorraire(String csvFile, Map map) throws FormatException{
 
         try {
@@ -83,7 +91,13 @@ public class Parser {
 
     }
 
-    public static void fillMapWithHorraires(Map map, Iterator<CSVRecord> it){
+    /**
+     * static method that is used to fill each station of the lines of the map with times
+     * @param map the map to fill
+     * @param it iterator of the csv file
+     */
+
+    private static void fillMapWithHorraires(Map map, Iterator<CSVRecord> it){
 
         CSVRecord record = it.next();
 
@@ -99,11 +113,11 @@ public class Parser {
     }
 
     /**
-     * ...
-     *
-     * @param map
-     * @param it
+     * Static method that is used to fill the map with the data extracted from the csv file
+     * @param map the map to fill
+     * @param it iterator of the csv file
      */
+
     private static void fillMapInformationsWithExtractedFields(Map map, Iterator<CSVRecord> it) {
         CSVRecord record = it.next();
         // Creating map
@@ -139,6 +153,16 @@ public class Parser {
         stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
     }
 
+
+    /**
+     * Static method that is used to get an iterator of the csv file
+     * @param file the path to the file
+     * @param headers the headers of the csv file
+     * @return an iterator of the csv file
+     * @throws IOException
+     * @throws FileNotFoundException
+     * @throws FormatException
+     */
     private static Iterator<CSVRecord> getCsvRecordIterator(String file, String[] headers) throws IOException, FileNotFoundException, FormatException {
         FileReader reader = new FileReader(file);
         //Build a format of the csv file
@@ -158,8 +182,7 @@ public class Parser {
     }
 
     /**
-     * ...
-     *
+     * Static method that is used to check if the csv file is in the correct format
      * @param records
      * @param format
      * @throws FormatException

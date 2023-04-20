@@ -31,9 +31,9 @@ public class Line {
         return (ArrayList<Station>) stations.keySet();
     }
 
+
     /**
-     * Like contains method for ArrayList but with String instead of Object
-     *
+     * Check if a station is already in the line
      * @param name
      * @return
      */
@@ -46,15 +46,15 @@ public class Line {
         return false;
     }
 
+
     /**
-     * ...
-     *
+     * Add a station to the line stations list if it is not already in
      * @param station
      * @param localisation
      */
     public void addStation(Station station, Localisation localisation) {
         if (!isIn(station.getName())) {
-            stations.put(station, localisation);
+            stations.put(station,localisation);
         }
     }
 
@@ -70,6 +70,12 @@ public class Line {
         return stationsTimes.get(station);
     }
 
+
+    /**
+     * Add a time to a station in the line stations times list
+     * @param station
+     * @param time
+     */
     public void addStationTime(Station station, LocalTime time) {
         if (stationsTimes.containsKey(station)) {
             stationsTimes.get(station).add(time);

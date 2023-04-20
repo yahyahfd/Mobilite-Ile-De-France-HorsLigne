@@ -62,8 +62,14 @@ public class ParserTest {
         LocalTime time = LocalTime.of(10, 42);
 
         assertEquals(time, line.getStationTimes(map.getStationByName("Lourmel")).get(0));
+    }
 
-
+    @Test
+    public void testReadMapHorraireWithIncorrectCsv() {
+        assertThrows(FormatException.class, () -> {
+            Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
+            Parser.readMapHorraire("src/test/resources/testCsvHorraireIncorrect.csv", map);
+        });
     }
 
 
