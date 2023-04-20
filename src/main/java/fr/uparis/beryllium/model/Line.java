@@ -1,21 +1,21 @@
 package fr.uparis.beryllium.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
+
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Line {
 
-    private final String lineName;
-    private final HashMap<Station, Localisation> stations = new HashMap<>();
+    private String lineName;
+    private HashMap<Station, Localisation> stations = new HashMap<>();
+    private HashMap<Station, ArrayList<LocalTime>> stationsTimes = new HashMap<>();
 
-    public Line(String name) {
+    Line(String name) {
         lineName = name;
-    }
-
-    public String getName() {
-        return lineName;
     }
 
     public String getLineName() {
@@ -61,5 +61,25 @@ public class Line {
     public String toString() {
         return getLineNameWithoutVariant();
     }
+
+    public HashMap<Station, ArrayList<LocalTime>> getStationsTimes() {
+        return stationsTimes;
+    }
+
+    public ArrayList<LocalTime> getStationTimes(Station station) {
+        return stationsTimes.get(station);
+    }
+
+    public void addStationTime(Station station, LocalTime time) {
+        if (stationsTimes.containsKey(station)) {
+            stationsTimes.get(station).add(time);
+        } else {
+            ArrayList<LocalTime> times = new ArrayList<>();
+             times.add(time);
+            Collections.sort(times);
+            stationsTimes.put(station, times);
+        }
+    }
+
 }
 

@@ -4,12 +4,12 @@ package fr.uparis.beryllium.model;
 import static org.junit.jupiter.api.Assertions.*;
 
 import java.time.Duration;
+import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import fr.uparis.beryllium.exceptions.FormatException;
 
 public class ParserTest {
-
     @Test
     public void testReadMapWithCorrectCSV() throws FormatException {
 
@@ -48,6 +48,23 @@ public class ParserTest {
 
     @Test
     public void testReadMapWithIncorrectCSV() {
-        assertThrows(FormatException.class, () -> Parser.readMap("src/test/resources/testCsvParserIncorrect.csv"));
+        assertThrows(FormatException.class, () -> {
+            Parser.readMap("src/test/resources/testCsvParserIncorrect.csv");
+        });
     }
+
+    @Test
+    public void testReadMapHorraireWithCorrectCsv() throws FormatException {
+        Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
+        map = Parser.readMapHorraire("src/test/resources/testCsvHorraire.csv", map);
+        assertNotNull(map);
+        Line line = map.searchLine("8.1");
+        LocalTime time = LocalTime.of(10, 42);
+
+        assertEquals(time, line.getStationTimes(map.getStationByName("Lourmel")).get(0));
+
+
+    }
+
+
 }

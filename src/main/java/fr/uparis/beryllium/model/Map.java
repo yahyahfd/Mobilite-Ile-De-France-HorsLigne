@@ -1,13 +1,15 @@
 package fr.uparis.beryllium.model;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.LinkedList;
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
 
 public class Map {
-
-    private final ArrayList<Line> lines = new ArrayList<>();
-    private final ArrayList<Station> stations = new ArrayList<>();
+    private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Station> stations = new ArrayList<>();
 
     public ArrayList<Line> getLines() {
         return lines;
@@ -31,16 +33,18 @@ public class Map {
      */
     public Station searchStation(String name, Localisation localisation, String lineNumber) {
         for (Station s : stations) {
-            if (s.getName().equals(name)) {
-                if (!s.hasThisLocalisation(localisation)) {
+            if(s.getName().equals(name)){
+                if(!s.hasThisLocalisation(localisation)) {
                     s.getLocalisations().put(lineNumber, localisation);
                 }
                 return s;
             }
         }
+
         Station newstation = new Station(name, localisation, lineNumber);
         stations.add(newstation);
         return newstation;
+
     }
 
     /**
@@ -55,6 +59,7 @@ public class Map {
                 return station;
             }
         }
+
         return null;
     }
 
@@ -97,12 +102,11 @@ public class Map {
 
     /**
      * Method used in terminal mode to get all the stations with <code>name</code> as a name
-     *
      * @param name A station's name
      * @return An ArrayList of stations with the corresponding name (can be empty if no stations found)
      */
     public ArrayList<Station> getStationsByName(String name){
-        ArrayList<Station> result = new ArrayList<>();
+        ArrayList<Station> result = new ArrayList<Station>();
         for(Station s : stations){
             if(StringUtils.stripAccents(s.getName()).equalsIgnoreCase(StringUtils.stripAccents(name))) result.add(s);
         }
@@ -125,5 +129,21 @@ public class Map {
         // we add the stations that are un this perimeter as neighbors of the position
         start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, addFirstStation, lStart);
     }
+
+
+
+    /**
+     * Method used in terminal mode to get the first station with <code>name</code> as a name
+     * @param name
+     * @return The first station with the corresponding name (can be null if no station found)
+     */
+    public Station getStationByName(String name){
+        for(Station s : stations){
+            if(StringUtils.stripAccents(s.getName()).equalsIgnoreCase(StringUtils.stripAccents(name))) return s;
+        }
+        return null;
+    }
+
+
 
 }

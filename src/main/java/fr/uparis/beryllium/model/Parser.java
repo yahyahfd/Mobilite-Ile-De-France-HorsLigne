@@ -1,16 +1,18 @@
 package fr.uparis.beryllium.model;
 
-import fr.uparis.beryllium.exceptions.FormatException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalTime;
 import java.util.Iterator;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import fr.uparis.beryllium.exceptions.FormatException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Parser {
 
@@ -28,13 +30,18 @@ public class Parser {
 
         Map map = new Map();
         try {
-            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile);
+
+            String[] HEADERS = {"station1", "gps1", "station2", "gps2", "line", "duration", "dist"};
+
+            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
             if (!it.hasNext()) {
                 LOGGER.warn("The file is empty");
             }
+
             while (it.hasNext()) {
                 fillMapInformationsWithExtractedFields(map, it);
             }
+
         } catch (IllegalArgumentException e) {
             // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
             LOGGER.error("Csv format incorrect, the map is incomplete.", e);
@@ -43,7 +50,52 @@ public class Parser {
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
         }
+
         return map;
+
+    }
+
+    public static Map readMapHorraire(String csvFile, Map map) throws FormatException{
+
+        try {
+
+            String[] HEADERS = {"line", "station", "time","variant"};
+
+            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
+            if (!it.hasNext()) {
+                LOGGER.warn("The file is empty");
+            }
+
+            while (it.hasNext()) {
+                fillMapWithHorraires(map, it);
+            }
+
+        } catch (IllegalArgumentException e) {
+            // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
+            LOGGER.error("Csv format incorrect, the map is incomplete.", e);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("File not found", e);
+        } catch (IOException e) {
+            LOGGER.error("Error while reading the file", e);
+        }
+
+        return map;
+
+    }
+
+    public static void fillMapWithHorraires(Map map, Iterator<CSVRecord> it){
+
+        CSVRecord record = it.next();
+
+        String lineString = record.get("line");
+        String stationString = record.get("station");
+        String time[] = record.get("time").split(":");
+        String variant = record.get("variant");
+
+        Line line = map.searchLine(lineString + "." + variant);
+        Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
+
+        line.addStationTime(station, LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1])));
     }
 
     /**
@@ -87,21 +139,14 @@ public class Parser {
         stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
     }
 
-    /**
-     * ...
-     *
-     * @param file
-     * @return
-     * @throws IOException
-     * @throws FormatException
-     */
-    private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
+    private static Iterator<CSVRecord> getCsvRecordIterator(String file, String[] headers) throws IOException, FileNotFoundException, FormatException {
         FileReader reader = new FileReader(file);
         //Build a format of the csv file
         CSVFormat format = CSVFormat.DEFAULT.builder()
-                .setHeader("station1", "gps1", "station2", "gps2", "line", "duration", "dist")
+                .setHeader(headers)
                 .setDelimiter(";")
                 .build();
+
 
         CSVParser parser = new CSVParser(reader, format);
         Iterable<CSVRecord> records = parser.getRecords();

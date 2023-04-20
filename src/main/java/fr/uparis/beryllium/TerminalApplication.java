@@ -25,6 +25,7 @@ public class TerminalApplication {
     public static void main(String[] args) throws FormatException {
         //we parse the map
         Map m = Parser.readMap("map_data.csv");
+        m = Parser.readMapHorraire("timetables.csv", m);
 
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
