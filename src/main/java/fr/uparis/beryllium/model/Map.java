@@ -17,12 +17,22 @@ public class Map {
         return stations;
     }
 
-    //Return Station if exist in the list
-    //else create and return the new Station
+    public ArrayList<Station> getAllStations() {
+        return this.stations;
+    }
+
+    /**
+     * Return Station if exist in the list else creates and returns the new Station
+     *
+     * @param name
+     * @param localisation
+     * @param lineNumber
+     * @return
+     */
     public Station searchStation(String name, Localisation localisation, String lineNumber) {
         for (Station s : stations) {
-            if(s.getName().equals(name)){
-                if(!s.hasThisLocalisation(localisation)) {
+            if (s.getName().equals(name)) {
+                if (!s.hasThisLocalisation(localisation)) {
                     s.getLocalisations().put(lineNumber, localisation);
                 }
                 return s;
@@ -33,17 +43,24 @@ public class Map {
         return newstation;
     }
 
-    public Station searchStationByName(String name){
-        for(Station station : stations) {
-            if(station.getName().equals(name)) {
+    /**
+     * ...
+     *
+     * @param name
+     * @return
+     */
+    public Station searchStationByName(String name) {
+        for (Station station : stations) {
+            if (station.getName().equals(name)) {
                 return station;
             }
         }
-
         return null;
     }
 
     /**
+     * ...
+     *
      * @param name the name of a line we wanted
      * @return Return the Line if exist else create and return new Line
      */
@@ -56,26 +73,31 @@ public class Map {
         return newLine;
     }
 
-    public ArrayList<Station> getAllStations() {
-        return this.stations;
-    }
-
     /**
      * Method used to remove a station from the list of all stations
+     *
      * @param station The station to remove from the list
      */
     public void removeStation(Station station) {
         this.stations.remove(station);
     }
-    
+
+    /**
+     * ...
+     *
+     * @param latitude
+     * @param longitude
+     * @param name
+     */
     public void addStation(Double latitude, Double longitude, String name) {
-        Station s = new Station(name,new Localisation(latitude, longitude), "--MARCHE--");
+        Station s = new Station(name, new Localisation(latitude, longitude), "--MARCHE--");
         // we add the station to the list of stations
         this.stations.add(s);
     }
 
     /**
      * Method used in terminal mode to get all the stations with <code>name</code> as a name
+     *
      * @param name A station's name
      * @return An ArrayList of stations with the corresponding name (can be empty if no stations found)
      */
@@ -88,12 +110,14 @@ public class Map {
     }
 
     /**
-     * Search for all station inbetween dist (start to dest) and add these stations as neighbors of the initial position
+     * Search for all stations inbetween dist (start to dest) and add these stations as neighbors of the initial position
      *
-     * @param start         The starting station (coordonnees)
-     * @param dest          The destination Station
+     * @param start           The starting station (coordonnees)
+     * @param addFirstStation
+     * @param lStart          the localisation of the starting station
+     * @param lDest           the localisation of the destination station
      */
-    public void walkToBestStation(Station start, Station dest, Boolean addFirstStation, Localisation lStart, Localisation lDest){
+    public void walkToBestStation(Station start, Boolean addFirstStation, Localisation lStart, Localisation lDest) {
         // we get the walking line, create it if it doesn't exist
         Line walkingLine = this.searchLine("--MARCHE--");
         // we get the distance from the starting point to the final destination (it will be our aera of search)

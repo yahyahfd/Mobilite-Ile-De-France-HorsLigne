@@ -1,17 +1,18 @@
 package fr.uparis.beryllium.model;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
 
 public class Line {
 
-    private String lineName;
-    private HashMap<Station, Localisation> stations = new HashMap<>();
+    private final String lineName;
+    private final HashMap<Station, Localisation> stations = new HashMap<>();
 
-    Line(String name) {
+    public Line(String name) {
         lineName = name;
+    }
+
+    public String getName() {
+        return lineName;
     }
 
     public String getLineName() {
@@ -22,7 +23,12 @@ public class Line {
         return lineName.split("\\.")[0];
     }
 
-    //Like contains method for ArrayList but with String instead of Object
+    /**
+     * Like contains method for ArrayList but with String instead of Object
+     *
+     * @param name
+     * @return
+     */
     private boolean isIn(String name) {
         for (Station station : stations.keySet()) {
             if (station.getName().equals(name)) {
@@ -32,27 +38,20 @@ public class Line {
         return false;
     }
 
+    /**
+     * ...
+     *
+     * @param station
+     * @param localisation
+     */
     public void addStation(Station station, Localisation localisation) {
         if (!isIn(station.getName())) {
-            stations.put(station,localisation);
+            stations.put(station, localisation);
         }
     }
 
-    public String getName() {
-        return lineName;
-    }
-
-    public void setLineName(String lineName) {
-        this.lineName = lineName;
-    }
-
-    @JsonIgnore
-    public ArrayList<Station> getStations(){
-        return (ArrayList<Station>) stations.keySet();
-    }
-
-    public String toString(){
-         return getLineNameWithoutVariant();
+    public String toString() {
+        return getLineNameWithoutVariant();
     }
 }
 

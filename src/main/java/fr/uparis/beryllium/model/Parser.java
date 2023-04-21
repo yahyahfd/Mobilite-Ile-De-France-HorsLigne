@@ -46,6 +46,12 @@ public class Parser {
         return map;
     }
 
+    /**
+     * ...
+     *
+     * @param map
+     * @param it
+     */
     private static void fillMapInformationsWithExtractedFields(Map map, Iterator<CSVRecord> it) {
         CSVRecord record = it.next();
         // Creating map
@@ -63,7 +69,7 @@ public class Parser {
         // Add line with variant in the name
         Line line = map.searchLine(lineInCsv[0] + "." + lineInCsv[2]);
 
-        // If they exist, search function return their object in map's lists
+        // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
         Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0]);
         Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0]);
@@ -76,14 +82,22 @@ public class Parser {
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
         int radius1km = 1;
-        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance)/10, false, null);
+        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance) / 10, false, null);
         stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, firstStationLocalisation);
         stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
     }
 
+    /**
+     * ...
+     *
+     * @param file
+     * @return
+     * @throws IOException
+     * @throws FormatException
+     */
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
         FileReader reader = new FileReader(file);
-        //Build format of the csv file
+        //Build a format of the csv file
         CSVFormat format = CSVFormat.DEFAULT.builder()
                 .setHeader("station1", "gps1", "station2", "gps2", "line", "duration", "dist")
                 .setDelimiter(";")
@@ -98,6 +112,13 @@ public class Parser {
         return records.iterator();
     }
 
+    /**
+     * ...
+     *
+     * @param records
+     * @param format
+     * @throws FormatException
+     */
     private static void checkCsvFileFormat(Iterable<CSVRecord> records, CSVFormat format) throws FormatException {
         for (CSVRecord record : records) {
             if (record.size() != format.getHeader().length) {

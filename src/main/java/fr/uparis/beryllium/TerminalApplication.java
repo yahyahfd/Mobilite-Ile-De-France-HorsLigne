@@ -100,11 +100,11 @@ public class TerminalApplication {
 
                 // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
                 if (localpositionStart) {
-                    m.walkToBestStation(chosen_1, chosen_2, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
                 // we add the neighbors for the destination station
                 if (localpositionDest) {
-                    m.walkToBestStation(chosen_2, chosen_1, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
                 // instance itinerary with all stations of the map
                 Itinerary i = new Itinerary(m.getAllStations());
@@ -136,6 +136,7 @@ public class TerminalApplication {
     /**
      * This method is used twice in terminal mode to either propose all the stations
      * that have the same name, or just choose the single station with the name specified.
+     *
      * @param name Name of the station to look for
      * @param m The map used in this app
      * @param scanner Same scanner for the whole app.
@@ -158,49 +159,57 @@ public class TerminalApplication {
             }
             
             int num_chosen = 0;
-            while(num_chosen == 0 || num_chosen>i-1){
+            while (num_chosen == 0 || num_chosen > i - 1) {
                 try {
                     String read = scanner.nextLine();
-                    if(read.trim().equalsIgnoreCase("quit")) break;
+                    if (read.trim().equalsIgnoreCase("quit")) break;
                     num_chosen = Integer.parseInt(read);
-                    System.out.println(stations.get(num_chosen-1) + " was chosen");
+                    System.out.println(stations.get(num_chosen - 1) + " was chosen");
                 } catch (Exception e) {
                     System.out.println("You need to choose a valid number ! Try again ! ");
                 }
             }
-            return stations.get(num_chosen-1);
-        }else if(stations.size() == 0){
-            System.out.println("No station with the name "+name+ " was found !");
+            return stations.get(num_chosen - 1);
+        } else if (stations.size() == 0) {
+            System.out.println("No station with the name " + name + " was found !");
             return null;
-        }else{
+        } else {
             return stations.get(0);
         }
     }
-    public static void addStationByCoordonnees(Scanner scanner, Map m, String name){
+
+    /**
+     * ...
+     *
+     * @param scanner
+     * @param m
+     * @param name
+     */
+    public static void addStationByCoordonnees(Scanner scanner, Map m, String name) {
         Double longitude = null;
-            Double latitude = null;
-            System.out.print("\u001B[32mEnter your position : \u001B[0m");
-            while(latitude == null){
-                System.out.print("\u001B[32mLatitude : \u001B[0m");
-                // how do they want to travel
-                try {
-                    // we convert string to int
-                    latitude = Double.parseDouble(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Veuillez renseigner un double");
-                }
+        Double latitude = null;
+        System.out.print("\u001B[32mEnter your position : \u001B[0m");
+        while (latitude == null) {
+            System.out.print("\u001B[32mLatitude : \u001B[0m");
+            // how do they want to travel
+            try {
+                // we convert string to int
+                latitude = Double.parseDouble(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez renseigner un double");
             }
-            while(longitude == null){
-                System.out.print("\u001B[32mLongitude : \u001B[0m");
-                // how do they want to travel
-                try {
-                    // we convert string to int
-                    longitude = Double.parseDouble(scanner.nextLine());
-                } catch (NumberFormatException e) {
-                    System.out.println("Veuillez renseigner un double");
-                }
+        }
+        while (longitude == null) {
+            System.out.print("\u001B[32mLongitude : \u001B[0m");
+            // how do they want to travel
+            try {
+                // we convert string to int
+                longitude = Double.parseDouble(scanner.nextLine());
+            } catch (NumberFormatException e) {
+                System.out.println("Veuillez renseigner un double");
             }
-            // we add the station to the map
-            m.addStation(latitude, longitude, name);
+        }
+        // we add the station to the map
+        m.addStation(latitude, longitude, name);
     }
 }

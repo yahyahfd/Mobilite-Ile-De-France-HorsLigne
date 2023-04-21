@@ -4,10 +4,7 @@ package fr.uparis.beryllium.exceptions;
  * a specific format. Example: (Station1,Station2,Line)
 */
 public class FormatException extends Exception {
-    /**
-     * Constructor for the FormatException class
-     * @see Exception
-     */
+
     public FormatException(String message) {
         super(message);
     }

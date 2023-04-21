@@ -3,8 +3,8 @@ package fr.uparis.beryllium.model;
 import fr.uparis.beryllium.exceptions.FormatException;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.logging.log4j.LogManager;
-import org.junit.jupiter.api.Test;
 import org.apache.logging.log4j.Logger;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -43,25 +43,25 @@ public class ItineraryTest {
     }
 
     @Test
-    public void testShortestDist() throws FormatException  {
+    public void testShortestDist() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
         Itinerary itinerary = new Itinerary(map.getAllStations());
         Station station1 = map.getStations().get(0);
         Station station2 = map.getStations().get(3);
         Station station3 = map.getStations().get(3);
 
-        HashMap<Station, MutablePair<Double,Double>> listStart = new HashMap<>();
+        HashMap<Station, MutablePair<Double, Double>> listStart = new HashMap<>();
         listStart.put(station1, new MutablePair<>(12.0, 4.0));
-        listStart.put(station3, new MutablePair<>( 15.7,2.4));
-        listStart.put(station2, new MutablePair<>( 10.1, 2.5));
-        itinerary.distTimeToStart = listStart;
+        listStart.put(station3, new MutablePair<>(15.7, 2.4));
+        listStart.put(station2, new MutablePair<>(10.1, 2.5));
+        itinerary.setDistTimeToStart(listStart);
         ArrayList<Station> notVisited = new ArrayList<>();
         notVisited.add(station1);
         notVisited.add(station2);
         notVisited.add(station3);
 
-        itinerary.shortestDist(notVisited,0);
-        assertEquals(station2, itinerary.shortestDist(notVisited,0));
-        assertEquals(station3, itinerary.shortestDist(notVisited,1));
+        itinerary.shortestDist(notVisited, 0);
+        assertEquals(station2, itinerary.shortestDist(notVisited, 0));
+        assertEquals(station3, itinerary.shortestDist(notVisited, 1));
     }
 }

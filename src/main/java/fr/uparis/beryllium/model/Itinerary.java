@@ -3,31 +3,33 @@ package fr.uparis.beryllium.model;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.time.Duration;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.Map;
+import java.util.*;
 
 public class Itinerary {
 
-	ArrayList<Station> stations;
-	HashMap<Station, HashMap<Station, Line>> stationBefore = new HashMap<>();
-	HashMap<Station, MutablePair<Double, Double>> distTimeToStart = new HashMap<>();
-    
-    public Itinerary(ArrayList<Station> stations) {
-		this.stations = stations;
-    }
+	private final ArrayList<Station> stations;
+	private final HashMap<Station, HashMap<Station, Line>> stationBefore = new HashMap<>();
+	private HashMap<Station, MutablePair<Double, Double>> distTimeToStart = new HashMap<>();
 
-	public HashMap<Station, MutablePair<Double,Double>> getDistTime(){
+	public Itinerary(ArrayList<Station> stations) {
+		this.stations = stations;
+	}
+
+	public HashMap<Station, MutablePair<Double, Double>> getDistTime() {
 		return distTimeToStart;
 	}
 
-    /**
-     * Initialize the graph of the distance and time between a station and the starting point
-     * @param start Station from where we start
-     */
-    public void init(Station start) {
+	public void setDistTimeToStart(HashMap<Station, MutablePair<Double, Double>> distTimeToStart) {
+		this.distTimeToStart = distTimeToStart;
+	}
+
+	/**
+	 * Initialize the graph of the distance and time between a station and the starting point
+	 *
+	 * @param start Station from where we start
+	 */
+	public void init(Station start) {
 		// for each station, initialize dist and time to infinite
 		for (Station s : stations) {
 			MutablePair<Double, Double> mp = new MutablePair<>(Double.MAX_VALUE, Double.MAX_VALUE);
@@ -40,6 +42,7 @@ public class Itinerary {
 
     /**
 	 * Search in all stations didn't visit the nearest station from the start
+	 *
 	 * @param notVisited
 	 * @return the nearest station to starting point
 	 */
@@ -77,9 +80,10 @@ public class Itinerary {
 
 	/**
 	 * Update distance and time between s1 and s2: which station is the most appropriate
-	 * @param s1         Station start
-	 * @param s2         Station dest
-	 * @param n          NeighborData all information of s2
+	 *
+	 * @param s1 Station start
+	 * @param s2 Station dest
+	 * @param n NeighborData all information of s2
 	 * @param preference Integer depending on the choice of the user: 0=shortest dist / 1=shortest time
 	 */
 	public void updateDist(Station s1, Station s2, NeighborData n, Integer preference) {
@@ -126,25 +130,22 @@ public class Itinerary {
 			default -> {
 			}
 		}
-    }
+	}
 
 	/**
-     * Search for the shortest way to go from a station to another
-     * @param start Station from where we start
-     * @param dest Station of destination
-     * @param preference Integer : 0 = shortest distance / 1 = shortest time / 2 = unitaire
-     * @return all stations and lines from start to destination
-     */
+	 * Search for the shortest way to go from a station to another
+	 *
+	 * @param start Station from where we start
+	 * @param dest Station of destination
+	 * @param preference Integer : 0 = shortest distance / 1 = shortest time / 2 = unitaire
+	 * @return all stations and lines from start to destination
+	 */
 	public HashMap<Station, Line> shortestWay(Station start, Station dest, Integer preference) {
-		// boolean a true / false -> si il existe un chemin avec une autre ligne que la marche, ignorer marche
-		// sinon prendre marche si c'est la seule possibilité
 		// initialize the map
 		init(start);
 		// all stations of the map
 		ArrayList<Station> allStations = new ArrayList<>(stations);
 		Station s1;
-		Line lineAlreadyUse = null;
-		boolean stayOnline = false;
 		// while allstation is not empty
 		while(allStations.size() > 0) {
 			// we get the min of all stations
@@ -161,9 +162,8 @@ public class Itinerary {
 					// we get all information of the neighbors
 					Station s2 = entry.getKey();
 					ArrayList<NeighborData> neighbors = entry.getValue();
-					NeighborData neighbor = null;
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
-					for(NeighborData n : neighbors) {
+					for (NeighborData n : neighbors) {
 						updateDist(s1, s2, n, preference);
 					}
 				}
@@ -172,6 +172,13 @@ public class Itinerary {
 		return getShortestPath(start, dest);
 	}
 
+	/**
+	 * ...
+	 *
+	 * @param start
+	 * @param dest
+	 * @return
+	 */
 	private HashMap<Station, Line> getShortestPath(Station start, Station dest) {
 		// linkedHashmap to preserve the order of insertion
 		HashMap<Station, Line> shortestPath = new LinkedHashMap<>();
@@ -208,6 +215,7 @@ public class Itinerary {
 
 	/**
      * Show the shortest way to go from a station to another
+	 *
      * @param res Res of the algorithm
      * @return a string of the stations and line in order
      */
@@ -269,6 +277,7 @@ public class Itinerary {
 
 	/**
 	 * Get distance and time traveled on a line
+	 *
 	 * @param stationRes list of all the station
 	 * @param lineRes list of all the line
 	 * @param position the position of the station in the stationRes
@@ -296,6 +305,7 @@ public class Itinerary {
 
 	/**
 	 * This method is used to return an ordered list of all stations in a path
+	 *
 	 * @param res HashMap of the path calculated by shortestWay Method
 	 * @return An ordered list of stations in the path (can be empty)
 	 */
@@ -308,22 +318,6 @@ public class Itinerary {
 		Collections.reverse(stationRes);
 
 		return stationRes;
-	}
-
-	/**
-	 * This method is used to return an ordered list of all lines in a path
-	 * @param res HashMap of the path calculated by shortestWay Method
-	 * @return An ordred list of lines in the path (can be empty)
-	 */
-
-	public ArrayList<Line> getPathLines(HashMap<Station, Line> res){
-		if(res == null){
-			return new ArrayList<>();
-		}
-		ArrayList<Line> lineRes = new ArrayList<>(res.values());
-		Collections.reverse(lineRes);
-
-		return lineRes;
 	}
 
 }
