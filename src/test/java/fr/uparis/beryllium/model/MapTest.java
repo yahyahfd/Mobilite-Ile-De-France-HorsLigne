@@ -21,9 +21,10 @@ class MapTest {
         Station dest = m.getAllStations().get(2);
         
         // When
-        m.walkToBestStation(start, dest, true);
+        m.walkToBestStation(start, dest, true, start.getLocalisations().get("--MARCHE--"), (Localisation) dest.getLocalisations().values().toArray()[0]);
 
         // Assert
+        System.out.println(start.getNextStations().keySet());
         assertEquals(2, start.getNextStations().size());
         assert (start.getNextStations().get(station1).get(0).getLine().getName().equals(walkingLine.getName()));
         assert (start.getNextStations().get(dest).get(0).getLine().getName().equals(walkingLine.getName()));

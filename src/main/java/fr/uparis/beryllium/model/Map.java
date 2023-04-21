@@ -1,13 +1,8 @@
 package fr.uparis.beryllium.model;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedList;
-
 
 import org.apache.commons.lang3.StringUtils;
 
 import java.util.ArrayList;
-// import java.text.Normalizer;
 
 public class Map {
 
@@ -33,11 +28,9 @@ public class Map {
                 return s;
             }
         }
-
         Station newstation = new Station(name, localisation, lineNumber);
         stations.add(newstation);
         return newstation;
-
     }
 
     public Station searchStationByName(String name){
@@ -76,7 +69,7 @@ public class Map {
     }
     
     public void addStation(Double latitude, Double longitude, String name) {
-        Station s = new Station(name,new Localisation(latitude, longitude));
+        Station s = new Station(name,new Localisation(latitude, longitude), "--MARCHE--");
         // we add the station to the list of stations
         this.stations.add(s);
     }
@@ -96,16 +89,17 @@ public class Map {
 
     /**
      * Search for all station inbetween dist (start to dest) and add these stations as neighbors of the initial position
-     * @param start The starting station (coordonnees)
-     * @param dest The destination Station
+     *
+     * @param start         The starting station (coordonnees)
+     * @param dest          The destination Station
      */
-    public void walkToBestStation(Station start, Station dest, Boolean addFirstStation){
-        // we get the walking line, create it if it doesn't exists
+    public void walkToBestStation(Station start, Station dest, Boolean addFirstStation, Localisation lStart, Localisation lDest){
+        // we get the walking line, create it if it doesn't exist
         Line walkingLine = this.searchLine("--MARCHE--");
         // we get the distance from the starting point to the final destination (it will be our aera of search)
-        Double radius = start.getDistanceToAStation(dest);
+        double radius = start.getDistanceToAStation(lStart, lDest);
         // we add the stations that are un this perimeter as neighbors of the position
-        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, addFirstStation);
+        start.addWalkingNeighbours(walkingLine, this.getAllStations(), radius, addFirstStation, lStart);
     }
 
 }

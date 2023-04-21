@@ -1,25 +1,28 @@
 package fr.uparis.beryllium.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
 public class Station {
-    private String name;
+    private final String name;
     private Localisation usedLocalisation;
-
     private HashMap<String,Localisation> localisations = new HashMap<>();
     @JsonIgnore
     private Map<Station,ArrayList<NeighborData>> nextStations = new HashMap<>();
 
+    public Station(String n, Localisation localisation, String lineNumber) {
+        name = n;
+        //localisation = localisation;
+        localisations.put(lineNumber, localisation);
+    }
+
     /**
      * All neighboring lines
-     *
      * @return all lines of the current station to reach a neighbor station
      */
     public ArrayList<String> getNeighboringLines(){
@@ -33,16 +36,6 @@ public class Station {
             }
         });
         return result;
-    }
-
-    /**
-     * Neighboring stations or stations reached
-     * directly after the current one (this)
-     */
-    Station(String n, Localisation localisation, String lineNumber) {
-        name = n;
-        //localisation = localisation;
-        localisations.put(lineNumber, localisation);
     }
 
     public String getName() {
@@ -86,7 +79,7 @@ public class Station {
      * @param durationArray    the time with which you can reach s
      * @param distance the distance between these stations
      */
-    public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig) {
+    public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig, Localisation localisation) {
         Duration duration = Duration.ZERO;
         // we get the duration from the csv
         if(!addWalkingNeig){
@@ -113,6 +106,9 @@ public class Station {
             tmp.add(n);
             nextStations.put(station, tmp);
         }
+        if (addWalkingNeig) {
+            localisations.put(line.getLineName(), localisation);
+        }
     }
 
     /**
@@ -134,12 +130,34 @@ public class Station {
     /**
      * Add all the walking neighbors
      *
-     * @param walkingLine the walking line
-     * @param allStations the list of all existing stations
-     * @param radius the distance we want the neighbors to be in
+     * @param walkingLine   the walking line
+     * @param allStations   the list of all existing stations
+     * @param radius        the distance we want the neighbors to be in
      */
-    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius, Boolean addFirstStation) {
-        List<Station> reacheable1kmStations = allStations.stream().filter(s -> (s.isWithinARadius(this, radius) && !s.equals(this))).toList();
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius, Boolean addFirstStation, Localisation st) {
+        //List<Station> reacheable1kmStations = allStations.stream().filter(s -> (s.isWithinARadius(this, radius) && !s.equals(this))).collect(Collectors.toList());;
+        for (Station s: allStations) {
+            List<Localisation> destLocalisation = s.localisations.values().stream().toList();
+                for (Localisation dest : destLocalisation) {
+                    if (dest.getLongitude() != st.getLongitude() && dest.getLatitude() != st.getLatitude()) {
+                        List<Localisation> startLocalisation = localisations.values().stream().toList();
+                        for (Localisation start : startLocalisation) {
+                            if (s.isWithinARadius(start, dest, radius)) {
+                                double distance = s.getDistanceToAStation(start, dest);
+                                double time = s.getWalkingTimeInSecondsFromADistance(distance);
+                                String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
+                                // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)
+                                this.addNextStation(s, walkingLine, stringTime, distance, true, start);
+                                if (!addFirstStation) {
+                                    s.addNextStation(this, walkingLine, stringTime, distance, true, dest);
+                                }
+                            }
+                        }
+                    }
+                }
+
+        }
+        /*
         for (Station s : reacheable1kmStations) {
             double distance = s.getDistanceToAStation(this);
             double time = s.getWalkingTimeInSecondsFromADistance(distance);
@@ -150,37 +168,37 @@ public class Station {
                 s.addNextStation(this, walkingLine, stringTime, distance, true);
             }
         }
+
+         */
     }
 
     /**
      * Check if the station is in the radius we wanted
      *
-     * @param reachable the station we wanted to reach
      * @param radius    the radius we wanted to be in (in km)
      * @return a boolean that determines if the station is in the radius away or less
      */
-    public boolean isWithinARadius(Station reachable, double radius) {
-        double distance = getDistanceToAStation(reachable);
+    public boolean isWithinARadius(Localisation start, Localisation dest, double radius) {
+        double distance = getDistanceToAStation(start, dest);
         return distance <= radius;
     }
 
     /**
      * Calculate the distance to the other station
-     * @param station the station we wanted to reach
+     *
      * @return the distance between our station and the other station in km
      */
-    public double getDistanceToAStation(Station station) {
-        Localisation localisationStart = station.localisation;
-        Localisation reacheableLocalisation = this.localisation;
-        double x0 = localisationStart.getLongitude() * 111;
-        double y0 = localisationStart.getLatitude() * (111.11 * Math.cos(Math.toRadians(localisationStart.getLongitude())));
-        double x = reacheableLocalisation.getLongitude() * 111;
-        double y = reacheableLocalisation.getLatitude() * (111.11 * Math.cos(Math.toRadians(reacheableLocalisation.getLongitude())));
+    public double getDistanceToAStation(Localisation start, Localisation dest) {
+        double x0 = start.getLongitude() * 111;
+        double y0 = start.getLatitude() * (111.11 * Math.cos(Math.toRadians(start.getLongitude())));
+        double x = dest.getLongitude() * 111;
+        double y = dest.getLatitude() * (111.11 * Math.cos(Math.toRadians(dest.getLongitude())));
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
     /**
      * Calculate the time it takes to cover a distance
+     *
      * @param distance the distance between 2 stations in km
      * @return the time it takes to cover the distance
      */
@@ -192,14 +210,14 @@ public class Station {
     }
     
     /**
-     * Remove all occurences of the temporary station which was added
+     * Remove all occurrences of the temporary station which was added
      *
      * @param allStations all the stations
      * @param radius      distance between the two stations
      */
-    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius) {
+    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius, Localisation start, Localisation dest) {
         // get all stations where we added the temporary station 
-        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(this, radius) && !s.equals(this)).toList();
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(start, dest, radius) && !s.equals(this)).toList();
         // for all these stations, we remove the temporary station from nextstation
         for (Station s : reacheable1kmStations) {
             s.nextStations.remove(this);

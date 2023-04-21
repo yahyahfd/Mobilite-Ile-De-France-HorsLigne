@@ -164,7 +164,7 @@ public class Itinerary {
 					NeighborData neighbor = null;
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
 					for(NeighborData n : neighbors) {
-						updateDist(s1, (Station) s2.getKey(), n, preference);
+						updateDist(s1, s2, n, preference);
 					}
 				}
 			}
@@ -195,8 +195,7 @@ public class Itinerary {
 				}
 			}
 			s.setLocalisation(s.getLocalisations().get(l.getLineNameWithoutVariant()));
-			//System.out.println(s.getLocalisation().getLatitude());
-			// we add the station at the begining of the list
+			// we add the station at the beginning of the list
 			shortestPath.put(s, l);
 			// we follow the path
 			s = before;

@@ -59,7 +59,7 @@ public class TerminalApplication {
                 localpositionStart = true;
             }
             
-            System.out.print("\u001B[32mEnter your second station's name: (lp : local position)\u001B[0m");
+            System.out.print("\u001B[32mEnter your second station's name: (lp : local position) \u001B[0m");
             String station2 = "";
             while(station2.isEmpty() || chosen_2 == null){
                 station2 = scanner.nextLine();
@@ -97,37 +97,36 @@ public class TerminalApplication {
                 }
             }
             if (chosen_1 != null && chosen_2 != null) {
-                Station start = chosen_1;
-                Station dest = chosen_2;
 
                 // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
                 if (localpositionStart) {
-                    m.walkToBestStation(start, dest, true);
+                    m.walkToBestStation(chosen_1, chosen_2, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
                 // we add the neighbors for the destination station
                 if (localpositionDest) {
-                    m.walkToBestStation(dest, start, false);
+                    m.walkToBestStation(chosen_2, chosen_1, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
-                // instanciate itinerary with all stations of the map
+                // instance itinerary with all stations of the map
                 Itinerary i = new Itinerary(m.getAllStations());
                 // get the shortest way depending on the preference
-                HashMap<Station, Line> route = i.shortestWay(start, dest, preference);
+                HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference);
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
                 // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
                 // We add the method (the algorithm) to look for the path
                 if (route == null) {
-                    System.out.println("Looks like there is no route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m");
+                    System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m");
                 } else {
-                    System.out.println("Route to go from \u001B[31m" + start.getName() + "\u001B[0m to \u001B[31m" + dest.getName() + "\u001B[0m :\n");
+                    System.out.println("Route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m :\n");
                     System.out.println(i.showPath(route));
                 }
                 // if we added temporary station, we remove them of the list of stations
                 if (localpositionStart) {
-                    m.removeStation(start);
+                    m.removeStation(chosen_1);
                 }
                 if (localpositionDest) {
-                    dest.removeWalkingNeighbours(m.getAllStations(), start.getDistanceToAStation(dest));
-                    m.removeStation(dest);
+                    chosen_2.removeWalkingNeighbours(m.getAllStations(), chosen_1.getDistanceToAStation((Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]),
+                            (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    m.removeStation(chosen_2);
                 }
             }
         }

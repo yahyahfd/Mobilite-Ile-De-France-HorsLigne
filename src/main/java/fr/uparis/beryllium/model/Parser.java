@@ -28,16 +28,13 @@ public class Parser {
 
         Map map = new Map();
         try {
-
             Iterator<CSVRecord> it = getCsvRecordIterator(csvFile);
             if (!it.hasNext()) {
                 LOGGER.warn("The file is empty");
             }
-
             while (it.hasNext()) {
                 fillMapInformationsWithExtractedFields(map, it);
             }
-
         } catch (IllegalArgumentException e) {
             // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
             LOGGER.error("Csv format incorrect, the map is incomplete.", e);
@@ -46,7 +43,6 @@ public class Parser {
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
         }
-
         return map;
     }
 
@@ -68,7 +64,7 @@ public class Parser {
         Line line = map.searchLine(lineInCsv[0] + "." + lineInCsv[2]);
 
         // If they exist, search function return their object in map's lists
-        // Else, it create a new object, put it in map's lists and return it
+        // Else, it creates a new object, put it in map's lists and return it
         Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0]);
         Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0]);
 
@@ -80,9 +76,9 @@ public class Parser {
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
         int radius1km = 1;
-        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance)/10, false);
-        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false);
-        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false);
+        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance)/10, false, null);
+        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, firstStationLocalisation);
+        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
     }
 
     private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
@@ -92,7 +88,6 @@ public class Parser {
                 .setHeader("station1", "gps1", "station2", "gps2", "line", "duration", "dist")
                 .setDelimiter(";")
                 .build();
-
 
         CSVParser parser = new CSVParser(reader, format);
         Iterable<CSVRecord> records = parser.getRecords();
