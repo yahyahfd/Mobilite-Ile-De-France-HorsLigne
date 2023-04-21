@@ -11,7 +11,7 @@ import java.util.Map;
 public class Station {
     private final String name;
     private Localisation usedLocalisation;
-    private final HashMap<String, Localisation> localisations = new HashMap<>();
+    private HashMap<String, Localisation> localisations = new HashMap<>();
     @JsonIgnore
     private final Map<Station, ArrayList<NeighborData>> nextStations = new HashMap<>();
 
@@ -32,7 +32,7 @@ public class Station {
         return localisations;
     }
 
-    public Localisation getUsedLocalisation() {
+    public Localisation getLocalisation() {
         return usedLocalisation;
     }
 
@@ -56,6 +56,10 @@ public class Station {
 
     public void setLocalisation(Localisation localisation) {
         usedLocalisation = localisation;
+    }
+
+    public void setLocalisations(HashMap<String, Localisation> localisations) {
+        this.localisations = localisations;
     }
 
     /**
