@@ -82,9 +82,9 @@ public class Line {
         } else {
             ArrayList<LocalTime> times = new ArrayList<>();
              times.add(time);
-            Collections.sort(times);
             stationsTimes.put(station, times);
         }
+        Collections.sort(stationsTimes.get(station));
     }
 
 }
