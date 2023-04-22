@@ -18,6 +18,10 @@ public class Line {
         lineName = name;
     }
 
+    public String getName() {
+        return lineName;
+    }
+
     public String getLineName() {
         return lineName;
     }
