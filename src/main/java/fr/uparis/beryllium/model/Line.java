@@ -1,5 +1,8 @@
 package fr.uparis.beryllium.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Line {
@@ -21,6 +24,11 @@ public class Line {
 
     public String getLineNameWithoutVariant() {
         return lineName.split("\\.")[0];
+    }
+
+    @JsonIgnore
+    public ArrayList<Station> getStations() {
+        return (ArrayList<Station>) stations.keySet();
     }
 
     /**
