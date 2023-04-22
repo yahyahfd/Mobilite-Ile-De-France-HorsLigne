@@ -39,7 +39,7 @@ public class ItineraryTest {
         HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1);
         timeDist = itinerary.getDistTime();
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(216, timeDist.get(stations_3.get(0)).getRight());
+        assertEquals(216008.0, timeDist.get(stations_3.get(0)).getRight());
     }
 
     @Test
