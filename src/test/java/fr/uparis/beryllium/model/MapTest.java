@@ -10,7 +10,7 @@ class MapTest {
     void walkToBestStation() {
         // Given
         Line walkingLine = new Line("--MARCHE--");
-        Map m = new Map();
+        Map m = Map.getMapInstance();
         m.addStation(48.84268433479670,2.2928472203679453, "LocalPosition");
         m.addStation(48.84268433479664, 2.2918472203679703, "Félix Faure");
         m.addStation(48.84461151236847, 2.293796842192864, "Commerce");
