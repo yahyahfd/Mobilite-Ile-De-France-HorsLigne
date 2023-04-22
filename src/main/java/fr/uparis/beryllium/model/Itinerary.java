@@ -114,7 +114,7 @@ public class Itinerary {
 				}
 			}
 			case 1 -> {
-				weight = (double) n.getDuration().toSeconds();
+				weight = (double) n.getDuration().toMillis();
 				if (time2 > Double.sum(time1, weight)) {
 					HashMap<Station, Line> statB = stationBefore.get(s2);
 					if ((statB == null) || (!n.getLine().getName().equals("--MARCHE--"))) {
@@ -244,7 +244,7 @@ public class Itinerary {
 				if (i == 0 ) {
 					MutablePair<Double, Double> distTimeFromDestination = distTimeToStart.get(stationRes.get(stationRes.size() - 1));
 					Duration d = Duration.ZERO;
-					d = d.plusSeconds((long) (distTimeFromDestination.getRight() - 0));
+					d = d.plusMillis((long) (distTimeFromDestination.getRight() - 0));
 					path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTimeFromDestination.getLeft()).append("km.\n");
 					distTime = getDistTimeForALine(stationRes, lineRes, i);
 					path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
@@ -298,7 +298,7 @@ public class Itinerary {
 		MutablePair<Double, Long> result = new MutablePair<>();
 		result.setLeft(distTimeDestination.getLeft() - distTimeStart.getLeft());
 		Duration d = Duration.ZERO;
-		d = d.plusSeconds((long) (distTimeDestination.getRight() - distTimeStart.getRight()));
+		d = d.plusMillis((long) (distTimeDestination.getRight() - distTimeStart.getRight()));
 		result.setRight(d.toMinutes() + 1); // 40s => 1min pour arrondir
 		return result;
 	}
