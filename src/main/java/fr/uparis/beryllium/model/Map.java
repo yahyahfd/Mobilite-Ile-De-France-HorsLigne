@@ -1,30 +1,43 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
-import fr.uparis.beryllium.exceptions.FormatException;
+// import java.text.Normalizer;
 
 public class Map {
 
-    private final ArrayList<Line> lines = new ArrayList<>();
-    private final ArrayList<Station> stations = new ArrayList<>();
     // Singleton
     private static Map mapInstance = null;
     private boolean isMapLoaded = false;
     private Map(){}
-    public static Map getMapInstance() throws FormatException {
+
+    /**
+     * Method used to get the map instance. Creates a new map if it isn't created yet
+     * @return An instance of the used map. Creates it if it doesn't exist.
+     */
+    public static Map getMapInstance() {
         if(mapInstance == null){
             mapInstance = new Map();
         }
         return mapInstance;
     }
     
+    /**
+     * @return <code>true</code> if the map exists, <code>false</code> otherwise
+     */
     public boolean isMapLoaded() {
         return isMapLoaded;
     }
 
+    /**
+     * Setter for <code>isMapLoaded</code>
+     * @param mapLoaded <code>true</code> if the map is being loaded, <code>false</code> otherwise
+     */
     public void setMapLoaded() {
         isMapLoaded = true;
     }
+
+    private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Station> stations = new ArrayList<>();
 
     public ArrayList<Line> getLines() {
         return lines;
