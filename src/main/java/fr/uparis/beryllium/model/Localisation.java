@@ -18,17 +18,18 @@ public class Localisation {
         return longitude;
     }
 
-    //Return if both localisation has same attributes
-    public boolean sameLocalisation(Localisation l){
+    /**
+     * Return if both localisations have same attributes
+     *
+     * @param l
+     * @return
+     */
+    public boolean sameLocalisation(Localisation l) {
         return this.latitude == l.getLatitude() && this.longitude == l.getLongitude();
     }
 
-    /**
-     * Returns latitude and longitude in a localisation
-     * @return (latitude,longitude) of localisation
-     */
-    public String toString(){
-        return "("+latitude+","+longitude+")";
+    public String toString() {
+        return "(" + latitude + "," + longitude + ")";
     }
 
 }

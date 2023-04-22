@@ -20,7 +20,7 @@ public class MapController {
   @GetMapping("/stations")
   public List<Station> getStations() throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    List<Station> stations = m.getStations();
+    List<Station> stations = m.getAllStations();
 
     return stations;
   }
