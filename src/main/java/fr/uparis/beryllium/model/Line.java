@@ -11,8 +11,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 public class Line {
 
     private String lineName;
-    private HashMap<Station, Localisation> stations = new HashMap<>();
-    private HashMap<Station, ArrayList<LocalTime>> stationsTimes = new HashMap<>();
+    private HashMap<Station, Localisation> stations = new LinkedHashMap<>();
+    private HashMap<Station, ArrayList<LocalTime>> stationsTimes = new LinkedHashMap<>();
 
     Line(String name) {
         lineName = name;
@@ -32,7 +32,11 @@ public class Line {
 
     @JsonIgnore
     public ArrayList<Station> getStations() {
-        return (ArrayList<Station>) stations.keySet();
+        ArrayList<Station> result = new ArrayList<>();
+        for (Station station : stations.keySet()) {
+            result.add(station);
+        }
+        return result;
     }
 
 

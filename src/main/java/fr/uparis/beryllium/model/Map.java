@@ -34,9 +34,7 @@ public class Map {
     public Station searchStation(String name, Localisation localisation, String lineNumber) {
         for (Station s : stations) {
             if(s.getName().equals(name)){
-                if(!s.hasThisLocalisation(localisation)) {
-                    s.getLocalisations().put(lineNumber, localisation);
-                }
+                s.getLocalisations().put(lineNumber, localisation);
                 return s;
             }
         }

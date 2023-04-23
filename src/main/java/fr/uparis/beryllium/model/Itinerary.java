@@ -201,14 +201,14 @@ public class Itinerary {
 					}
 				}
 			}
-			s.setLocalisation(s.getLocalisations().get(l.getLineNameWithoutVariant()));
+			s.setLocalisation(s.getLocalisations().get(l.getLineName()));
 			// we add the station at the beginning of the list
 			shortestPath.put(s, l);
 			// we follow the path
 			s = before;
 		}
 		// add first station
-		start.setLocalisation(start.getLocalisations().get(l.getLineNameWithoutVariant()));
+		start.setLocalisation(start.getLocalisations().get(l.getLineName()));
 		shortestPath.put(start,l);
 		return shortestPath;
 	}

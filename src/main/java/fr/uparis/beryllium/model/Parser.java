@@ -4,7 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -101,15 +103,28 @@ public class Parser {
 
         CSVRecord record = it.next();
 
-        String lineString = record.get("line");
         String stationString = record.get("station");
         String time[] = record.get("time").split(":");
         String variant = record.get("variant");
+        String lineString = record.get("line") + "." + variant;
 
-        Line line = map.searchLine(lineString + "." + variant);
+        Line line = map.searchLine(lineString);
         Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
 
-        line.addStationTime(station, LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1])));
+        final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
+        line.addStationTime(station, timeOfStation[0]);
+        List<Station> stationsOfLine = line.getStations();
+        final Station[] fromStation = {station};
+        stationsOfLine.stream().forEach(stationStream ->{
+            if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0){
+                return;
+            }
+            NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
+            assert neighborData != null;
+            timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
+            line.addStationTime(stationStream, timeOfStation[0]);
+            fromStation[0] = stationStream;
+        });
     }
 
     /**
@@ -137,8 +152,8 @@ public class Parser {
 
         // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0]);
-        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0]);
+        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
+        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
 
         // Add station to line's list
         // addStation verify if the station is already in the list or not

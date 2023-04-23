@@ -54,6 +54,15 @@ public class Station {
         return result;
     }
 
+    public NeighborData getNeighborDataOfLine(String lineName, Station station){
+        for(NeighborData nd : nextStations.get(station)){
+            if(nd.getLine().getLineName().equals(lineName)){
+                return nd;
+            }
+        }
+        return null;
+    }
+
     public void setLocalisation(Localisation localisation) {
         usedLocalisation = localisation;
     }
