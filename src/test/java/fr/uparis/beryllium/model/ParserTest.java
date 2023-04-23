@@ -20,8 +20,8 @@ public class ParserTest {
 
         Line line = map.getLines().get(0);
 
-        Localisation firstStationLocalisation = firstStation.getLocalisations().get(line.getLineNameWithoutVariant());
-        Localisation secondStationLocalisation = secondStation.getLocalisations().get(line.getLineNameWithoutVariant());
+        Localisation firstStationLocalisation = firstStation.getLocalisations().get(line.getLineName());
+        Localisation secondStationLocalisation = secondStation.getLocalisations().get(line.getLineName());
 
         Duration duration = firstStation.getNextStations().get(secondStation).get(0).getDuration();
         Double distance = firstStation.getNextStations().get(secondStation).get(0).getDistance();
