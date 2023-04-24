@@ -3,6 +3,7 @@ package fr.uparis.beryllium.model;
 import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.Map;
 import java.util.*;
 
@@ -11,6 +12,8 @@ public class Itinerary {
 	private final ArrayList<Station> stations;
 	private final HashMap<Station, HashMap<Station, Line>> stationBefore = new HashMap<>();
 	private HashMap<Station, MutablePair<Double, Double>> distTimeToStart = new HashMap<>();
+
+	private HashMap<Station, LocalTime> itineraryTimes = new LinkedHashMap<>();
 
 	public Itinerary(ArrayList<Station> stations) {
 		this.stations = stations;
@@ -86,7 +89,7 @@ public class Itinerary {
 	 * @param n NeighborData all information of s2
 	 * @param preference Integer depending on the choice of the user: 0=shortest dist / 1=shortest time
 	 */
-	public void updateDist(Station s1, Station s2, NeighborData n, Integer preference) {
+	public void updateDist(Station s1, Station s2, NeighborData n, Integer preference, LocalTime actualTime) {
 		// we get all the time and dist of the two stations
 		Double weight, dist1, dist2, time1, time2;
 		MutablePair<Double, Double> distTimeS1 = distTimeToStart.get(s1);
@@ -98,6 +101,8 @@ public class Itinerary {
 		// we get the time and the dist of s2
 		dist2 = distTimeS2.getLeft();
 		time2 = distTimeS2.getRight();
+		LocalTime nextTrainTime = n.getLine().getNextTrainTime(s2, actualTime);
+		double timeToWait = Duration.between(actualTime, nextTrainTime).toMillis();
 		switch (preference) {
 			case 0, 2 -> {
 				weight = n.getDistance();
@@ -114,7 +119,7 @@ public class Itinerary {
 				}
 			}
 			case 1 -> {
-				weight = (double) n.getDuration().toMillis();
+				weight = (double) n.getDuration().toMillis() + timeToWait;
 				if (time2 > Double.sum(time1, weight)) {
 					HashMap<Station, Line> statB = stationBefore.get(s2);
 					if ((statB == null) || (!n.getLine().getName().equals("--MARCHE--"))) {
@@ -146,6 +151,7 @@ public class Itinerary {
 		// all stations of the map
 		ArrayList<Station> allStations = new ArrayList<>(stations);
 		Station s1;
+		LocalTime actualTime = LocalTime.now();
 		// while allstation is not empty
 		while(allStations.size() > 0) {
 			// we get the min of all stations
@@ -164,7 +170,7 @@ public class Itinerary {
 					ArrayList<NeighborData> neighbors = entry.getValue();
 					// if we can stay on the same line for the next station, we take it, else, we take the first line of the list
 					for (NeighborData n : neighbors) {
-						updateDist(s1, s2, n, preference);
+						updateDist(s1, s2, n, preference, actualTime);
 					}
 				}
 			}

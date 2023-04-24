@@ -95,5 +95,16 @@ public class Line {
         Collections.sort(stationsTimes.get(station));
     }
 
+
+    public LocalTime getNextTrainTime(Station station, LocalTime time) {
+        ArrayList<LocalTime> times = stationsTimes.get(station);
+        for (LocalTime localTime : times) {
+            if (localTime.equals(time) || localTime.isAfter(time)) {
+                return localTime;
+            }
+        }
+        return null;
+    }
+
 }
 
