@@ -20,7 +20,8 @@ public class MapController {
   @GetMapping("/stations")
   public List<Station> getStations() throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    List<Station> stations = m.getAllStations();
+    m = Parser.readMapHorraire("timetables.csv", m);
+    List<Station> stations = m.getStations();
 
     return stations;
   }
@@ -33,6 +34,7 @@ public class MapController {
   @GetMapping("/shortest-way")
   public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
+    m = Parser.readMapHorraire("timetables.csv", m);
     Itinerary i = new Itinerary(m.getAllStations());
     try {
       Station start = m.searchStationByName(depart);
@@ -47,6 +49,7 @@ public class MapController {
   @GetMapping("/shortest-way/lines")
   public HashMap<Station,Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
+    m = Parser.readMapHorraire("timetables.csv", m);
     Itinerary i = new Itinerary(m.getAllStations());
     try {
       Station start = m.searchStationByName(depart);

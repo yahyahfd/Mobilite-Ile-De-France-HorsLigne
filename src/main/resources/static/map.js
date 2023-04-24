@@ -141,6 +141,7 @@ form.addEventListener('submit', function (event) {
                         var lineName = linesItinerary[stationName].lineNameWithoutVariant;
                         itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + stationName + '</span>';
                         if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+                        console.log(station.localisation);
                         var latitude = station.localisation.latitude;
                         var longitude = station.localisation.longitude;
                         latLngs.push([latitude, longitude]);

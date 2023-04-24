@@ -1,23 +1,27 @@
 package fr.uparis.beryllium.model;
 
-import fr.uparis.beryllium.exceptions.FormatException;
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
+import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.List;
+
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import fr.uparis.beryllium.exceptions.FormatException;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 public class Parser {
 
     private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
     /**
-     * Static method that is used to parse a file containing
+     * Static method that is used to parse the map data file containing
      * the network data (CSV file)
      *
      * @param csvFile String of the path to the file
@@ -28,13 +32,18 @@ public class Parser {
 
         Map map = new Map();
         try {
-            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile);
+
+            String[] HEADERS = {"station1", "gps1", "station2", "gps2", "line", "duration", "dist"};
+
+            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
             if (!it.hasNext()) {
                 LOGGER.warn("The file is empty");
             }
+
             while (it.hasNext()) {
                 fillMapInformationsWithExtractedFields(map, it);
             }
+
         } catch (IllegalArgumentException e) {
             // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
             LOGGER.error("Csv format incorrect, the map is incomplete.", e);
@@ -43,15 +52,87 @@ public class Parser {
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
         }
+
         return map;
+
     }
 
     /**
-     * ...
-     *
+     * Static method that is used to parse the timetables data file containing
+     * @param csvFile
      * @param map
-     * @param it
+     * @return
+     * @throws FormatException
      */
+
+    public static Map readMapHorraire(String csvFile, Map map) throws FormatException{
+
+        try {
+
+            String[] HEADERS = {"line", "station", "time","variant"};
+
+            Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
+            if (!it.hasNext()) {
+                LOGGER.warn("The file is empty");
+            }
+
+            while (it.hasNext()) {
+                fillMapWithHorraires(map, it);
+            }
+
+        } catch (IllegalArgumentException e) {
+            // the StackTrace doesn't tell where is the error, only lines of error in our code like line 12 in Controller, 127 in apache csv
+            LOGGER.error("Csv format incorrect, the map is incomplete.", e);
+        } catch (FileNotFoundException e) {
+            LOGGER.error("File not found", e);
+        } catch (IOException e) {
+            LOGGER.error("Error while reading the file", e);
+        }
+
+        return map;
+
+    }
+
+    /**
+     * static method that is used to fill each station of the lines of the map with times
+     * @param map the map to fill
+     * @param it iterator of the csv file
+     */
+
+    private static void fillMapWithHorraires(Map map, Iterator<CSVRecord> it){
+
+        CSVRecord record = it.next();
+
+        String stationString = record.get("station");
+        String time[] = record.get("time").split(":");
+        String variant = record.get("variant");
+        String lineString = record.get("line") + "." + variant;
+
+        Line line = map.searchLine(lineString);
+        Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
+
+        final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
+        line.addStationTime(station, timeOfStation[0]);
+        List<Station> stationsOfLine = line.getStations();
+        final Station[] fromStation = {station};
+        stationsOfLine.stream().forEach(stationStream ->{
+            if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0){
+                return;
+            }
+            NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
+            assert neighborData != null;
+            timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
+            line.addStationTime(stationStream, timeOfStation[0]);
+            fromStation[0] = stationStream;
+        });
+    }
+
+    /**
+     * Static method that is used to fill the map with the data extracted from the csv file
+     * @param map the map to fill
+     * @param it iterator of the csv file
+     */
+
     private static void fillMapInformationsWithExtractedFields(Map map, Iterator<CSVRecord> it) {
         CSVRecord record = it.next();
         // Creating map
@@ -71,8 +152,8 @@ public class Parser {
 
         // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0]);
-        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0]);
+        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
+        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
 
         // Add station to line's list
         // addStation verify if the station is already in the list or not
@@ -87,21 +168,24 @@ public class Parser {
         stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
     }
 
+
     /**
-     * ...
-     *
-     * @param file
-     * @return
+     * Static method that is used to get an iterator of the csv file
+     * @param file the path to the file
+     * @param headers the headers of the csv file
+     * @return an iterator of the csv file
      * @throws IOException
+     * @throws FileNotFoundException
      * @throws FormatException
      */
-    private static Iterator<CSVRecord> getCsvRecordIterator(String file) throws IOException, FormatException {
+    private static Iterator<CSVRecord> getCsvRecordIterator(String file, String[] headers) throws IOException, FileNotFoundException, FormatException {
         FileReader reader = new FileReader(file);
         //Build a format of the csv file
         CSVFormat format = CSVFormat.DEFAULT.builder()
-                .setHeader("station1", "gps1", "station2", "gps2", "line", "duration", "dist")
+                .setHeader(headers)
                 .setDelimiter(";")
                 .build();
+
 
         CSVParser parser = new CSVParser(reader, format);
         Iterable<CSVRecord> records = parser.getRecords();
@@ -113,8 +197,7 @@ public class Parser {
     }
 
     /**
-     * ...
-     *
+     * Static method that is used to check if the csv file is in the correct format
      * @param records
      * @param format
      * @throws FormatException
