@@ -14,7 +14,7 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 
 /**
  * Our Itinerary computing class.
- * Contains the algorithm that calculates the best path between 
+ * Contains the algorithm that calculates the best path between
  * two stations given the preference.
  * This itinerary should be unique for each two stations (distinct or not)
  * and therefore there is no need to specify these stations as attributes of this class
@@ -65,7 +65,7 @@ public class Itinerary{
 
 	/**
 	 * Constructor for our Itinerary class.
-	 * 
+	 *
 	 * @param stations ArrayList of all our stations (in our map)
 	 * @param start The starting station
 	 */
@@ -79,17 +79,17 @@ public class Itinerary{
 	 * The three values are initizalized to the <code>MAX_VALUE</code>
 	 * for all the stations except for the <code>start</> station
 	 * which is obviously at 0.
-	 * 
+	 *
 	 * @param start The starting station
 	 */
 	private void init(Station start){
 		for(Station s: allStations){
-			MutableTriple<Double,Integer,Long> distCountTime = 
+			MutableTriple<Double,Integer,Long> distCountTime =
 			new MutableTriple<Double,Integer,Long>
 			(Double.MAX_VALUE, Integer.MAX_VALUE, Long.MAX_VALUE);
 			distCountTimeToStart.put(s, distCountTime);
 		}
-		MutableTriple<Double,Integer,Long> distCountTime = 
+		MutableTriple<Double,Integer,Long> distCountTime =
 			new MutableTriple<Double,Integer,Long>
 			(0.0,0 , 0L);
 		distCountTimeToStart.put(start, distCountTime);
@@ -98,7 +98,7 @@ public class Itinerary{
 	/**
 	 * Method used to look for the nearest station to our starting point
 	 * by preference.
-	 * 
+	 *
 	 * @param notVisited ArrayList of stations not visited yet
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
 	 * @return the closest station to our starting point
@@ -140,7 +140,7 @@ public class Itinerary{
 				}
 				default -> {
 					throw new IllegalArgumentException
-					("Invalid preference value " + preference 
+					("Invalid preference value " + preference
 					+ ". It's supposed to be a value between 0 and 2");
 				}
 			}
@@ -154,7 +154,7 @@ public class Itinerary{
 	 * our starting point.
 	 * Updates distance, count and time for the neighbors.
 	 * Adds this neighbor to the bestPreviousNeighbors HashMap if it's better.
-	 * 
+	 *
 	 * @param station the station to verify
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
 	 * @throws IllegalArgumentException when you choose a preference other than 0, 1 or 2
@@ -211,9 +211,9 @@ public class Itinerary{
 					}
 					default -> {
 						throw new IllegalArgumentException
-						("Invalid preference value " + preference 
+						("Invalid preference value " + preference
 						+ ". It's supposed to be a value between 0 and 2");
-					} 
+					}
 				}
 				// in each case, we update the time and dist to go to the neighbor station
 				if(swap){
@@ -234,7 +234,7 @@ public class Itinerary{
 
 	/**
 	 * Search for the shortest way to get from a station to another.
-	 * 
+	 *
 	 * @param start our starting station
 	 * @param dest our destination station
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
@@ -268,7 +268,7 @@ public class Itinerary{
 	 * This method is called in shortestWay to calculate the shortest path
 	 * between two stations.
 	 * This method uses a LinkedHashMap to preserve the order of insertion.
-	 * 
+	 *
 	 * @param start our starting station
 	 * @param dest our destination station
 	 * @return the whole path from start to destination in order (LinkedHashMap), null if no path
@@ -280,7 +280,7 @@ public class Itinerary{
 		Line l = null;
 		Station before = null;
 		while(s!=start){
-			if(s == null) return null; // 
+			if(s == null) return null; //
 			for(Map.Entry<Station,MutablePair<Station,Line>> sb : bestPreviousNeighbors.entrySet()){
 				if(sb.getKey() == s){
 					MutablePair<Station,Line> statL;
@@ -303,15 +303,15 @@ public class Itinerary{
 	 * the shortestWay between the two stations, using the corresponding method
 	 * and returns the best path, depending on the <code>preference</code> specified
 	 * between all the computed paths.
-	 * 
+	 *
 	 * @param start ArrayList of starting points
-	 * @param dest ArrayList of destination points	 
+	 * @param dest ArrayList of destination points
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
 	 * @return the best path possible between a station called X and a station called Y
-	 * @see Station 
+	 * @see Station
 	 * @throws IllegalArgumentException when you choose a preference other than 0, 1 or 2
 	 */
-	public HashMap<Station,Line> shortestMultiplePaths(ArrayList<Station> start, 
+	public HashMap<Station,Line> shortestMultiplePaths(ArrayList<Station> start,
 	ArrayList<Station> dest, Integer preference, LocalTime timeWeLeft){
 		HashMap<Station,Line> res = new HashMap<>();
 		Double minDist = Double.MAX_VALUE;
@@ -346,7 +346,7 @@ public class Itinerary{
 					}
 					default -> {
 						throw new IllegalArgumentException
-						("Invalid preference value " + preference 
+						("Invalid preference value " + preference
 						+ ". It's supposed to be a value between 0 and 2");
 					}
 				}

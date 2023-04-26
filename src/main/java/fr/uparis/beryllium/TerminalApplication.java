@@ -2,14 +2,16 @@ package fr.uparis.beryllium;
 
 import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.model.*;
-import fr.uparis.beryllium.model.Map;
 import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.tuple.MutablePair;
 
 import java.time.LocalTime;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Scanner;
+
 import static java.lang.Character.toLowerCase;
 
 /**
@@ -51,8 +53,9 @@ public class TerminalApplication {
                 if (station1.trim().equalsIgnoreCase("lp")) break;
                 chosen_1 = m.getStationsByName(station1);
                 if(chosen_1.size() == 0){
-                    System.out.println("No station with the name " + station1 + " was found !");
-                    System.out.println("Try again!");
+                    ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1),m);
+                    if(!list_1.isEmpty()) chosen_1 = multi_choice_similar(list_1, scanner);
+                    else System.out.println("No station with the name " + station1 + " was found !"); System.out.println("Try again!");
                 }
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
@@ -94,7 +97,7 @@ public class TerminalApplication {
             int preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
-                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = unitary / 2 = shortest time : \u001B[0m");
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());
@@ -106,14 +109,11 @@ public class TerminalApplication {
 
                 // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
                 if (localpositionStart) {
-                    // On prend la premiere station de ce nom? //////////////////////
-                    // m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
-                    // m.walkToBestStation(chosen_1, true, chosen_2.getLocalisation());
+                    m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
                 // we add the neighbors for the destination station
                 if (localpositionDest) {
-                    // m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
-                    // m.walkToBestStation(chosen_2, false, chosen_1.getLocalisation());
+                    m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
                 }
                 // instance itinerary with all stations of the map
                 Itinerary i = new Itinerary(m.getStations());
@@ -121,8 +121,7 @@ public class TerminalApplication {
                 LocalTime timeWeLeft = LocalTime.now();
                 // get the shortest way depending on the preference
                 HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
-                // HashMap<Station, Line> route = i.shortestWay(chosen_1.get(0), chosen_2.get(0), preference);
-                
+                HashMap<Station, MutablePair<Double, Double>> distTimeToStart = i.getDistTime();
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
                 // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
                 // We add the method (the algorithm) to look for the path
@@ -130,18 +129,16 @@ public class TerminalApplication {
                     System.out.println("Looks like there is no route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m");
                 } else {
                     System.out.println("Route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m :\n");
-                    System.out.println(i.showPath(route, timeWeLeft));
+                    System.out.println(showPath(route, distTimeToStart, timeWeLeft));
                 }
                 // if we added temporary station, we remove them of the list of stations
                 if (localpositionStart) {
-                    // m.removeStation(chosen_1);
+                    m.removeStation(chosen_1.get(0));
                 }
                 if (localpositionDest) {
-                    // removewalkingneighbours pas correct (regarder commentaire sur méthode)
-                    // chosen_2.removeWalkingNeighbours(m.getStations(), chosen_1.getDistanceToAStation((Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]),
-                    //         (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
-                    
-                            // m.removeStation(chosen_2);
+                    chosen_2.removeWalkingNeighbours(m.getStations(), chosen_1.getDistanceToAStation((Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]),
+                            (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    m.removeStation(chosen_2.get(0));
                 }
             }
         }
@@ -151,6 +148,7 @@ public class TerminalApplication {
     /**
      * This method is used twice in terminal mode to either propose all the stations
      * that have the same name, or just choose the single station with the name specified.
+     *
      * @param name Name of the station to look for
      * @param m The map used in this app
      * @param scanner Same scanner for the whole app.
@@ -183,9 +181,9 @@ public class TerminalApplication {
                     System.out.println("You need to choose a valid number ! Try again ! ");
                 }
             }
-            return stations.get(num_chosen-1);
-        }else if(stations.size() == 0){
-            System.out.println("No station with the name "+name+ " was found !");
+            return stations.get(num_chosen - 1);
+        } else if (stations.size() == 0) {
+            System.out.println("No station with the name " + name + " was found !");
             return null;
         } else {
             return stations.get(0);
@@ -302,5 +300,95 @@ public class TerminalApplication {
             }
         }
         return similar;
+    }
+
+    /**
+     * Show the shortest way to go from a station to another
+     *
+     * @param res Res of the algorithm
+     * @return a string of the stations and line in order
+     */
+    public static String showPath(HashMap<Station, Line> res, HashMap<Station, MutablePair<Double, Double>> distTimeToStart) {
+        ArrayList<Station> stationRes = new ArrayList<>();
+        ArrayList<Line> lineRes = new ArrayList<>();
+        StringBuilder path = new StringBuilder();
+        if (res == null) {
+            path.append("Il n'existe aucun chemin");
+        } else {
+            // pour remettre dans le bon sens si c'est dans le mauvais
+            for (java.util.Map.Entry<Station, Line> r : res.entrySet()) {
+                stationRes.add(0, r.getKey());
+                lineRes.add(0, r.getValue());
+            }
+            // afficher le chemin du depart jusqu'a dest
+            int i = 0;
+            String downArrow = "↓";
+
+            String normalColor = "\033[0m";
+            String blue_bold = "\033[1;34m";
+            String purple_bold = "\033[1;35m";
+            String yellow_bold = "\033[1;33m";
+            MutablePair<Double, Long> distTime;
+            while (i < stationRes.size()) {
+                if (i == 0) {
+                    MutablePair<Double, Double> distTimeFromDestination = distTimeToStart.get(stationRes.get(stationRes.size() - 1));
+                    Duration d = Duration.ZERO;
+                    d = d.plusMillis((long) (distTimeFromDestination.getRight() - 0));
+                    path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTimeFromDestination.getLeft()).append("km.\n");
+                    distTime = getDistTimeForALine(stationRes, lineRes, i, distTimeToStart);
+                    path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
+                    path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+                } else {
+                    if (i != 1) {
+                        if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
+                            MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i - 1, distTimeToStart);
+                            path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
+                            path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName()).append("\n");
+                        }
+                    }
+                    if (i + 1 < stationRes.size()) {
+                        if (lineRes.get(i) != lineRes.get(i + 1) && lineRes.get(i) != null) {
+                            path.append(purple_bold).append(downArrow).append("     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+                        } else {
+                            path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
+                        }
+                    } else if (i + 1 == stationRes.size()) {
+                        path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+                    } else {
+                        path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
+                    }
+                }
+                i++;
+            }
+        }
+        return path.toString();
+    }
+
+    /**
+     * Get distance and time traveled on a line
+     *
+     * @param stationRes list of all the station
+     * @param lineRes    list of all the line
+     * @param position   the position of the station in the stationRes
+     * @return a couple of distance/time which represent the distance and time to travel the line of the station at the position
+     */
+    private static MutablePair<Double, Long> getDistTimeForALine(ArrayList<Station> stationRes, ArrayList<Line> lineRes, int position, HashMap<Station, MutablePair<Double, Double>> distTimeToStart) {
+
+        MutablePair<Double, Double> distTimeStart = new MutablePair<>(0.0, 0.0);
+        if (position != 0) {
+            distTimeStart = distTimeToStart.get(stationRes.get(position));
+        }
+        int tempPos = position + 2;
+        while (tempPos < stationRes.size()) {
+            if (lineRes.get(position + 1) != lineRes.get(tempPos)) break;
+            tempPos++;
+        }
+        MutablePair<Double, Double> distTimeDestination = distTimeToStart.get(stationRes.get(tempPos - 1));
+        MutablePair<Double, Long> result = new MutablePair<>();
+        result.setLeft(distTimeDestination.getLeft() - distTimeStart.getLeft());
+        Duration d = Duration.ZERO;
+        d = d.plusMillis((long) (distTimeDestination.getRight() - distTimeStart.getRight()));
+        result.setRight(d.toMinutes() + 1); // 40s => 1min pour arrondir
+        return result;
     }
 }
