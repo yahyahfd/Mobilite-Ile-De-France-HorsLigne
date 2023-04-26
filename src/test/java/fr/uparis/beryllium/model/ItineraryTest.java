@@ -21,8 +21,12 @@ public class ItineraryTest {
         map = Parser.readMapHoraire("newtimetables.csv", map);
         Station olympiade = map.getStations().get(0);
         Station bercy = map.getStations().get(3);
+<<<<<<< HEAD
         Itinerary itinerary = new Itinerary(map.getAllStations());
         LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
+=======
+        Itinerary itinerary = new Itinerary(map.getStations());
+>>>>>>> 07ffb055 (Réecriture de itinary)
         //Test with equal weight
         HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2, timeWeLeft);
         //List is reverse, a first element is the end of the path found
@@ -48,7 +52,7 @@ public class ItineraryTest {
     @Test
     public void testShortestDist() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
-        Itinerary itinerary = new Itinerary(map.getAllStations());
+        Itinerary itinerary = new Itinerary(map.getStations());
         Station station1 = map.getStations().get(0);
         Station station2 = map.getStations().get(3);
         Station station3 = map.getStations().get(3);

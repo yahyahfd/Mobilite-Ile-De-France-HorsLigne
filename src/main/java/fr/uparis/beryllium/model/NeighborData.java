@@ -14,6 +14,16 @@ public class NeighborData {
         this.distance = distance;
     }
 
+    /**
+     * Compares <code>nData</code> to the NeighborData Object it's called on
+     * 
+     * @param nData a NeighborData
+     * @return <code>true</code> if <code>nData</code> corresponds fully to <code>this</code>, false otherwise
+     */
+    public boolean compareNeighborData(NeighborData nData){
+        return nData.duration.equals(this.duration) && nData.distance.equals(this.distance) && nData.line.equals(this.line);
+    }
+
     public Line getLine() {
         return line;
     }
@@ -22,12 +32,16 @@ public class NeighborData {
         return duration;
     }
 
+    public Long getMillisDuration(){
+        return duration.toMillis();
+    }
+    
     public Double getDistance() {
         return distance;
     }
 
     public String toString(){
-        return line.getLineName() + " " ;
+        return line.getName() + " " ;
     }
 
 }

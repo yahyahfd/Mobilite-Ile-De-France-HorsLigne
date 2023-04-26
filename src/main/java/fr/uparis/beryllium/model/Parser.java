@@ -4,8 +4,9 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -96,11 +97,11 @@ public class Parser {
     }
 
     /**
-     * static method that is used to fill each station of the lines of the map with times
+     * Static method that is used to fill each station of the lines of the map with times
+     * 
      * @param map the map to fill
      * @param it iterator of the csv file
      */
-
     private static void fillMapWithHoraires(Map map, Iterator<CSVRecord> it){
 
         CSVRecord record = it.next();
@@ -109,25 +110,26 @@ public class Parser {
         String time[] = record.get("time").split(":");
         String variant = record.get("variant");
         String lineString = record.get("line") + "." + variant;
-
         Line line = map.searchLine(lineString);
-        // if we don't have a complet file (for tests)
-        if(map.getStationByName(stationString) != null){
-            Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
-
+        if(line == null){
+            System.out.println("xd");
+            return;
+        }
+        // On récupère toutes les stations avec ce nom
+        ArrayList<Station> stations = map.getStationsByName(stationString);
+        ArrayList<Station> resultStations = new ArrayList<>();
+        for(Station s: stations){
+            // Si on peut atteindre la ligne (via neighbors), on stocke dans nos resultats pour rajouter les horaires en une fois
+            if(s.containsLine(lineString)) resultStations.add(s);
+        }
+        for(Station s: resultStations){ // On rajoute les horaires pour les stations qui nous interessent
             final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
-            line.addStationTime(station, timeOfStation[0]);
-            List<Station> stationsOfLine = line.getStations();
-            final Station[] fromStation = {station};
-            stationsOfLine.stream().forEach(stationStream ->{
-                if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0){
-                    return;
-                }
-                NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
-                assert neighborData != null;
-                timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
-                line.addStationTime(stationStream, timeOfStation[0]);
-                fromStation[0] = stationStream;
+            s.addLineSchedule(line, timeOfStation[0]);
+            // Puis on propage vers les neighbors en suivant la line
+            HashMap<Station,Long> neighborsScheduling = s.getNeighborsForLine(lineString);
+            neighborsScheduling.forEach((nStation, duration)->{
+                timeOfStation[0] = timeOfStation[0].plusSeconds(duration);
+                nStation.addLineSchedule(line, timeOfStation[0]);
             });
         }
     }
@@ -153,26 +155,28 @@ public class Parser {
         Localisation secondStationLocalisation = new Localisation(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0]));
         // Search for the stations and line
         // Add line with variant in the name
-        Line line = map.searchLine(lineInCsv[0] + "." + lineInCsv[2]);
+        String newLinename = lineInCsv[0] + "." + lineInCsv[2];
+        Line line = map.searchLine(newLinename);
+        line = line == null?map.addLine(lineInCsv[0] + "." + lineInCsv[2]):line;
 
         // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, firstStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
-        Station stat2 = map.searchStation(secondStation, secondStationLocalisation, lineInCsv[0] + "." + lineInCsv[2]);
-
-        // Add station to line's list
-        // addStation verify if the station is already in the list or not
-        line.addStation(stat1,firstStationLocalisation);
-        line.addStation(stat2, secondStationLocalisation);
+        Station stat1 = map.searchStation(firstStation, firstStationLocalisation);
+        Station stat2 = map.searchStation(secondStation, secondStationLocalisation);
 
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
         int radius1km = 1;
-        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance) / 10, false, null);
-        stat1.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, firstStationLocalisation);
-        stat2.addWalkingNeighbours(walkingLine, map.getAllStations(), radius1km, false, secondStationLocalisation);
+        // for(String s: duration){
+        //     System.out.println(s);
+        // }
+        /*à revoir */
+        /* */   stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance) / 10, false);
+        /* */   stat1.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
+        /* */   stat2.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
+        /*à revoir */
+   
     }
-
 
     /**
      * Static method that is used to get an iterator of the csv file

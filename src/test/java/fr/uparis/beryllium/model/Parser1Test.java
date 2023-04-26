@@ -35,4 +35,42 @@ public class Parser1Test {
 
     }
 
+<<<<<<< HEAD:src/test/java/fr/uparis/beryllium/model/Parser1Test.java
+=======
+    @Test
+    public void testReadMapWithEmptyCSV() throws FormatException {
+        Map map = Parser.readMap("src/test/resources/testCsvParserEmpty.csv");
+        assertNotNull(map);
+        assertEquals(0, map.getLines().size());
+        assertEquals(0, map.getStations().size());
+    }
+
+    @Test
+    public void testReadMapWithIncorrectCSV() {
+        assertThrows(FormatException.class, () -> {
+            Parser.readMap("src/test/resources/testCsvParserIncorrect.csv");
+        });
+    }
+
+    @Test
+    public void testReadMapHorraireWithCorrectCsv() throws FormatException {
+        Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
+        map = Parser.readMapHoraire("src/test/resources/testCsvHorraire.csv", map);
+        assertNotNull(map);
+        Line line = map.searchLine("8.1");
+        LocalTime time = LocalTime.of(10, 42);
+
+        assertEquals(time, line.getStationTimes(map.getStationByName("Lourmel")).get(0));
+    }
+
+    @Test
+    public void testReadMapHorraireWithIncorrectCsv() {
+        assertThrows(FormatException.class, () -> {
+            Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
+            Parser.readMapHoraire("src/test/resources/testCsvHorraireIncorrect.csv", map);
+        });
+    }
+
+
+>>>>>>> 07ffb055 (Réecriture de itinary):src/test/java/fr/uparis/beryllium/model/ParserTest.java
 }
