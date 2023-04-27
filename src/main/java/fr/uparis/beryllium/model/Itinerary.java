@@ -127,19 +127,10 @@ public class Itinerary {
 					// for each station taken, we remember the time
 					if(nextTrainTime != null){
 						itineraryTimes.put(s1,nextTrainTime);
-						System.out.println("we take: "+s1.getName()+" a: "+itineraryTimes.get(s1)+" sur ligne:"+n.getLine().getLineName());
-						System.out.println("to go to "+s1.getName()+" "+time1+", to go from "+s1.getName()+" to "+s2.getName()+" : "+(double) n.getDuration().toMillis()+" time to wait : "+timeToWait);
-					}
-					else{
-					// 	System.out.println("on prend le train directement");
-					System.out.println("no next train "+n.getLine().getLineName());
-					System.out.println("to go to "+s1.getName()+" "+time1+", to go from "+s1.getName()+" to "+s2.getName()+" : "+(double) n.getDuration().toMillis()+" time to wait : "+timeToWait);
 					}
 					HashMap<Station, Line> statLine = new HashMap<>();
 					statLine.put(s1, n.getLine());
 					stationBefore.put(s2, statLine);
-					System.out.println("-- DISTANCE TOTALE "+s2.getName()+": "+Double.sum(dist1, weight));
-					System.out.println("STATION BEFORE "+s2.getName()+" is "+s1.getName()+" line "+n.getLine()+"\n");
 				}
 			}
 			case 1 -> {
@@ -152,22 +143,10 @@ public class Itinerary {
 					// for each station taken, we remember the time (except if we walk)
 					if(nextTrainTime != null){
 						itineraryTimes.put(s1,nextTrainTime);
-						System.out.println("we take: "+s1.getName()+" a: "+itineraryTimes.get(s1)+" sur ligne:"+n.getLine().getLineName());
-						System.out.println("to go to "+s1.getName()+" "+time1+", to go from "+s1.getName()+" to "+s2.getName()+" : "+(double) n.getDuration().toMillis()+" time to wait : "+timeToWait);
-					}
-					else{
-						// if we walk or if we can't take the train the horaire is null
-						// if(n.getLine().getName().equals("--MARCHE--"))
-						System.out.println("no next train "+n.getLine().getLineName());
-						// itineraryTimes.put(s1,null);
-						System.out.println("to go to "+s1.getName()+" "+time1+", to go from "+s1.getName()+" to "+s2.getName()+" : "+(double) n.getDuration().toMillis()+" time to wait : "+timeToWait);
-						// System.out.println("pas d'attente ! "+n.getLine().getName());
 					}
 					HashMap<Station, Line> statLine = new HashMap<>();
 					statLine.put(s1, n.getLine());
 					stationBefore.put(s2, statLine);
-					System.out.println("-- TEMPS TOTAL: "+s2.getName()+" "+Double.sum(time1, weight));
-					System.out.println("STATION BEFORE "+s2.getName()+" is "+s1.getName()+" line "+n.getLine()+"\n");
 				}
 			}
 			default -> {
@@ -205,7 +184,6 @@ public class Itinerary {
 				long durationInMillis = (long) timeToGetToS1;
 				// add the duration of the travel to the time we left
 				actualTime = timeWeLeft.plus(Duration.ofMillis(durationInMillis));
-				System.out.println("STATION PLUS PROCHE "+s1.getName()+" - "+actualTime);
 				// we remove the station from the list
 				allStations.remove(s1);
 				Map<Station,ArrayList<NeighborData>> nextStationOfs1 = s1.getNextStations();
@@ -303,7 +281,7 @@ public class Itinerary {
 					path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
 					LocalTime horaire = itineraryTimes.get(stationRes.get(i));
 					path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName());
-					if(horaire != null || lineRes.get(i).getName() != "--MARCHE--"){
+					if(horaire != null && lineRes.get(i).getName() != "--MARCHE--"){
 						path.append(" - "+horaire);
 					}
 					path.append("\n");
@@ -314,7 +292,7 @@ public class Itinerary {
 							path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
 							path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName());
 							LocalTime horaire = itineraryTimes.get(stationRes.get(i-1));
-							if(horaire != null || lineRes.get(i).getName() != "--MARCHE--"){
+							if(horaire != null && lineRes.get(i).getName() != "--MARCHE--"){
 								path.append(" - "+horaire);
 							}
 							path.append("\n");
