@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.model;
 import java.util.ArrayList;
+
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -10,6 +11,9 @@ public class Map {
     // Singleton
     private static Map mapInstance = null;
     private boolean isMapLoaded = false;
+    private ArrayList<Line> lines = new ArrayList<>();
+    private ArrayList<Station> stations = new ArrayList<>();
+    
     private Map(){}
 
     /**
@@ -22,7 +26,7 @@ public class Map {
         }
         return mapInstance;
     }
-    
+
     /**
      * @return <code>true</code> if the map exists, <code>false</code> otherwise
      */
@@ -32,15 +36,12 @@ public class Map {
 
     /**
      * Setter for <code>isMapLoaded</code>
-     * @param mapLoaded <code>true</code> if the map is being loaded, <code>false</code> otherwise
+     * <code>true</code> if the map is being loaded, <code>false</code> otherwise
      */
     public void setMapLoaded() {
         isMapLoaded = true;
     }
-
-    private ArrayList<Line> lines = new ArrayList<>();
-    private ArrayList<Station> stations = new ArrayList<>();
-
+    
     public ArrayList<Line> getLines() {
         return lines;
     }
@@ -115,8 +116,6 @@ public class Map {
         // we add the station to the list of stations
         stations.add(s);
     }
-    // ^ à modifier, utilisé une seule fois uniquement pour une marche à pieds au
-    // début et à la fin (Terminal)
 
     /**
      * Method used in terminal mode to get all the stations with <code>name</code>
@@ -152,5 +151,17 @@ public class Map {
         double radius = start.getDistanceToAStation(lDest);
         // we add the stations that are within this perimeter as neighbors of the position
         start.addWalkingNeighbours(walkingLine, this.getStations(), radius, addFirstStation);
+    }
+
+    public ArrayList<Line> getLinesByName(String lineName) {
+        ArrayList<Line> allLines = new ArrayList<>();
+
+        for (Line line : lines) {
+            if (line.getLineNameWithoutVariant().equals(lineName)) {
+                allLines.add(line);
+            }
+        }
+
+        return allLines;
     }
 }

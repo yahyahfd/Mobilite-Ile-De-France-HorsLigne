@@ -38,20 +38,23 @@ public class TerminalApplication {
         Scanner scanner = new Scanner(System.in);
 
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
-        System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n\n");
+        System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
 
         while (true) {
 
-            System.out.println("\u001B[34mWhat do you want to do ?\u001B[0m");
+            System.out.println("\n\u001B[34mWhat do you want to do ?\u001B[0m");
             System.out.println("\u001B[34m1) Search an itinerary\u001B[0m");
             System.out.println("\u001B[34m2) See schedules\u001B[0m");
 
             String choice = "";
-            while (!isFirstChoiceCorrect(choice)) {
+            boolean choiceIsOk = false;
+            while (!choiceIsOk) {
 
                 choice = scanner.nextLine().trim();
 
-                if (!isFirstChoiceCorrect(choice)) {
+                if (isFirstChoiceCorrect(choice)) {
+                    choiceIsOk = true;
+                } else {
                     System.out.println("Try again !");
                 }
 
@@ -465,113 +468,165 @@ public class TerminalApplication {
     private static void searchSchedule(Map m, Scanner scanner) {
 
         // Afficher les lignes
-        printLines(m);
+        ArrayList<String> linesNames = printLines(m);
 
         // demande la ligne
-        Line lineChoice = askChoiceLine(m, scanner);
+        String lineChoice = askChoiceLine(scanner, linesNames);
 
         // afficher les stations de la ligne
-        printStationsLine(lineChoice);
+        ArrayList<Station> stations = printStationsLine(lineChoice, m);
 
         // demande la station
-        Station stationChoice = askChoiceStation(lineChoice, scanner);
+        Station stationChoice = askChoiceStation(scanner, stations);
 
         // afficher les horaires de la station
-        printSchedules(lineChoice, stationChoice);
+        printSchedules(m, lineChoice, stationChoice);
     }
 
-    private static void printLines(Map m) {
+    private static ArrayList<String> printLines(Map m) {
 
-        System.out.println("\u001B[34mWe have the lines :\u001B[0m");
+        System.out.println("\n\u001B[34mWe have the lines :\u001B[0m");
         ArrayList<Line> lines = m.getLines();
+        ArrayList<String> linesNames = new ArrayList<>();
 
-        for (int i = 0; i < lines.size(); i++) {
-            System.out.println("\u001B[34m" + i + ")\u001B[0m " + lines.get(i).getLineName());
+        for (Line line : lines) {
+            String name = line.getLineNameWithoutVariant();
+            if (!linesNames.contains(name) && !line.getStationsTimes().isEmpty()) {
+                System.out.println("\u001B[34m--\u001B[0m " + name);
+                linesNames.add(name);
+            }
         }
+
+        return linesNames;
     }
 
-    private static Line askChoiceLine(Map m, Scanner scanner) {
+    private static String askChoiceLine(Scanner scanner, ArrayList<String> linesNames) {
 
-        System.out.println("Select your line :");
+        System.out.println("\n\u001B[34mSelect your line :\u001B[0m");
         String choice = "";
-        ArrayList<Line> lines = m.getLines();
-        int sizeLine = lines.size();
+        boolean choiceIsOk = false;
 
-        while (!isChoiceLineCorrect(choice, sizeLine)) {
+        while (!choiceIsOk) {
 
             choice = scanner.nextLine().trim();
 
-            if (!isChoiceLineCorrect(choice, sizeLine)) {
-                // TODO revoir
+            if (isChoiceLineCorrect(choice, linesNames)) {
+                choiceIsOk = true;
+            } else {
+                System.out.println("Try again !");
+            }
+        }
+        return choice;
+    }
+
+    private static boolean isChoiceLineCorrect(String choice, ArrayList<String> linesNames) {
+        return linesNames.contains(choice);
+    }
+
+    private static ArrayList<Station> printStationsLine(String line, Map m) {
+
+        System.out.println("\n\u001B[34mFor the Line " + line + ", we have the stations :\u001B[0m");
+        ArrayList<Line> lines = m.getLinesByName(line);
+        ArrayList<Station> stations = getAllStationsForALine(lines);
+
+        for (Station station : stations) {
+            System.out.println("\u001B[34m-- \u001B[0m " + station.getName());
+        }
+
+        return stations;
+    }
+
+    private static ArrayList<Station> getAllStationsForALine(ArrayList<Line> lines) {
+        ArrayList<Station> stations = new ArrayList<>();
+
+        for (Line line : lines) {
+            for (Station station : line.getStations()) {
+                if (!stations.contains(station)) {
+                    stations.add(station);
+                }
+            }
+        }
+
+        return stations;
+    }
+
+    private static Station askChoiceStation(Scanner scanner, ArrayList<Station> stations) {
+
+        System.out.println("\n\u001B[34mSelect your station :\u001B[0m");
+        String choice = "";
+        boolean choiceIsOk = false;
+
+        while (!choiceIsOk) {
+
+            choice = scanner.nextLine().trim();
+
+            if (isChoiceStationCorrect(choice, stations)) {
+                choiceIsOk = true;
+            } else {
                 System.out.println("Try again !");
             }
 
         }
 
-        int position = Integer.parseInt(choice);
-        return lines.get(position);
-
+        for (Station station : stations) {
+            if (station.getName().equals(choice)) {
+                return station;
+            }
+        }
+        return null;
     }
 
-    private static boolean isChoiceLineCorrect(String choice, int size) {
-
-        try {
-
-            int pos = Integer.parseInt(choice);
-            if (pos >= 0 && pos < size) {
+    private static boolean isChoiceStationCorrect(String choice, ArrayList<Station> stations) {
+        for (Station station : stations) {
+            if (station.getName().equals(choice)) {
                 return true;
             }
-
-        } catch (NumberFormatException e) {
-            System.out.println("We want a number please!");
         }
-
         return false;
-
     }
 
-    private static void printStationsLine(Line line) {
-
-        System.out.println("\u001B[34mWe have the stations :\u001B[0m");
-        ArrayList<Station> stations = line.getStations();
-
-        for (int i = 0; i < stations.size(); i++) {
-            System.out.println("\u001B[34m" + i + ")\u001B[0m " + stations.get(i).getName());
-        }
-    }
-
-    private static Station askChoiceStation(Line l, Scanner scanner) {
-
-        System.out.println("Select your station :");
-        String choice = "";
-        ArrayList<Station> stations = l.getStations();
-        int sizeLine = stations.size();
-
-        while (!isChoiceLineCorrect(choice, sizeLine)) {
-
-            choice = scanner.nextLine().trim();
-
-            if (!isChoiceLineCorrect(choice, sizeLine)) {
-                // TODO revoir
-                System.out.println("Try again !");
+    private static void printSchedules(Map m, String lineName, Station station) {
+        ArrayList<Line> lines = m.getLinesByName(lineName);
+        lines = getLinesWhoContainsStation(station, lines);
+        ArrayList<LocalTime> schedules = new ArrayList<>();
+        for (Line line : lines) {
+            if (line.getStationTimes(station) != null) { // Au cas où ce serait un terminus : pas d'horaires
+                for (LocalTime localTime : line.getStationTimes(station)) {
+                    if (!schedules.contains(localTime)) {
+                        schedules.add(localTime);
+                    }
+                }
             }
+        }
+        System.out.println("\n\u001B[34mFor the Station \"" + station.getName() + "\" on the Line " + lineName + ", we have theses schedules :\u001B[0m");
 
+        int count = 1;
+        for (LocalTime localTime : schedules) {
+            System.out.print(localTime);
+            if (count % 6 == 0) {
+                System.out.println();
+            } else {
+                if (!(schedules.get(schedules.size() - 1) == localTime)) {
+                    System.out.print(", ");
+                }
+            }
+            count++;
         }
 
-        int position = Integer.parseInt(choice);
-        return stations.get(position);
+        System.out.println();
 
     }
 
-    private static void printSchedules(Line line, Station station) {
+    private static ArrayList<Line> getLinesWhoContainsStation(Station station, ArrayList<Line> lines) {
+        ArrayList<Line> linesWithStation = new ArrayList<>();
 
-        ArrayList<LocalTime> schedules = line.getStationTimes(station);
-        System.out.println("\u001B[34mFor the Station \"" + station.getName() + "\" on the Line " + line.getLineName() + ", we have theses schedules :\u001B[0m");
-
-        for (LocalTime localTime : schedules) {
-            System.out.println(localTime);
+        for (Line line : lines) {
+            if (line.getStations().contains(station)) {
+                linesWithStation.add(line);
+            }
         }
 
+        return linesWithStation;
     }
 
 }
