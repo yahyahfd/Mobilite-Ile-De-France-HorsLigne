@@ -5,6 +5,7 @@ import fr.uparis.beryllium.model.*;
 import fr.uparis.beryllium.model.Map;
 import org.apache.commons.lang3.StringUtils;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,8 +29,7 @@ public class TerminalApplication {
     public static void main(String[] args) throws FormatException {
         //we parse the map
         Map m = Parser.readMap("map_data.csv");
-        m = Parser.readMapHorraire("timetables.csv", m);
-
+        m = Parser.readMapHoraire("timetables.csv", m);
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
@@ -115,8 +115,10 @@ public class TerminalApplication {
                 }
                 // instance itinerary with all stations of the map
                 Itinerary i = new Itinerary(m.getAllStations());
+                // default, actual time, else, the time the user enter
+                LocalTime timeWeLeft = LocalTime.now();
                 // get the shortest way depending on the preference
-                HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference);
+                HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference, timeWeLeft);
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
                 // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
                 // We add the method (the algorithm) to look for the path
@@ -124,7 +126,7 @@ public class TerminalApplication {
                     System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m");
                 } else {
                     System.out.println("Route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m :\n");
-                    System.out.println(i.showPath(route));
+                    System.out.println(i.showPath(route, timeWeLeft));
                 }
                 // if we added temporary station, we remove them of the list of stations
                 if (localpositionStart) {

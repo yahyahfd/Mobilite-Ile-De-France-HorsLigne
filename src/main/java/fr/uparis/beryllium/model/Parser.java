@@ -65,7 +65,7 @@ public class Parser {
      * @throws FormatException
      */
 
-    public static Map readMapHorraire(String csvFile, Map map) throws FormatException{
+    public static Map readMapHoraire(String csvFile, Map map) throws FormatException{
 
         try {
 
@@ -77,7 +77,7 @@ public class Parser {
             }
 
             while (it.hasNext()) {
-                fillMapWithHorraires(map, it);
+                fillMapWithHoraires(map, it);
             }
 
         } catch (IllegalArgumentException e) {
@@ -99,7 +99,7 @@ public class Parser {
      * @param it iterator of the csv file
      */
 
-    private static void fillMapWithHorraires(Map map, Iterator<CSVRecord> it){
+    private static void fillMapWithHoraires(Map map, Iterator<CSVRecord> it){
 
         CSVRecord record = it.next();
 
@@ -109,22 +109,25 @@ public class Parser {
         String lineString = record.get("line") + "." + variant;
 
         Line line = map.searchLine(lineString);
-        Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
+        // if we don't have a complet file (for tests)
+        if(map.getStationByName(stationString) != null){
+            Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocalisations().get(lineString), lineString);
 
-        final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
-        line.addStationTime(station, timeOfStation[0]);
-        List<Station> stationsOfLine = line.getStations();
-        final Station[] fromStation = {station};
-        stationsOfLine.stream().forEach(stationStream ->{
-            if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0){
-                return;
-            }
-            NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
-            assert neighborData != null;
-            timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
-            line.addStationTime(stationStream, timeOfStation[0]);
-            fromStation[0] = stationStream;
-        });
+            final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
+            line.addStationTime(station, timeOfStation[0]);
+            List<Station> stationsOfLine = line.getStations();
+            final Station[] fromStation = {station};
+            stationsOfLine.stream().forEach(stationStream ->{
+                if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0){
+                    return;
+                }
+                NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
+                assert neighborData != null;
+                timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
+                line.addStationTime(stationStream, timeOfStation[0]);
+                fromStation[0] = stationStream;
+            });
+        }
     }
 
     /**

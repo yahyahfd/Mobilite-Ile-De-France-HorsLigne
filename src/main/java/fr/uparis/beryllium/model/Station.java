@@ -162,7 +162,7 @@ public class Station {
                         List<Localisation> startLocalisation = localisations.values().stream().toList();
                         for (Localisation start : startLocalisation) {
                             if (s.isWithinARadius(start, dest, radius)) {
-                                double distance = s.getDistanceToAStation(start, dest);
+                                double distance = s.getDistanceToAStation(start, dest); // ?
                                 double time = s.getWalkingTimeInSecondsFromADistance(distance);
                                 String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
                                 // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)

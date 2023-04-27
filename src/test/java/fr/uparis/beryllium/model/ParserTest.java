@@ -54,9 +54,9 @@ public class ParserTest {
     }
 
     @Test
-    public void testReadMapHorraireWithCorrectCsv() throws FormatException {
+    public void testReadMapHoraireWithCorrectCsv() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
-        map = Parser.readMapHorraire("src/test/resources/testCsvHorraire.csv", map);
+        map = Parser.readMapHoraire("src/test/resources/testCsvHoraire.csv", map);
         assertNotNull(map);
         Line line = map.searchLine("8.1");
         LocalTime time = LocalTime.of(10, 42);
@@ -65,10 +65,10 @@ public class ParserTest {
     }
 
     @Test
-    public void testReadMapHorraireWithIncorrectCsv() {
+    public void testReadMapHoraireWithIncorrectCsv() {
         assertThrows(FormatException.class, () -> {
             Map map = Parser.readMap("src/test/resources/testCsvParser.csv");
-            Parser.readMapHorraire("src/test/resources/testCsvHorraireIncorrect.csv", map);
+            Parser.readMapHoraire("src/test/resources/testCsvHoraireIncorrect.csv", map);
         });
     }
 

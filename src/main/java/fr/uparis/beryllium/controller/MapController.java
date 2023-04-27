@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.controller;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -20,7 +21,7 @@ public class MapController {
   @GetMapping("/stations")
   public List<Station> getStations() throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHorraire("timetables.csv", m);
+    m = Parser.readMapHoraire("timetables.csv", m);
     List<Station> stations = m.getStations();
 
     return stations;
@@ -34,12 +35,13 @@ public class MapController {
   @GetMapping("/shortest-way")
   public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHorraire("timetables.csv", m);
+    m = Parser.readMapHoraire("timetables.csv", m);
     Itinerary i = new Itinerary(m.getAllStations());
+    LocalTime timeWeLeft = LocalTime.now();
     try {
       Station start = m.searchStationByName(depart);
       Station dest = m.searchStationByName(arrivee);
-      HashMap<Station,Line> res = i.shortestWay(start, dest, preference);
+      HashMap<Station,Line> res = i.shortestWay(start, dest, preference, timeWeLeft);
       return i.getPathStations(res);
     } catch (Exception e) {
       return null;
@@ -49,12 +51,13 @@ public class MapController {
   @GetMapping("/shortest-way/lines")
   public HashMap<Station,Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHorraire("timetables.csv", m);
+    m = Parser.readMapHoraire("timetables.csv", m);
     Itinerary i = new Itinerary(m.getAllStations());
+    LocalTime timeWeLeft = LocalTime.now();
     try {
       Station start = m.searchStationByName(depart);
       Station dest = m.searchStationByName(arrivee);
-      HashMap<Station, Line> res = i.shortestWay(start, dest, preference);
+      HashMap<Station, Line> res = i.shortestWay(start, dest, preference, timeWeLeft);
       HashMap<Station, Line> resReversed = new HashMap<>();
       ArrayList<Station> stations = i.getPathStations(res);
       return res;
