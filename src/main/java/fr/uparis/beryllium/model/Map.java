@@ -3,6 +3,13 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 // import java.text.Normalizer;
 
+// On a vraiment besoin de lines ici? l'information est déjà stockée dans les neighbors non?
+// ON duplique l'information lors du parsing, on rajoute la ligne ici ET dans le neighbor
+// lors de la création d'une station.
+// MAP à REVOIR
+/**
+ * Our map class, designed to store all the stations
+ */
 public class Map {
 
     // Singleton
@@ -52,16 +59,16 @@ public class Map {
      * needed
      * 
      * @param name         Name of the station we are looking for
-     * @param localisation Localisation of the station we are looking for
+     * @param location Location of the station we are looking for
      * @return returns the Station if it exists, creates it before returning it if
      *         it doesn't exist
      */
-    public Station searchStation(String name, Localisation l) {
+    public Station searchStation(String name, Location location) {
         for (Station s : stations) {
-            if ((s.getName()).equals(name) && (s.getLocalisation()).sameLocalisation(l))
+            if ((s.getName()).equals(name) && (s.getLocation()).sameLocation(location))
                 return s;
         }
-        Station newStation = new Station(name, l);
+        Station newStation = new Station(name, location);
         stations.add(newStation);
         return newStation;
     }
@@ -108,7 +115,7 @@ public class Map {
      * @param name      name of our new station
      */
     public void addStation(Double latitude, Double longitude, String name) {
-        Station s = new Station(name, new Localisation(latitude, longitude));
+        Station s = new Station(name, new Location(latitude, longitude));
         // we add the station to the list of stations
         stations.add(s);
     }
@@ -138,9 +145,9 @@ public class Map {
      *
      * @param start           The starting station (coordonnees)
      * @param addFirstStation
-     * @param lDest           the localisation of the destination station
+     * @param lDest           the location of the destination station
      */
-    public void walkToBestStation(Station start, Boolean addFirstStation, Localisation lDest) {
+    public void walkToBestStation(Station start, Boolean addFirstStation, Location lDest) {
         // we get the walking line, create it if it doesn't exist
         Line getLine = this.searchLine("--MARCHE--");
         Line walkingLine = getLine==null?addLine("--MARCHE--"):getLine;

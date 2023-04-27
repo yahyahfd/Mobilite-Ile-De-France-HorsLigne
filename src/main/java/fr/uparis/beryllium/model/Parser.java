@@ -111,10 +111,6 @@ public class Parser {
         String variant = record.get("variant");
         String lineString = record.get("line") + "." + variant;
         Line line = map.searchLine(lineString);
-        if(line == null){
-            System.out.println("xd");
-            return;
-        }
         // On récupère toutes les stations avec ce nom
         ArrayList<Station> stations = map.getStationsByName(stationString);
         ArrayList<Station> resultStations = new ArrayList<>();
@@ -151,8 +147,8 @@ public class Parser {
         String[] duration = record.get("duration").split(":");
         String distance = record.get("dist");
 
-        Localisation firstStationLocalisation = new Localisation(Double.parseDouble(gpsFirstStation[1]), Double.parseDouble(gpsFirstStation[0]));
-        Localisation secondStationLocalisation = new Localisation(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0]));
+        Location firstStationLocation = new Location(Double.parseDouble(gpsFirstStation[1]), Double.parseDouble(gpsFirstStation[0]));
+        Location secondStationLocation = new Location(Double.parseDouble(gpsSecondStation[1]), Double.parseDouble(gpsSecondStation[0]));
         // Search for the stations and line
         // Add line with variant in the name
         String newLinename = lineInCsv[0] + "." + lineInCsv[2];
@@ -161,8 +157,8 @@ public class Parser {
 
         // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
-        Station stat1 = map.searchStation(firstStation, firstStationLocalisation);
-        Station stat2 = map.searchStation(secondStation, secondStationLocalisation);
+        Station stat1 = map.searchStation(firstStation, firstStationLocation);
+        Station stat2 = map.searchStation(secondStation, secondStationLocation);
 
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");

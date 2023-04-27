@@ -94,7 +94,7 @@ public class TerminalApplication {
             int preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
-                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = unitary / 2 = shortest time : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());
@@ -116,10 +116,10 @@ public class TerminalApplication {
                     // m.walkToBestStation(chosen_2, false, chosen_1.getLocalisation());
                 }
                 // instance itinerary with all stations of the map
-                Itinerary i = new Itinerary(m.getStations(),chosen_1.get(0));
+                Itinerary i = new Itinerary(m.getStations());
                 // get the shortest way depending on the preference
-                // HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference);
-                HashMap<Station, Line> route = i.shortestWay(chosen_1.get(0), chosen_2.get(0), preference);
+                HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference);
+                // HashMap<Station, Line> route = i.shortestWay(chosen_1.get(0), chosen_2.get(0), preference);
                 
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
                 // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not

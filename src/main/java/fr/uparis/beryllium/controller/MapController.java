@@ -39,9 +39,9 @@ public class MapController {
     Itinerary i = new Itinerary(m.getStations());
     LocalTime timeWeLeft = LocalTime.now();
     try {
-      Station start = m.searchStationByName(depart);
-      Station dest = m.searchStationByName(arrivee);
-      HashMap<Station,Line> res = i.shortestWay(start, dest, preference, timeWeLeft);
+      ArrayList<Station> start = m.getStationsByName(depart);
+      ArrayList<Station> dest = m.getStationsByName(arrivee);
+      HashMap<Station,Line> res = i.shortestMultiplePaths(start, dest, preference);
       return i.getPathStations(res);
     } catch (Exception e) {
       return null;
@@ -56,37 +56,35 @@ public class MapController {
     Itinerary i = new Itinerary(m.getStations());
     LocalTime timeWeLeft = LocalTime.now();
     try {
-      Station start = m.searchStationByName(depart);
-      Station dest = m.searchStationByName(arrivee);
-      HashMap<Station, Line> res = i.shortestWay(start, dest, preference, timeWeLeft);
-      HashMap<Station, Line> resReversed = new HashMap<>();
-      ArrayList<Station> stations = i.getPathStations(res);
+      ArrayList<Station> start = m.getStationsByName(depart);
+      ArrayList<Station> dest = m.getStationsByName(arrivee);
+      HashMap<Station,Line> res = i.shortestMultiplePaths(start, dest, preference);
       return res;
     } catch (Exception e) {
       return null;
     }
   }
 
-  /**
-   * Parsing method to get the name out of depart or arrivee in shortestWay method
-   */
-  private static String getName(String s) {
-    return s.substring(0, s.indexOf(" ["));
-  }
+  // /**
+  //  * Parsing method to get the name out of depart or arrivee in shortestWay method
+  //  */
+  // private static String getName(String s) {
+  //   return s.substring(0, s.indexOf(" ["));
+  // }
 
-  /**
-   * Parsing method to get the X coordinate out of depart or arrivee in shortestWay method
-   */
-  private static Double getX(String s) {
-    String coordonnees = s.substring(s.indexOf("(") + 1, s.indexOf(","));
-    return Double.parseDouble(coordonnees);
-  }
+  // /**
+  //  * Parsing method to get the X coordinate out of depart or arrivee in shortestWay method
+  //  */
+  // private static Double getX(String s) {
+  //   String coordonnees = s.substring(s.indexOf("(") + 1, s.indexOf(","));
+  //   return Double.parseDouble(coordonnees);
+  // }
 
-  /**
-   * Parsing method to get the Y coordinate out of depart or arrivee in shortestWay method
-   */
-  private static Double getY(String s) {
-    String coordonnees = s.substring(s.indexOf(",") + 1, s.indexOf(")"));
-    return Double.parseDouble(coordonnees);
-  }
+  // /**
+  //  * Parsing method to get the Y coordinate out of depart or arrivee in shortestWay method
+  //  */
+  // private static Double getY(String s) {
+  //   String coordonnees = s.substring(s.indexOf(",") + 1, s.indexOf(")"));
+  //   return Double.parseDouble(coordonnees);
+  // }
 }

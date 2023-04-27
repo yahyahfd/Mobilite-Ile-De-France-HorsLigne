@@ -5,58 +5,74 @@ import org.apache.commons.lang3.tuple.MutablePair;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.MutableTriple;
 
 /**
- * Our Itinerary calculation class.
+ * Our Itinerary computing class.
  * Contains the algorithm that calculates the best path between 
- * two stations (the only public method)
+ * two stations given the preference.
  * This itinerary should be unique for each two stations (distinct or not)
  * and therefore there is no need to specify these stations as attributes of this class
  */
 public class Itinerary{
 
 	/**
-	 * We stock all of our stations here
+	 * We stock all of our stations here.
 	 */
 	private final ArrayList<Station> allStations;
+
+	/**
+	 * Getter for allStations.
+	 * @return <code>allStations</code>
+	 */
+	public ArrayList<Station> getAllStations(){
+		return allStations;
+	}
 
 	/**
 	 * This HashMap stocks the best distance, the least amount of stations and the
 	 * best duration of travel for each station (compared to our fixed starting station)
 	 */
-	private final HashMap<Station, MutableTriple<Double,Integer,Long>> 
+	private final HashMap<Station, MutableTriple<Double,Integer,Long>>
 	distCountTimeToStart = new HashMap<>();
 
 	/**
+	 * Getter for distCountTimeToStart.
+	 * @return <code>distCountTimeToStart</code>
+	 */
+	public HashMap<Station, MutableTriple<Double,Integer,Long>>
+	getDistCountTimeToStart(){
+		return distCountTimeToStart;
+	}
+
+	/**
 	 * This HashMap stocks the best neighbor of each station (and the line to take)
-	 * to reach the starting point
+	 * to reach the starting point.
 	 */
 	private final HashMap<Station, MutablePair<Station,Line>> bestPreviousNeighbors =
 	new HashMap<>();
 
 	/**
-	 * Constructor for our Itinerary class
+	 * Constructor for our Itinerary class.
 	 * 
 	 * @param stations ArrayList of all our stations (in our map)
 	 * @param start The starting station
 	 */
-	public Itinerary(ArrayList<Station> stations,Station start){
+	public Itinerary(ArrayList<Station> stations){
 		allStations = stations;
-		init(start);
 	}
 
 	/**
 	 * Method used to initialize the graph of distances, station counts and time
-	 * between all the stations and our starting point
+	 * between all the stations and our starting point.
 	 * The three values are initizalized to the <code>MAX_VALUE</code>
 	 * for all the stations except for the <code>start</> station
-	 * which is obviously at 0
+	 * which is obviously at 0.
 	 * 
 	 * @param start The starting station
 	 */
@@ -75,11 +91,12 @@ public class Itinerary{
 
 	/**
 	 * Method used to look for the nearest station to our starting point
-	 * by preference
+	 * by preference.
 	 * 
 	 * @param notVisited ArrayList of stations not visited yet
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
 	 * @return the closest station to our starting point
+	 * @throws IllegalArgumentException when you choose a preference other than 0, 1 or 2
 	 */
 	private Station bestStationByPreference
 	(ArrayList<Station> notVisited, int preference){
@@ -129,13 +146,14 @@ public class Itinerary{
 	 * Gets the best neighbor of <code>station</code> to reach.
 	 * Updates for each neighbor of <code>station</code> the best way to reach
 	 * our starting point.
-	 * Updates distance, count and time for the neighbors (doesn't check if better).
-	 * Adds this neighbor to the bestPreviousNeighbors HashMap (replaces if exists).
-	 * needs to be changed
+	 * Updates distance, count and time for the neighbors.
+	 * Adds this neighbor to the bestPreviousNeighbors HashMap if it's better.
 	 * 
 	 * @param station the station to verify
-	 */           ///////////modifier pour pas update systematiquement
-	private void updateDistCountTime(Station station){
+	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
+	 * @throws IllegalArgumentException when you choose a preference other than 0, 1 or 2
+	 */
+	private void updateDistCountTime(Station station, Integer preference){
 		HashMap<Station, ArrayList<NeighborData>> neighborsOfStation =
 		station.getNextStations();
 		MutableTriple<Double,Integer,Long> stationDistCountTime =
@@ -151,26 +169,46 @@ public class Itinerary{
 				Long timeWeight = Long.sum(timeStation,nData.getMillisDuration());
 				MutableTriple<Double,Integer,Long> neighborDistCountTime =
 				distCountTimeToStart.get(neighborStation);
-				neighborDistCountTime.setLeft(distWeight);
-				neighborDistCountTime.setMiddle(countWeight);
-				neighborDistCountTime.setRight(timeWeight);
-				MutablePair<Station,Line> statLine = new MutablePair<Station,Line>
-				(station, nData.getLine());
-				bestPreviousNeighbors.put(neighborStation,statLine);
+				boolean swap = false;
+				switch(preference){
+					case 0 ->{
+						if(distWeight<neighborDistCountTime.getLeft()) swap = true;
+					}
+					case 1 ->{
+						if(countWeight<neighborDistCountTime.getMiddle()) swap = true;
+					}
+					case 2 ->{
+						if(timeWeight<neighborDistCountTime.getRight()) swap = true;
+					}
+					default -> {
+						throw new IllegalArgumentException
+						("Invalid preference value " + preference 
+						+ ". It's supposed to be a value between 0 and 2");
+					} 
+				}
+				if(swap){
+					neighborDistCountTime.setLeft(distWeight);
+					neighborDistCountTime.setMiddle(countWeight);
+					neighborDistCountTime.setRight(timeWeight);
+					MutablePair<Station,Line> statLine = new MutablePair<Station,Line>
+					(station, nData.getLine());
+					bestPreviousNeighbors.put(neighborStation,statLine);
+				}
 			}
 		});
 	}
 
 	/**
-	 * Search for the shortest way to get from a station to another
+	 * Search for the shortest way to get from a station to another.
 	 * 
 	 * @param start our starting station
 	 * @param dest our destination station
 	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
-	 * @return the whole path from start to destination in order (LinkedHashMap)
+	 * @return the whole path from start to destination in order (LinkedHashMap), null if no path
 	 */
-	public HashMap<Station,Line> shortestWay
+	private HashMap<Station,Line> shortestWay
 	(Station start, Station dest, Integer preference){
+		init(start);
 		ArrayList<Station> notVisited = new ArrayList<>(allStations);
 		while(notVisited.size() > 0){
 			Station station = bestStationByPreference(notVisited,preference);
@@ -178,13 +216,22 @@ public class Itinerary{
 				notVisited.clear();
 			}else{
 				notVisited.remove(station);
-				updateDistCountTime(station);
+				updateDistCountTime(station, preference);
 			}
 		}
 
 		return getShortestPath(start, dest);
 	}
 
+	/**
+	 * This method is called in shortestWay to calculate the shortest path
+	 * between two stations.
+	 * This method uses a LinkedHashMap to preserve the order of insertion.
+	 * 
+	 * @param start our starting station
+	 * @param dest our destination station
+	 * @return the whole path from start to destination in order (LinkedHashMap), null if no path
+	 */
 	private HashMap<Station, Line> getShortestPath(Station start, Station dest){
 		// linkedHashmap to preserve the order of insertion
 		HashMap<Station, Line> shortestPath = new LinkedHashMap<>();
@@ -192,7 +239,7 @@ public class Itinerary{
 		Line l = null;
 		Station before = null;
 		while(s!=start){
-			if(s == null) return null; // C'est un terminus, il n'y a pas de previous
+			if(s == null) return null; // 
 			for(Map.Entry<Station,MutablePair<Station,Line>> sb : bestPreviousNeighbors.entrySet()){
 				if(sb.getKey() == s){
 					MutablePair<Station,Line> statL;
@@ -204,17 +251,94 @@ public class Itinerary{
 			shortestPath.put(s,l);
 			s= before;
 		}
-		shortestPath.put(start,l); // premiere station
+		shortestPath.put(start,l); //first station
 		return shortestPath;
 	}
 
+	/**
+	 * Computes the shortest path between all pairs of start and dest stations defined in
+	 * the corresponding arraylists using the shortestWay algorithm on each pair:
+	 * For each station in <code>start</code> and each station in <code>dest</code>, this method calculates
+	 * the shortestWay between the two stations, using the corresponding method
+	 * and returns the best path, depending on the <code>preference</code> specified
+	 * between all the computed paths.
+	 * 
+	 * @param start ArrayList of starting points
+	 * @param dest ArrayList of destination points	 
+	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
+	 * @return the best path possible between a station called X and a station called Y
+	 * @see Station 
+	 * @throws IllegalArgumentException when you choose a preference other than 0, 1 or 2
+	 */
+	public HashMap<Station,Line> shortestMultiplePaths(ArrayList<Station> start, 
+	ArrayList<Station> dest, Integer preference){
+		HashMap<Station,Line> res = new HashMap<>();
+		Double minDist = Double.MAX_VALUE;
+		Integer minCount = Integer.MAX_VALUE;
+		Long minTime = Long.MAX_VALUE;
+		for(Station s1: start){
+			for(Station s2: dest){
+				HashMap<Station, Line> tmp = shortestWay(s1, s2, preference);
+
+				double dist = distCountTimeToStart.get(s2).getLeft();
+				Integer count = distCountTimeToStart.get(s2).getMiddle();
+				Long time = distCountTimeToStart.get(s2).getRight();
+				switch(preference){
+					case 0 -> {
+						if(dist<minDist){
+							minDist = dist;
+							res = tmp;
+						}
+					}
+
+					case 1 -> {
+						if(count<minCount){
+							minCount = count;
+							res = tmp;
+						}
+					}
+					case 2 -> {
+						if (time < minTime) {
+							minTime = time;
+							res = tmp;
+						}
+					}
+					default -> {
+						throw new IllegalArgumentException
+						("Invalid preference value " + preference 
+						+ ". It's supposed to be a value between 0 and 2");
+					}
+				}
+			}
+		}
+		return res;
+	}
+
+	// à supprimer, reverse dans la méthode de calcul plutot, et traitement dans le mapController./////////////
+    /**
+	 * This method is used to return an ordered list of all stations in a path
+	 *
+	 * @param res HashMap of the path calculated by shortestWay Method
+	 * @return An ordered list of stations in the path (can be empty)
+	 */
+	public ArrayList<Station> getPathStations(HashMap<Station, Line> res){
+		if(res == null){
+			return new ArrayList<>();
+		}
+
+		ArrayList<Station> stationRes = new ArrayList<>(res.keySet());
+		Collections.reverse(stationRes);
+
+		return stationRes;
+	}
+
+	// à modifier/déplacer vers le terminalAPP, reverse dans la méthode de calcul plutot, et traitement dans le TERMINAL./////////////
 	public String showPath(HashMap<Station, Line> route) {
 		StringBuilder res = new StringBuilder();
 		route.forEach((station,line)->{
-			res.append(station+"\n");
 			res.append(line+"\n");
+			res.append(station+"\n");
 		});
 		return res.toString();
 	}
-
 }
