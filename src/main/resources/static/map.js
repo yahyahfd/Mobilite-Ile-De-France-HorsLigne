@@ -27,19 +27,21 @@ fetch('http://localhost:8080/stations')
     .then(data => {
         data.forEach(station => {
             var lines = station.neighboringLines.join('<br>');
-            var localisations = station.localisations;
-            var markers = [];
+            //var localisations = station.localisations;
+            //var markers = [];
 
-            for(let i in localisations){
-                var marker = L.marker([localisations[i].latitude, localisations[i].longitude])
-                    .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
-                markers.push(marker);
-            }
+            var location = station.location
 
-            markersLayer.addLayer(L.layerGroup(markers));
+            //for(let i in localisations){
+            var marker = L.marker([location.latitude, location.longitude])
+                 .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
+            //markers.push(marker);
+            //}
+
+            //markersLayer.addLayer(L.layerGroup(marker));
             // var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
             //     .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
-            //markersLayer.addLayer(marker);
+            markersLayer.addLayer(marker);
 
             // Adding station names + localisation to datalist of both inputs
             departList.push(station.name);
