@@ -27,23 +27,23 @@ fetch('http://localhost:8080/stations')
     .then(data => {
         data.forEach(station => {
             var lines = station.neighboringLines.join('<br>');
-            //var localisations = station.localisations;
+            //var locations = station.locations;
             //var markers = [];
 
             var location = station.location
 
-            //for(let i in localisations){
+            //for(let i in locations){
             var marker = L.marker([location.latitude, location.longitude])
                  .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
             //markers.push(marker);
             //}
 
             //markersLayer.addLayer(L.layerGroup(marker));
-            // var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
+            // var marker = L.marker([station.location.latitude, station.location.longitude])
             //     .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
             markersLayer.addLayer(marker);
 
-            // Adding station names + localisation to datalist of both inputs
+            // Adding station names + location to datalist of both inputs
             departList.push(station.name);
             arriveeList.push(station.name);
         });
@@ -143,9 +143,9 @@ form.addEventListener('submit', function (event) {
                         var lineName = linesItinerary[stationName].lineNameWithoutVariant;
                         itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + stationName + '</span>';
                         if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
-                        console.log(station.localisation);
-                        var latitude = station.localisation.latitude;
-                        var longitude = station.localisation.longitude;
+                        console.log(station.location);
+                        var latitude = station.location.latitude;
+                        var longitude = station.location.longitude;
                         latLngs.push([latitude, longitude]);
                         var lines = station.neighboringLines.join('<br>');
                         var marker = L.marker([latitude, longitude])

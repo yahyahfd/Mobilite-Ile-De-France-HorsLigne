@@ -52,7 +52,7 @@ public class MapController {
   }
 
   /**
-   * Doesn't recalculate the path if it's already calculated.
+   * Doesn't recalculate the path if it's already calculated
    * 
    * @param depart  contains 'name' and 'localisation' of station
    * @param arrivee contains 'name' and 'localisation' of station
