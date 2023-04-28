@@ -29,7 +29,7 @@ public class TerminalApplication {
     public static void main(String[] args) throws FormatException {
         //we parse the map
         Map m = Parser.readMap("map_data.csv");
-        m = Parser.readMapHoraire("timetables.csv", m);
+        m = Parser.readMapHoraire("newtimetables.csv", m);
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
