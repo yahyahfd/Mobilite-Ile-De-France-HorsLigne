@@ -14,77 +14,91 @@ import fr.uparis.beryllium.model.*;
 public class MapController {
 
   /**
+   * We stock our filled map here
+   */
+  private final Map map;
+  /**
+   * We stock our initialized itinerary here
+   */
+  private final Itinerary itinerary;
+  /**
+   * We stock all our stations here
+   */
+  private final ArrayList<Station> stations;
+  /**
+   * Our calculated path is stocked here
+   */
+  private HashMap<Station, Line> shortestPath = null;
+
+  /**
+   * Constructor for our MapController, called once when the app
+   * is launched. Is used to initialize all the needed attributes
+   */
+  public MapController() throws FormatException {
+    Map m = Parser.readMap("map_data.csv");
+    map = Parser.readMapHoraire("timetables.csv", m);
+    stations = map.getStations();
+    itinerary = new Itinerary(stations);
+  }
+
+  /**
    * This method allows us to send an HTTP GET request to get all stations
    * 
    * @return a list of all stations
    */
   @GetMapping("/stations")
   public List<Station> getStations() throws FormatException {
-    Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHoraire("newtimetables.csv", m);
-    List<Station> stations = m.getStations();
-
     return stations;
   }
 
   /**
+   * Doesn't recalculate the path if it's already calculated.
+   * 
    * @param depart  contains 'name' and 'localisation' of station
    * @param arrivee contains 'name' and 'localisation' of station
-   * @return path from <code>depart</code> to <code>arrivee</code>
+	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
+   * 
+   * @return stations from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
-    Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHoraire("newtimetables.csv", m);
-    Itinerary i = new Itinerary(m.getStations());
-    LocalTime timeWeLeft = LocalTime.now();
+  public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee,
+      @RequestParam Integer preference) throws FormatException {
     try {
-      ArrayList<Station> start = m.getStationsByName(depart);
-      ArrayList<Station> dest = m.getStationsByName(arrivee);
-      HashMap<Station,Line> res = i.shortestMultiplePaths(start, dest, preference);
-      return i.getPathStations(res);
+      HashMap<Station, Line> path;
+      if (shortestPath == null) {
+        ArrayList<Station> start = map.getStationsByName(depart);
+        ArrayList<Station> dest = map.getStationsByName(arrivee);
+        shortestPath = itinerary.shortestMultiplePaths(start, dest, preference);
+      }
+      path = shortestPath;
+      shortestPath = null;
+      return itinerary.getPathStations(path);
     } catch (Exception e) {
       return null;
     }
   }
 
-  // à modifier avec "bigstations"
+  /**
+   * Doesn't recalculate the path if it's already calculated.
+   * 
+   * @param depart  contains 'name' and 'localisation' of station
+   * @param arrivee contains 'name' and 'localisation' of station
+	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
+   * 
+   * @return path from <code>depart</code> to <code>arrivee</code>
+   */
   @GetMapping("/shortest-way/lines")
-  public HashMap<Station,Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee, @RequestParam Integer preference) throws FormatException {
-    Map m = Parser.readMap("map_data.csv");
-    m = Parser.readMapHoraire("newtimetables.csv", m);
-    Itinerary i = new Itinerary(m.getStations());
-    LocalTime timeWeLeft = LocalTime.now();
+  public HashMap<Station, Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee,
+      @RequestParam Integer preference) throws FormatException {
     try {
-      ArrayList<Station> start = m.getStationsByName(depart);
-      ArrayList<Station> dest = m.getStationsByName(arrivee);
-      HashMap<Station,Line> res = i.shortestMultiplePaths(start, dest, preference);
-      return res;
+      if (shortestPath == null) {
+        ArrayList<Station> start = map.getStationsByName(depart);
+        ArrayList<Station> dest = map.getStationsByName(arrivee);
+        shortestPath = itinerary.shortestMultiplePaths(start, dest, preference);
+      }
+      return shortestPath;
     } catch (Exception e) {
       return null;
     }
   }
-
-  // /**
-  //  * Parsing method to get the name out of depart or arrivee in shortestWay method
-  //  */
-  // private static String getName(String s) {
-  //   return s.substring(0, s.indexOf(" ["));
-  // }
-
-  // /**
-  //  * Parsing method to get the X coordinate out of depart or arrivee in shortestWay method
-  //  */
-  // private static Double getX(String s) {
-  //   String coordonnees = s.substring(s.indexOf("(") + 1, s.indexOf(","));
-  //   return Double.parseDouble(coordonnees);
-  // }
-
-  // /**
-  //  * Parsing method to get the Y coordinate out of depart or arrivee in shortestWay method
-  //  */
-  // private static Double getY(String s) {
-  //   String coordonnees = s.substring(s.indexOf(",") + 1, s.indexOf(")"));
-  //   return Double.parseDouble(coordonnees);
-  // }
 }
