@@ -6,6 +6,7 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 
@@ -17,29 +18,31 @@ public class ItineraryTest {
     @Test
     public void testShortestWay() throws FormatException  {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
+        map = Parser.readMapHoraire("newtimetables.csv", map);
         Station olympiade = map.getStations().get(0);
         Station bercy = map.getStations().get(3);
         Itinerary itinerary = new Itinerary(map.getAllStations());
+        LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
         //Test with equal weight
-        HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2);
+        HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2, timeWeLeft);
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_1));
+        LOGGER.info(itinerary.showPath(path_1, timeWeLeft));
         ArrayList<Station> stations_1 = new ArrayList<>(path_1.keySet());
         assertEquals(4, stations_1.size());
         assertEquals("Cour Saint-Emilion", stations_1.get(1).getName());
 
         //Test with preference dist
-        HashMap<Station, Line> path_2 = itinerary.shortestWay(olympiade, bercy, 0);
+        HashMap<Station, Line> path_2 = itinerary.shortestWay(olympiade, bercy, 0, timeWeLeft);
         HashMap<Station, MutablePair<Double, Double>> timeDist = itinerary.getDistTime();
         //Find a way to calculate dist total
         ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
         assertEquals(8.598552886278775, timeDist.get(stations_2.get(0)).getLeft());
 
         //Test with preference time
-        HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1);
+        HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1, timeWeLeft);
         timeDist = itinerary.getDistTime();
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(216008.0, timeDist.get(stations_3.get(0)).getRight());
+        assertEquals(286008.0, timeDist.get(stations_3.get(0)).getRight());
     }
 
     @Test
