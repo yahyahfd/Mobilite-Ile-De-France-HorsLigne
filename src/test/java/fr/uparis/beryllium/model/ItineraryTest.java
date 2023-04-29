@@ -18,7 +18,7 @@ public class ItineraryTest {
     @Test
     public void testShortestWay() throws FormatException  {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
-        map = Parser.readMapHoraire("timetables.csv", map);
+        map = Parser.readMapHoraire("newtimetables.csv", map);
         Station olympiade = map.getStations().get(0);
         Station bercy = map.getStations().get(3);
         Itinerary itinerary = new Itinerary(map.getAllStations());
@@ -42,7 +42,7 @@ public class ItineraryTest {
         HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1, timeWeLeft);
         timeDist = itinerary.getDistTime();
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(466008.0, timeDist.get(stations_3.get(0)).getRight());
+        assertEquals(286008.0, timeDist.get(stations_3.get(0)).getRight());
     }
 
     @Test
