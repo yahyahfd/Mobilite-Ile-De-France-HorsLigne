@@ -2,7 +2,6 @@ package fr.uparis.beryllium.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.Duration;
-// import java.time.LocalTime;
 
 import org.junit.jupiter.api.Test;
 import fr.uparis.beryllium.exceptions.FormatException;

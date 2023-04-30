@@ -177,8 +177,9 @@ public class Itinerary{
 				LocalTime nextTrainTime = null;
 				// if we walk, we don't have wainting time
 				if(lineName != "--MARCHE--"){
-					// for the next train time, we compare hour:minuts:seconds (not millis)
-					nextTrainTime = nData.getLine().getNextTrainTime(station, actualTime.withNano(0)); // wainting time to take the station
+					// for the next train time, we compare hour:minutes:seconds (not millis)
+					nextTrainTime = neighborStation.getNextTrainTime(nData.getLine(), actualTime.withNano(0));
+					// ^waiting time to take the station
 					if(nextTrainTime != null){
 						timeToWait = Duration.between(actualTime.withNano(0), nextTrainTime).toMillis();
 					}else{

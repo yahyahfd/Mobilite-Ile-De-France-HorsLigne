@@ -3,10 +3,6 @@ import java.util.ArrayList;
 import org.apache.commons.lang3.StringUtils;
 // import java.text.Normalizer;
 
-// On a vraiment besoin de lines ici? l'information est déjà stockée dans les neighbors non?
-// ON duplique l'information lors du parsing, on rajoute la ligne ici ET dans le neighbor
-// lors de la création d'une station.
-// MAP à REVOIR
 /**
  * Our map class, designed to store all the stations
  */
@@ -98,6 +94,7 @@ public class Map {
         lines.add(newLine);
         return newLine;
     }
+
     /**
      * Method used to remove a station from the list of all stations
      *
@@ -139,17 +136,6 @@ public class Map {
         return result;
     }
 
-    public Station searchStationByLine(String name, Line l) {
-        for (Line li : lines) {
-            if(li.getName().equals( l.getName())){
-                for(Station s : li.getStations()){
-                    if ((s.getName()).equals(name)) return s;
-                }
-            }
-        }
-       return  null;
-    }
-
     /**
      * Search for all stations inbetween dist (start to dest) and add these stations
      * as neighbors of the initial position
@@ -169,6 +155,7 @@ public class Map {
         start.addWalkingNeighbours(walkingLine, this.getStations(), radius, addFirstStation);
     }
 
+    //// inutile vu la méthode getStationsByName
     /**
      * Method used in terminal mode to get the first station with <code>name</code>
      * as a name

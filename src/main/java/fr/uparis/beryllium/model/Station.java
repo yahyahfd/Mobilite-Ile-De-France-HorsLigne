@@ -30,6 +30,62 @@ public class Station {
     private final HashMap<Station, ArrayList<NeighborData>> nextStations = new HashMap<>();
 
     /**
+     * The line schedules of our station. Each station can have multiple lines, therefore,
+     * we stock here an ArrayList of all the times for each line, if at least one
+     * neighbor has this line (if to reach a certain neighbor, we need to take this line).
+     */
+    private final LinkedHashMap<Line, ArrayList<LocalTime>> lineSchedules = new LinkedHashMap<>();
+    
+    /**
+     * Getter for the schedule of a certain line.
+     * 
+     * @param line line for which we are looking for the ArrayList of schedules
+     * @return the ArrayList of schedules if found, null otherwise
+     */
+    public ArrayList<LocalTime> getSchedulesOfLine(Line line) {
+        return lineSchedules.get(line);
+    }
+
+    // ce getter sert-il vraiment à quelque chose si on a la méthode d'avant?
+    /**
+     * Getter for lineSchedules.
+     * 
+     * @return <code>lineSchedules</code>
+     */
+    public LinkedHashMap<Line, ArrayList<LocalTime>> getLineSchedules(){
+        return lineSchedules;
+    }
+
+    /**
+     * Add time schedules for a specific line of this station.
+     * Doesn't check if a neighbor can be reached with this line.
+     * This checking wouldn't be needed anyways thanks to our
+     * path searching algorithm.
+     * 
+     * @param line line to be added
+     * @param time time to be added to the line
+     */
+    private void addLineSchedule(Line line, LocalTime time){
+        if(lineSchedules.containsKey(line)){
+            lineSchedules.get(line).add(time);
+        }else{
+            ArrayList<LocalTime> times = new ArrayList<>();
+            times.add(time);
+            lineSchedules.put(line,times);
+        }
+        Collections.sort(lineSchedules.get(line));
+    }
+    
+    public void propagateSchedules(LocalTime time, Line line){
+        if(!this.containsLine(line)) return; // juste pour la premiere vérification
+        this.addLineSchedule(line, time);
+        HashMap<Station,Long> neighbors = getNeighborsForLine(line.getName());
+        neighbors.forEach((station,duration)->{
+            station.propagateSchedules(time.plusSeconds(duration), line);
+        });
+    }
+
+    /**
      * Constructor of our station.
      * 
      * @param name name of our station
@@ -76,7 +132,7 @@ public class Station {
         HashSet<String> result = new HashSet<>();
         nextStations.forEach((station, neighborDataList) -> {
             for(NeighborData nData:neighborDataList){
-                result.add(nData.getLine().toString());
+                result.add(nData.getLine().getName());
             }
         });
         return new ArrayList<>(result);
@@ -106,10 +162,11 @@ public class Station {
      * 
      * @return true if the line is present in at least a neighbor, false otherwise
      */
-    public boolean containsLine(String lineName){
+    private boolean containsLine(Line line){
+        if(line == null) return false;
         ArrayList<String> neighboringLines = getNeighboringLines();
         for(String l : neighboringLines){
-            if(l.equals(lineName)) return true;
+            if(l.equals(line.getName())) return true;
         }
         return false;
     }
@@ -120,19 +177,19 @@ public class Station {
      * @param lineName name of the line
      * @return ArrayList of all the neighbors that we can reach using <code>lineName</code>
      */
-    public HashMap<Station,Long> getNeighborsForLine(String lineName){
+    private HashMap<Station,Long> getNeighborsForLine(String lineName){
         HashMap<Station,Long> resultStations = new HashMap<>();
         nextStations.forEach((station, neighborDataList) -> {
             for(NeighborData nData:neighborDataList){
                 if(nData.getLine().getName().equals(lineName)){
                     long d = nData.getDuration().getSeconds();
                     resultStations.put(station,d);
-                    break; // On passe à l'itération suivante du foreach, pas la peine de vérifier la suite
                 }
             }
         });
         return resultStations;
     }
+
     /**
      * Add station as a neighbor.
      *
@@ -284,6 +341,20 @@ public class Station {
         for (Station s : reacheable1kmStations) {
             s.nextStations.remove(this);
         }
+    }
+
+    public LocalTime getNextTrainTime(Line line, LocalTime time) {
+        ArrayList<LocalTime> schedule = this.getSchedulesOfLine(line);
+        // there is no horaire for this station on the given line
+        if(schedule == null){
+            return null;
+        }
+        for (LocalTime localTime : schedule) {
+            if (localTime.equals(time) || localTime.isAfter(time)) {
+                return localTime;
+            }
+        }
+        return null;
     }
 
 }

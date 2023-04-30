@@ -5,9 +5,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
-import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -113,26 +111,15 @@ public class Parser {
         String lineString = record.get("line") + "." + variant;
         Line line = map.searchLine(lineString);
 
-        if(map.getStationByName(stationString) != null && line != null ){
-            //Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocation());
-            Station station = map.searchStationByLine(stationString,line);
+        // On stocke nos stations initiales (qui contiennent la ligne lineString)
+        ArrayList<Station> stations = map.getStationsByName(stationString);
+        LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
 
-            final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
-            line.addStationTime(station, timeOfStation[0]);
-            List<Station> stationsOfLine = line.getStations();
-            final Station[] fromStation = {station};
-            stationsOfLine.stream().forEach(stationStream ->{
-                if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0 ){
-                    return;
-                }
-                NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
-                assert neighborData != null;
-                timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
-                line.addStationTime(stationStream, timeOfStation[0]);
-                fromStation[0] = stationStream;
-            });
+        for(Station s: stations){
+            s.propagateSchedules(timeOfStation[0], line);
         }
     }
+
 
     /**
      * Static method that is used to fill the map with the data extracted from the csv file
@@ -166,8 +153,8 @@ public class Parser {
 
         // Add station to line's list
         // addStation verify if the station is already in the list or not
-        line.addStation(stat1);
-        line.addStation(stat2);
+        // line.addStation(stat1);
+        // line.addStation(stat2);
 
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
