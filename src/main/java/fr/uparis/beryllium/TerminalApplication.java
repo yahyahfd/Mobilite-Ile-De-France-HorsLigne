@@ -36,6 +36,9 @@ public class TerminalApplication {
         Map m = Parser.readMap("map_data.csv");
         m = Parser.readMapHoraire("newtimetables.csv", m);
 
+        // instance itinerary with all stations of the map
+        Itinerary i = new Itinerary(m.getAllStations());
+
         Scanner scanner = new Scanner(System.in);
 
         while (true) {
@@ -59,7 +62,7 @@ public class TerminalApplication {
             }
 
             switch (choice) {
-                case "1" -> searchItinerary(m, scanner);
+                case "1" -> searchItinerary(m, scanner, i);
                 case "2" -> searchSchedule(m, scanner);
             }
 
@@ -68,24 +71,28 @@ public class TerminalApplication {
     }
 
     /**
-     * @param choice
-     * @return
+     * Method to know if the first choice (itinerary or schedules) is correct
+     *
+     * @param choice the string choice
+     * @return true if our choice is corect
      */
     private static boolean isFirstChoiceCorrect(String choice) {
         return choice.equals("1") || choice.equals("2");
     }
 
     /**
-     * @param m
-     * @param scanner
+     * Search an itinerary
+     *
+     * @param m       the map we use for data
+     * @param scanner the scanner for terminal
      */
-    private static void searchItinerary(Map m, Scanner scanner) {
+    private static void searchItinerary(Map m, Scanner scanner, Itinerary itinerary) {
 
         ArrayList<Station> chosen_1 = new ArrayList<>();
         ArrayList<Station> chosen_2 = new ArrayList<>();
         boolean localpositionStart = false;
         boolean localpositionDest = false;
-        
+
         System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
         System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
         String station1 = "";
@@ -167,7 +174,7 @@ public class TerminalApplication {
 
         if (chosen_1.size()>0 && chosen_2.size()>0) {
 
-            findRoute(m, chosen_1, chosen_2, localpositionStart, localpositionDest, preference);
+            findRoute(m, chosen_1, chosen_2, localpositionStart, localpositionDest, preference, itinerary);
 
         }
     }
@@ -182,7 +189,7 @@ public class TerminalApplication {
      * @return List of all the stations (with numbers to choose from) that have the name <code>name</code>,
      * or a single station or nothing if no station found.
      */
-    public static Station multi_choice(String name, Map m, Scanner scanner) {
+    private static Station multi_choice(String name, Map m, Scanner scanner) {
         ArrayList<Station> stations = m.getStationsByName(name);
         if (stations.size() > 1) {
             System.out.println("Multiple stations with the name " + name + " found. Choose one from the list below:");
@@ -218,7 +225,7 @@ public class TerminalApplication {
     }
 
     /**
-     * This method is used to find stations who has similar name in case the user didn't spell correctly
+     * This method is used to find stations who have similar name in case the user didn't spell correctly
      *
      * @param name Name of the station to look for
      * @param stations    The stations used in this app
@@ -264,13 +271,13 @@ public class TerminalApplication {
     }
 
     /**
-     * This method propose every possibilities found for a station name
+     * This method proposes every possibility found for a station name
      *
      * @param possibilities List of possibilities
      * @param scanner       Same scanner for the whole app.
      * @return chosen Station
      */
-    public static Station multi_choice_similar(ArrayList<Station> possibilities, Scanner scanner) {
+    private static Station multi_choice_similar(ArrayList<Station> possibilities, Scanner scanner) {
         System.out.println("But possibilites found. Choose one from the list below:");
         int i = 1;
         for (Station s : possibilities) {
@@ -297,13 +304,13 @@ public class TerminalApplication {
     }
 
     /**
-     * ...
+     * Add a station with latitude and longitude
      *
-     * @param scanner
-     * @param m
-     * @param name
+     * @param scanner the scanner for terminal
+     * @param m       the Map
+     * @param name    the name of the station
      */
-    public static void addStationByCoordonnees(Scanner scanner, Map m, String name) {
+    private static void addStationByCoordonnees(Scanner scanner, Map m, String name) {
         Double longitude = null;
         Double latitude = null;
         System.out.print("\u001B[32mEnter your position : \u001B[0m");
@@ -332,14 +339,16 @@ public class TerminalApplication {
     }
 
     /**
-     * @param m
-     * @param chosen_1
-     * @param chosen_2
-     * @param localpositionStart
-     * @param localpositionDest
-     * @param preference
+     * Find a route between 2 points
+     *
+     * @param m                  the map
+     * @param chosen_1           the first station
+     * @param chosen_2           the second station
+     * @param localpositionStart if we start from a localisation and not from a station
+     * @param localpositionDest  if we are going to a localisation and not to a station
+     * @param preference         our preference for the itinerary
      */
-    private static void findRoute(Map m, ArrayList<Station> chosen_1, ArrayList<Station> chosen_2, boolean localpositionStart, boolean localpositionDest, int preference) {
+    private static void findRoute(Map m, ArrayList<Station> chosen_1, ArrayList<Station> chosen_2, boolean localpositionStart, boolean localpositionDest, int preference, Itinerary i) {
         // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
         if (localpositionStart) {
             m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
@@ -348,8 +357,7 @@ public class TerminalApplication {
         if (localpositionDest) {
             m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
         }
-        // instance itinerary with all stations of the map
-        Itinerary i = new Itinerary(m.getStations());
+
         // get the shortest way depending on the preference
         LocalTime timeWeLeft = LocalTime.now();
         HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
@@ -378,10 +386,13 @@ public class TerminalApplication {
     /**
      * Show the shortest way to go from a station to another
      *
-     * @param res Res of the algorithm
+     * @param res             Res of the algorithm
+     * @param distTimeToStart couples of distances and time for stations
+     * @param itineraryTimes  couple of stations and time
+     * @param timeWeLeft      the time we left
      * @return a string of the stations and line in order
      */
-    public static String showPath(HashMap<Station, Line> res, HashMap<Station, MutablePair<Double, Double>> distTimeToStart, HashMap<Station, LocalTime> itineraryTimes, LocalTime timeWeLeft) {
+    private static String showPath(HashMap<Station, Line> res, HashMap<Station, MutablePair<Double, Double>> distTimeToStart, HashMap<Station, LocalTime> itineraryTimes, LocalTime timeWeLeft) {
         ArrayList<Station> stationRes = new ArrayList<>();
         ArrayList<Line> lineRes = new ArrayList<>();
         StringBuilder path = new StringBuilder();
@@ -454,6 +465,7 @@ public class TerminalApplication {
      * @param stationRes list of all the station
      * @param lineRes    list of all the line
      * @param position   the position of the station in the stationRes
+     * @param distTimeToStart couples of distances and time for stations
      * @return a couple of distance/time which represent the distance and time to travel the line of the station at the position
      */
     private static MutablePair<Double, Long> getDistTimeForALine(ArrayList<Station> stationRes, ArrayList<Line> lineRes, int position, HashMap<Station, MutablePair<Double, Double>> distTimeToStart) {
@@ -478,17 +490,10 @@ public class TerminalApplication {
 
 
     /**
-     * -------------------------------------
-     * -------------------------------------
-     * -------------------------------------
-     * -------------------------------------
-     * -------------------------------------
+     * Search all schedules for a station in a line
      *
-     */
-
-    /**
-     * @param m
-     * @param scanner
+     * @param m the map we use for data
+     * @param scanner the scanner for terminal
      */
     private static void searchSchedule(Map m, Scanner scanner) {
 
@@ -508,6 +513,12 @@ public class TerminalApplication {
         printSchedules(m, lineChoice, stationChoice);
     }
 
+    /**
+     * Print all possibles lines and return all the line names
+     *
+     * @param m the map
+     * @return all the lines names
+     */
     private static ArrayList<String> printLines(Map m) {
 
         System.out.println("\n\u001B[34mWe have the lines :\u001B[0m");
@@ -525,6 +536,13 @@ public class TerminalApplication {
         return linesNames;
     }
 
+    /**
+     * Ask the choice of the line
+     *
+     * @param scanner    the scanner for terminal
+     * @param linesNames all the name's lines
+     * @return the choice of the line
+     */
     private static String askChoiceLine(Scanner scanner, ArrayList<String> linesNames) {
 
         System.out.println("\n\u001B[34mSelect your line :\u001B[0m");
@@ -544,10 +562,24 @@ public class TerminalApplication {
         return choice;
     }
 
+    /**
+     * Check if the choice of the line is correct
+     *
+     * @param choice     the choice of the line
+     * @param linesNames all the name's lines
+     * @return true if the choice is correct
+     */
     private static boolean isChoiceLineCorrect(String choice, ArrayList<String> linesNames) {
         return linesNames.contains(choice);
     }
 
+    /**
+     * Print all the stations for a line and return all the stations
+     *
+     * @param line the line we want
+     * @param m    the map
+     * @return all the stations in the line
+     */
     private static ArrayList<Station> printStationsLine(String line, Map m) {
 
         System.out.println("\n\u001B[34mFor the Line " + line + ", we have the stations :\u001B[0m");
@@ -561,6 +593,12 @@ public class TerminalApplication {
         return stations;
     }
 
+    /**
+     * Get all the stations for a line
+     *
+     * @param lines all the lines
+     * @return a list of all stations
+     */
     private static ArrayList<Station> getAllStationsForALine(ArrayList<Line> lines) {
         ArrayList<Station> stations = new ArrayList<>();
 
@@ -575,6 +613,13 @@ public class TerminalApplication {
         return stations;
     }
 
+    /**
+     * Ask the choice of the station
+     *
+     * @param scanner  the scanner for terminal
+     * @param stations all the stations of a line
+     * @return the station
+     */
     private static Station askChoiceStation(Scanner scanner, ArrayList<Station> stations) {
 
         System.out.println("\n\u001B[34mSelect your station :\u001B[0m");
@@ -603,6 +648,13 @@ public class TerminalApplication {
         return null;
     }
 
+    /**
+     * Check if the choice of the station is correct
+     *
+     * @param choice   the choice of the station
+     * @param stations all the stations
+     * @return true if the choice is correct
+     */
     private static boolean isChoiceStationCorrect(String choice, ArrayList<Station> stations) {
         for (Station station : stations) {
             if (station.getName().equals(choice)) {
@@ -612,6 +664,13 @@ public class TerminalApplication {
         return false;
     }
 
+    /**
+     * print all the schedules for a station and a line
+     *
+     * @param m        the map
+     * @param lineName the name of the line
+     * @param station  the station
+     */
     private static void printSchedules(Map m, String lineName, Station station) {
         ArrayList<Line> lines = m.getLinesByName(lineName);
         lines = getLinesWhoContainsStation(station, lines);
@@ -627,6 +686,16 @@ public class TerminalApplication {
         }
         System.out.println("\n\u001B[34mFor the Station \"" + station.getName() + "\" on the Line " + lineName + ", we have theses schedules :\u001B[0m");
 
+        // trier les horaires
+        schedules.sort((o1, o2) -> {
+            if (o1.isBefore(o2)) {
+                return -1;
+            } else if (o1.isAfter(o2)) {
+                return 1;
+            } else {
+                return 0;
+            }
+        });
         int count = 1;
         for (LocalTime localTime : schedules) {
             System.out.print(localTime);
@@ -644,6 +713,13 @@ public class TerminalApplication {
 
     }
 
+    /**
+     * Get all lines witch contains a station
+     *
+     * @param station the station
+     * @param lines   all lines
+     * @return all lines
+     */
     private static ArrayList<Line> getLinesWhoContainsStation(Station station, ArrayList<Line> lines) {
         ArrayList<Line> linesWithStation = new ArrayList<>();
 
