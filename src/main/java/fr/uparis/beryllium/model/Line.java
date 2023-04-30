@@ -31,6 +31,10 @@ public class Line {
         return lineName;
     }
 
+    public String getLineNameWithoutVariant() {
+        return (!lineName.equals("--MARCHE--")) ? lineName.split("\\.")[0] : "--MARCHE--";
+    }
+
     /**
      * Method used to return the linename without the variant.
      * Example: "1.1" -> "1".

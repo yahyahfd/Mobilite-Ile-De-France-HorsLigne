@@ -17,39 +17,6 @@ public class ItineraryTest {
     private static final Logger LOGGER = LogManager.getLogger(ItineraryTest.class);
 
     @Test
-<<<<<<< HEAD
-    public void testShortestWay() throws FormatException  {
-        Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
-        map = Parser.readMapHoraire("newtimetables.csv", map);
-        Station olympiade = map.getStations().get(0);
-        Station bercy = map.getStations().get(3);
-<<<<<<< HEAD
-        Itinerary itinerary = new Itinerary(map.getAllStations());
-        LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
-=======
-        Itinerary itinerary = new Itinerary(map.getStations());
->>>>>>> 07ffb055 (Réecriture de itinary)
-        //Test with equal weight
-        HashMap<Station, Line> path_1 = itinerary.shortestWay(olympiade,bercy, 2, timeWeLeft);
-        //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_1, timeWeLeft));
-        ArrayList<Station> stations_1 = new ArrayList<>(path_1.keySet());
-        assertEquals(4, stations_1.size());
-        assertEquals("Cour Saint-Emilion", stations_1.get(1).getName());
-
-        //Test with preference dist
-        HashMap<Station, Line> path_2 = itinerary.shortestWay(olympiade, bercy, 0, timeWeLeft);
-        HashMap<Station, MutablePair<Double, Double>> timeDist = itinerary.getDistTime();
-        //Find a way to calculate dist total
-        ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
-        assertEquals(8.598552886278775, timeDist.get(stations_2.get(0)).getLeft());
-
-        //Test with preference time
-        HashMap<Station, Line> path_3 = itinerary.shortestWay(olympiade,bercy, 1, timeWeLeft);
-        timeDist = itinerary.getDistTime();
-        ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(286008.0, timeDist.get(stations_3.get(0)).getRight());
-=======
     public void testItineraryConstructor(){
         ArrayList<Station> stations = new ArrayList<>();
         stations.add(new Station("start",new Location(0, 0)));
@@ -69,13 +36,12 @@ public class ItineraryTest {
         Itinerary itinerary = new Itinerary(stations);
         assertNotNull(itinerary, "Itinerary wasn't initialized correctly");
         assertEquals(stations,itinerary.getAllStations());
->>>>>>> 8bd0f8f1 (finalisation de l'itinéraire du nouveau modele)
     }
 
     @Test
     public void testShortestMultiplePaths() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
-        map = Parser.readMapHoraire("timetables.csv", map);
+        map = Parser.readMapHoraire("newtimetables.csv", map);
         ArrayList<Station> olympiades = map.getStationsByName("Olympiades");
         ArrayList<Station> bercys = map.getStationsByName("Bercy");
         ArrayList<Station> cstEmils = map.getStationsByName("Cour Saint-Emilion");
@@ -121,6 +87,6 @@ public class ItineraryTest {
         LOGGER.info(itinerary.showPath(path_3, timeWeLeft));
 
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(286008, distCountTime.get(stations_3.get(0)).getRight());
+        assertEquals(400008, distCountTime.get(stations_3.get(0)).getRight());
     }
 }

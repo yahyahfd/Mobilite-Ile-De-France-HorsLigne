@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.MutableTriple;
 
 /**
@@ -193,7 +192,7 @@ public class Itinerary{
 				Long timeWeight = Long.MAX_VALUE;
 				// time between the station + the wainting time
 				Long timeBetweenStation = Long.sum(nData.getMillisDuration(),timeToWait);
-				// if the wainting time is not infinite and it doesn't turn to negative, timeWeight = time to go to station + wainting time
+				// if the waiting time is not infinite and it doesn't turn to negative, timeWeight = time to go to station + wainting time
 				if(timeToWait != Long.MAX_VALUE && timeBetweenStation >= 0){
 					timeWeight = Long.sum(timeStation,timeBetweenStation);
 				}
@@ -202,10 +201,10 @@ public class Itinerary{
 				switch(preference){
 					case 0 ->{
 						// even if it's the shortest dist, if we don't have any train to go there, we don't take this road
-						if(distWeight<neighborDistCountTime.getLeft() && (timeToWait != Double.MAX_VALUE)) swap = true;
+						if(distWeight<neighborDistCountTime.getLeft() && (timeToWait != Long.MAX_VALUE)) swap = true;
 					}
 					case 1 ->{
-						if(countWeight<neighborDistCountTime.getMiddle()) swap = true;
+						if(countWeight<neighborDistCountTime.getMiddle() && (timeToWait != Long.MAX_VALUE)) swap = true;
 					}
 					case 2 ->{
 						if(timeWeight<neighborDistCountTime.getRight()) swap = true;

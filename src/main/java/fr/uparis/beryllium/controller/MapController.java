@@ -40,7 +40,7 @@ public class MapController {
    */
   public MapController() throws FormatException {
     Map m = Parser.readMap("map_data.csv");
-    map = Parser.readMapHoraire("timetables.csv", m);
+    map = Parser.readMapHoraire("newtimetables.csv", m);
     stations = map.getStations();
     itinerary = new Itinerary(stations);
   }
