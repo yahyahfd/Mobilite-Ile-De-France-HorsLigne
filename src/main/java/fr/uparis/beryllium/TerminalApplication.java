@@ -100,7 +100,7 @@ public class TerminalApplication {
             if (station1.trim().equalsIgnoreCase("lp")) break;
             chosen_1 = m.getStationsByName(station1);
             if (chosen_1 == null) {
-                ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1),m);
+                ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1),m.getAllStations());
                 if(!list_1.isEmpty()) chosen_1 = multi_choice_similar(list_1, scanner);
                 else  System.out.println("No station with the name " + station1 + " was found !"); System.out.println("Try again!");
             }
@@ -129,9 +129,13 @@ public class TerminalApplication {
             if (station2.trim().equalsIgnoreCase("lp")) break;
             chosen_2 = m.getStationsByName(station2);
             if (chosen_2.size() == 0) {
-                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2),m);
+                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2),m.getStations());
                 if(!list_2.isEmpty()) chosen_2 = multi_choice_similar(list_2, scanner);
-                else  System.out.println("No station with the name " + station2 + " was found !"); System.out.println("Try again!");
+                else System.out.println("No station with the name " + station2 + " was found !"); System.out.println("Try again!");
+            }else if(chosen_2 == chosen_1){
+                System.out.println("This is your start station, please enter another!");
+                chosen_2 = null;
+                station2 = "";
             }
         }
 
@@ -178,12 +182,12 @@ public class TerminalApplication {
      * @return List of all the stations (with numbers to choose from) that have the name <code>name</code>,
      * or a single station or nothing if no station found.
      */
-    public static Station multi_choice(String name, Map m, Scanner scanner){
+    public static Station multi_choice(String name, Map m, Scanner scanner) {
         ArrayList<Station> stations = m.getStationsByName(name);
-        if(stations.size()>1){
-            System.out.println("Multiple stations with the name "+name+" found. Choose one from the list below:");
+        if (stations.size() > 1) {
+            System.out.println("Multiple stations with the name " + name + " found. Choose one from the list below:");
             int i = 1;
-            for(Station s : stations){
+            for (Station s : stations) {
                 ArrayList<String> neighborLines = s.getNeighboringLines();
                 if (neighborLines.isEmpty()) {
                     System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
@@ -217,13 +221,13 @@ public class TerminalApplication {
      * This method is used to find stations who has similar name in case the user didn't spell correctly
      *
      * @param name Name of the station to look for
-     * @param m    The map used in this app
+     * @param stations    The stations used in this app
      * @return List of all the stations (with numbers to choose from) that have similar name <code>name</code>,
      * or a single station or nothing if no station found.
      */
-    public static ArrayList<Station> similar_names(String name, Map m) {
+    public static ArrayList<Station> similar_names(String name, ArrayList<Station> stations) {
         ArrayList<Station> similar = new ArrayList<>();
-        for (Station s : m.getAllStations()) {
+        for (Station s : stations) {
             String nameS = StringUtils.stripAccents(s.getName());
             if (nameS.length() >= name.length() && nameS.toLowerCase().contains(name.toLowerCase())) {
                 similar.add(s);
@@ -584,6 +588,8 @@ public class TerminalApplication {
             if (isChoiceStationCorrect(choice, stations)) {
                 choiceIsOk = true;
             } else {
+                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice),stations);
+                if(!list_2.isEmpty()) return multi_choice_similar(list_2, scanner);
                 System.out.println("Try again !");
             }
 
