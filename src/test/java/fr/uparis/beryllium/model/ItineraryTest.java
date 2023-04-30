@@ -75,21 +75,23 @@ public class ItineraryTest {
     @Test
     public void testShortestMultiplePaths() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvItinerary.csv");
+        map = Parser.readMapHoraire("timetables.csv", map);
         ArrayList<Station> olympiades = map.getStationsByName("Olympiades");
         ArrayList<Station> bercys = map.getStationsByName("Bercy");
         ArrayList<Station> cstEmils = map.getStationsByName("Cour Saint-Emilion");
         assertEquals(1, olympiades.size());
         assertEquals(1, bercys.size());
         assertEquals(2, cstEmils.size());
+        LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
         Itinerary itinerary = new Itinerary(map.getStations());
 
         //Test with equal weight
-        HashMap<Station, Line> path_1 = itinerary.shortestMultiplePaths(olympiades,bercys, 1);
+        HashMap<Station, Line> path_1 = itinerary.shortestMultiplePaths(olympiades,bercys, 1, timeWeLeft);
         HashMap<Station, MutableTriple<Double,Integer,Long>>  distCountTime = itinerary.getDistCountTimeToStart();
         assertNotNull(path_1);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_1));
+        LOGGER.info(itinerary.showPath(path_1, timeWeLeft));
         
         ArrayList<Station> stations_1 = new ArrayList<>(path_1.keySet());
         assertEquals(3, distCountTime.get(stations_1.get(0)).getMiddle());
@@ -100,25 +102,25 @@ public class ItineraryTest {
         assertEquals("Olympiades", stations_1.get(3).getName());
 
         //Test with preference dist
-        HashMap<Station, Line> path_2 = itinerary.shortestMultiplePaths(olympiades, bercys, 0);
+        HashMap<Station, Line> path_2 = itinerary.shortestMultiplePaths(olympiades, bercys, 0, timeWeLeft);
         distCountTime = itinerary.getDistCountTimeToStart();
         assertNotNull(path_2);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_2));
+        LOGGER.info(itinerary.showPath(path_2, timeWeLeft));
 
         ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
         assertEquals(8.598552886278775, distCountTime.get(stations_2.get(0)).getLeft());
 
         //Test with preference time
-        HashMap<Station, Line> path_3 = itinerary.shortestMultiplePaths(olympiades,bercys, 2);
+        HashMap<Station, Line> path_3 = itinerary.shortestMultiplePaths(olympiades,bercys, 2, timeWeLeft);
         distCountTime = itinerary.getDistCountTimeToStart();
         assertNotNull(path_3);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_3));
+        LOGGER.info(itinerary.showPath(path_3, timeWeLeft));
 
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
-        assertEquals(216008, distCountTime.get(stations_3.get(0)).getRight());
+        assertEquals(286008, distCountTime.get(stations_3.get(0)).getRight());
     }
 }

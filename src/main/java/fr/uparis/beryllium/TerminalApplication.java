@@ -117,8 +117,10 @@ public class TerminalApplication {
                 }
                 // instance itinerary with all stations of the map
                 Itinerary i = new Itinerary(m.getStations());
+                // default, actual time, else, the time the user enter
+                LocalTime timeWeLeft = LocalTime.now();
                 // get the shortest way depending on the preference
-                HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference);
+                HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
                 // HashMap<Station, Line> route = i.shortestWay(chosen_1.get(0), chosen_2.get(0), preference);
                 
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
@@ -127,7 +129,7 @@ public class TerminalApplication {
                 if (route == null) {
                     System.out.println("Looks like there is no route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m");
                 } else {
-                    System.out.println("Route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m :\n");
+                    System.out.println("Route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m :\n");
                     System.out.println(i.showPath(route, timeWeLeft));
                 }
                 // if we added temporary station, we remove them of the list of stations
@@ -266,7 +268,7 @@ public class TerminalApplication {
      */
     public static ArrayList<Station> similar_names(String name, Map m){
         ArrayList<Station> similar = new ArrayList<>();
-        for( Station s : m.getAllStations()) {
+        for( Station s : m.getStations()) {
             String nameS = StringUtils.stripAccents(s.getName());
             if (nameS.length() >= name.length() && nameS.toLowerCase().contains(name.toLowerCase())) {
                 similar.add(s);

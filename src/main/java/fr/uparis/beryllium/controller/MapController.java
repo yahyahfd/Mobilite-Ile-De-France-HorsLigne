@@ -1,5 +1,6 @@
 package fr.uparis.beryllium.controller;
 
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -70,7 +71,8 @@ public class MapController {
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
-        shortestPath = itinerary.shortestMultiplePaths(start, dest, preference);
+        LocalTime timeWeLeft = LocalTime.now();
+        shortestPath = itinerary.shortestMultiplePaths(start, dest, preference, timeWeLeft);
       }
 
       ObjectMapper pathMapper = new ObjectMapper();

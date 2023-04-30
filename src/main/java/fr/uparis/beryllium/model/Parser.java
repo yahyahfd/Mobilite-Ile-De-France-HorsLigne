@@ -113,7 +113,7 @@ public class Parser {
         String lineString = record.get("line") + "." + variant;
         Line line = map.searchLine(lineString);
 
-        if(map.getStationByName(stationString) != null){
+        if(map.getStationByName(stationString) != null && line != null ){
             //Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocation());
             Station station = map.searchStationByLine(stationString,line);
 
