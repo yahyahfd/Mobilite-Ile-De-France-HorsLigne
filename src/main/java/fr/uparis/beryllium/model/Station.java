@@ -28,57 +28,6 @@ public class Station {
      */
     @JsonIgnore
     private final HashMap<Station, ArrayList<NeighborData>> nextStations = new HashMap<>();
-    /**
-     * The line schedules of our station. Each station can have multiple lines, therefore,
-     * we stock here an ArrayList of all the times for each line, if at least one
-     * neighbor has this line (if to reach a certain neighbor, we need to take this line).
-     */
-    private final LinkedHashMap<Line, ArrayList<LocalTime>> lineSchedules = new LinkedHashMap<>();
-    
-    // à ne pas utiliser je crois, à revoir la marche entre les voisins (je n'ai pas trop touché)
-    public boolean isSamebutWalk(Station stDestination, Line lnDestination){
-        return stDestination == null ||(this.getName().equals(stDestination.getName()) && (lnDestination!= null && lnDestination.getName().equals("--MARCHE--")));
-    }
-
-    /**
-     * Getter for the schedule of a certain line.
-     * 
-     * @param line line for which we are looking for the ArrayList of schedules
-     * @return the ArrayList of schedules if found, null otherwise
-     */
-    public ArrayList<LocalTime> getSchedulesOfLine(Line line) {
-        return lineSchedules.get(line);
-    }
-
-    // ce getter sert-il vraiment à quelque chose si on a la méthode d'avant?
-    /**
-     * Getter for lineSchedules.
-     * 
-     * @return <code>lineSchedules</code>
-     */
-    public LinkedHashMap<Line, ArrayList<LocalTime>> getLineSchedules(){
-        return lineSchedules;
-    }
-
-    /**
-     * Add time schedules for a specific line of this station.
-     * Doesn't check if a neighbor can be reached with this line.
-     * This checking wouldn't be needed anyways thanks to our
-     * path searching algorithm.
-     * 
-     * @param line line to be added
-     * @param time time to be added to the line
-     */
-    public void addLineSchedule(Line line, LocalTime time){
-        if(lineSchedules.containsKey(line)){
-            lineSchedules.get(line).add(time);
-        }else{
-            ArrayList<LocalTime> times = new ArrayList<>();
-            times.add(time);
-            lineSchedules.put(line,times);
-        }
-        Collections.sort(lineSchedules.get(line));
-    }
 
     /**
      * Constructor of our station.
@@ -133,6 +82,25 @@ public class Station {
         return new ArrayList<>(result);
     }
 
+    public void setNeighboringLines(ArrayList<String> neighboringLines) {
+        nextStations.forEach((station, neighborDataList) -> {
+            for(NeighborData nData:neighborDataList){
+                if(neighboringLines.contains(nData.getLine().toString())){
+                    nData.setLine(new Line(nData.getLine().toString()));
+                }
+            }
+        });
+    }
+
+    public NeighborData getNeighborDataOfLine(String lineName, Station station){
+        for(NeighborData nd : nextStations.get(station)){
+            if(nd.getLine().getName().equals(lineName)){
+                return nd;
+            }
+        }
+        return null;
+    }
+
     /**
      * Checks whether a line is present in any of our neighbors.
      * 
@@ -145,19 +113,6 @@ public class Station {
         }
         return false;
     }
-
-    // public ArrayList<Station> getNeighborsForLine2(String lineName){
-    //     ArrayList<Station> resultStations = new ArrayList<>();
-    //     nextStations.forEach((station, neighborDataList) -> {
-    //         for(NeighborData nData:neighborDataList){
-    //             if(nData.getLine().getName().equals(lineName)){
-    //                 resultStations.add(station);
-    //                 break; // On passe à l'itération suivante du foreach, pas la peine de vérifier la suite
-    //             }
-    //         }
-    //     });
-    //     return resultStations;
-    // }
 
     /**
      * Gets all the neighbors that we can reach using a certain line.
@@ -232,6 +187,23 @@ public class Station {
     }
 
 
+    /**
+     * Check if the Neighbor exist in the list for nextStations
+     *
+     * @param list     the list of the neighbors
+     * @param duration the duration between 2 stations
+     * @param l        the line used between 2 stations
+     * @param dist     the distance between 2 stations
+     * @return true if the neighbor already exist in the list of nextStations
+     */
+    public boolean neighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
+        for (NeighborData n : list) {
+            if (n.getDuration().equals(duration) && n.getDistance().equals(dist) && n.getLine() == l) return true;
+        }
+        return false;
+    }
+
+
     // à revoir, walkingline nécessaire? le parsing de temps pas conforme au parsing
     // on peut directement spécifier les stations au lieu de calculer comparer chaque station -> trop long pour rien
     // retarde le chargement 
@@ -288,9 +260,7 @@ public class Station {
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
-    ////// pas très utile vu qu'on dispose d'un getName, à revoir
-    // (name,localisation, etc)
-    // probablement pour les requetes -> revoir les requetes (urgent)
+    @JsonIgnore
     public String toString() {
         return name;
     }

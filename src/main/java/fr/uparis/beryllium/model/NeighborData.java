@@ -12,7 +12,7 @@ public class NeighborData {
      * The line to be used to reach this station 
      * from our starting station.
      */
-    private final Line line;
+    private Line line;
     /**
      * The time it takes to reach this station
      * from our starting station.
@@ -35,6 +35,10 @@ public class NeighborData {
         this.line = line;
         this.duration = duration;
         this.distance = distance;
+    }
+
+    public void setLine(Line line) {
+        this.line = line;
     }
 
     /**

@@ -1,14 +1,17 @@
 package fr.uparis.beryllium.controller;
 
-import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.model.*;
+import jakarta.servlet.http.HttpServletResponse;
+import net.minidev.json.JSONObject;
 
 @RestController
 public class MapController {
@@ -52,33 +55,6 @@ public class MapController {
   }
 
   /**
-   * Doesn't recalculate the path if it's already calculated
-   * 
-   * @param depart  contains 'name' and 'localisation' of station
-   * @param arrivee contains 'name' and 'localisation' of station
-	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
-   * 
-   * @return stations from <code>depart</code> to <code>arrivee</code>
-   */
-  @GetMapping("/shortest-way")
-  public ArrayList<Station> shortestWay(@RequestParam String depart, @RequestParam String arrivee,
-      @RequestParam Integer preference) throws FormatException {
-    try {
-      HashMap<Station, Line> path;
-      if (shortestPath == null) {
-        ArrayList<Station> start = map.getStationsByName(depart);
-        ArrayList<Station> dest = map.getStationsByName(arrivee);
-        shortestPath = itinerary.shortestMultiplePaths(start, dest, preference);
-      }
-      path = shortestPath;
-      shortestPath = null;
-      return itinerary.getPathStations(path);
-    } catch (Exception e) {
-      return null;
-    }
-  }
-
-  /**
    * Doesn't recalculate the path if it's already calculated.
    * 
    * @param depart  contains 'name' and 'localisation' of station
@@ -87,18 +63,40 @@ public class MapController {
    * 
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
-  @GetMapping("/shortest-way/lines")
-  public HashMap<Station, Line> shortestWayLines(@RequestParam String depart, @RequestParam String arrivee,
-      @RequestParam Integer preference) throws FormatException {
+  @GetMapping("/shortest-way")
+  public void shortestWay(@RequestParam String depart, @RequestParam String arrivee,
+                                 @RequestParam Integer preference, HttpServletResponse response) throws FormatException {
     try {
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
         shortestPath = itinerary.shortestMultiplePaths(start, dest, preference);
       }
-      return shortestPath;
+
+      ObjectMapper pathMapper = new ObjectMapper();
+      pathMapper.registerModule(new JavaTimeModule());
+
+      JSONObject jsonObject = new JSONObject();
+      jsonObject.put("stations", itinerary.getPathStations(shortestPath));
+      jsonObject.put("lines", itinerary.getPathLines(shortestPath));
+
+      String responseString = pathMapper.writeValueAsString(jsonObject);
+
+      response.setContentType("application/json");
+      response.setCharacterEncoding("UTF-8");
+
+      response.getWriter().write(responseString);
+
+      shortestPath = null;
+
     } catch (Exception e) {
-      return null;
+      e.printStackTrace();
     }
   }
+
+
+
+
+
+
 }

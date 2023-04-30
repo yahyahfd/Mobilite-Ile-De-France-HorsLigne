@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.MutableTriple;
@@ -321,15 +322,26 @@ public class Itinerary{
 	 * @param res HashMap of the path calculated by shortestWay Method
 	 * @return An ordered list of stations in the path (can be empty)
 	 */
-	public ArrayList<Station> getPathStations(HashMap<Station, Line> res){
+	public LinkedList<Station> getPathStations(HashMap<Station, Line> res){
 		if(res == null){
-			return new ArrayList<>();
+			return new LinkedList<>();
 		}
 
-		ArrayList<Station> stationRes = new ArrayList<>(res.keySet());
+		LinkedList<Station> stationRes = new LinkedList<>(res.keySet());
 		Collections.reverse(stationRes);
 
 		return stationRes;
+	}
+
+	public LinkedList<Line> getPathLines(HashMap<Station, Line> res){
+		if(res == null){
+			return new LinkedList<>();
+		}
+
+		LinkedList<Line> lineRes = new LinkedList<>(res.values());
+		Collections.reverse(lineRes);
+
+		return lineRes;
 	}
 
 	// à modifier/déplacer vers le terminalAPP, reverse dans la méthode de calcul plutot, et traitement dans le TERMINAL./////////////

@@ -7,6 +7,7 @@ import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -111,21 +112,24 @@ public class Parser {
         String variant = record.get("variant");
         String lineString = record.get("line") + "." + variant;
         Line line = map.searchLine(lineString);
-        // On récupère toutes les stations avec ce nom
-        ArrayList<Station> stations = map.getStationsByName(stationString);
-        ArrayList<Station> resultStations = new ArrayList<>();
-        for(Station s: stations){
-            // Si on peut atteindre la ligne (via neighbors), on stocke dans nos resultats pour rajouter les horaires en une fois
-            if(s.containsLine(lineString)) resultStations.add(s);
-        }
-        for(Station s: resultStations){ // On rajoute les horaires pour les stations qui nous interessent
+
+        if(map.getStationByName(stationString) != null){
+            //Station station = map.searchStation(stationString, map.getStationByName(stationString).getLocation());
+            Station station = map.searchStationByLine(stationString,line);
+
             final LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
-            s.addLineSchedule(line, timeOfStation[0]);
-            // Puis on propage vers les neighbors en suivant la line
-            HashMap<Station,Long> neighborsScheduling = s.getNeighborsForLine(lineString);
-            neighborsScheduling.forEach((nStation, duration)->{
-                timeOfStation[0] = timeOfStation[0].plusSeconds(duration);
-                nStation.addLineSchedule(line, timeOfStation[0]);
+            line.addStationTime(station, timeOfStation[0]);
+            List<Station> stationsOfLine = line.getStations();
+            final Station[] fromStation = {station};
+            stationsOfLine.stream().forEach(stationStream ->{
+                if(stationStream.getName().equals(stationString) || fromStation[0].getNextStations() == null || fromStation[0].getNextStations().size() == 0 ){
+                    return;
+                }
+                NeighborData neighborData = fromStation[0].getNeighborDataOfLine(lineString, stationStream);
+                assert neighborData != null;
+                timeOfStation[0] = timeOfStation[0].plusSeconds(neighborData.getDuration().getSeconds());
+                line.addStationTime(stationStream, timeOfStation[0]);
+                fromStation[0] = stationStream;
             });
         }
     }
@@ -159,6 +163,11 @@ public class Parser {
         // Else, it creates a new object, put it in map's lists and return it
         Station stat1 = map.searchStation(firstStation, firstStationLocation);
         Station stat2 = map.searchStation(secondStation, secondStationLocation);
+
+        // Add station to line's list
+        // addStation verify if the station is already in the list or not
+        line.addStation(stat1);
+        line.addStation(stat2);
 
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");

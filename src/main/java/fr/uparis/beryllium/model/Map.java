@@ -139,6 +139,17 @@ public class Map {
         return result;
     }
 
+    public Station searchStationByLine(String name, Line l) {
+        for (Line li : lines) {
+            if(li.getName().equals( l.getName())){
+                for(Station s : li.getStations()){
+                    if ((s.getName()).equals(name)) return s;
+                }
+            }
+        }
+       return  null;
+    }
+
     /**
      * Search for all stations inbetween dist (start to dest) and add these stations
      * as neighbors of the initial position

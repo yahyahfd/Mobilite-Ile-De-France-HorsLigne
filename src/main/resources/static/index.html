@@ -22,13 +22,13 @@
 	<main>
 		<div id="menu1" class="menu left active">
 			<div id="first_left">
-				<h2>Rechercher un itinéraire</h2>
+				<h2><b> Ou allons-nous ?</b></h2>
 				<form id="itinerary_form" action="#" method="post" autocomplete="off">
-					<label for="depart">Départ:</label>
-					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="Départ">
+					<label for="depart"></label>
+					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="De">
 					<datalist id="depart-list"></datalist>
-					<label for="arrivee">Arrivée:</label>
-					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="Arrivée">
+					<label for="arrivee"></label>
+					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="A">
 					<datalist id="arrivee-list"></datalist>
 					<select id="options" name="options">
 						<option value="default">Par défaut</option>
@@ -40,7 +40,7 @@
 				<div id="error_itinerary"></div>
 			</div>
 			<div id="second_left">
-				<button id="back_button" class="btn-icon"><i class="fa-solid fa-chevron-left"></i></button>
+				<button id="back_button" class="btn-icon"><i class="fa-solid fa-circle-left fa-lg"></i></button>
 
 				<div id="itinerary">
 
