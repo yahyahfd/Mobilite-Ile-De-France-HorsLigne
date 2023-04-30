@@ -1,6 +1,7 @@
 package fr.uparis.beryllium;
 
 import fr.uparis.beryllium.exceptions.FormatException;
+import fr.uparis.beryllium.exceptions.QuitException;
 import fr.uparis.beryllium.model.Map;
 import fr.uparis.beryllium.model.*;
 import org.apache.commons.lang3.StringUtils;
@@ -41,31 +42,37 @@ public class TerminalApplication {
 
         Scanner scanner = new Scanner(System.in);
 
-        while (true) {
+        try {
 
-            System.out.println("\n\u001B[34mWhat do you want to do ?\u001B[0m");
-            System.out.println("\u001B[34m1) Search an itinerary\u001B[0m");
-            System.out.println("\u001B[34m2) See schedules\u001B[0m");
+            while (true) {
 
-            String choice = "";
-            boolean choiceIsOk = false;
-            while (!choiceIsOk) {
+                System.out.println("\n\u001B[34mWhat do you want to do ?\u001B[0m");
+                System.out.println("\u001B[34m1) Search an itinerary\u001B[0m");
+                System.out.println("\u001B[34m2) See schedules\u001B[0m");
 
-                choice = scanner.nextLine().trim();
+                String choice = "";
+                boolean choiceIsOk = false;
+                while (!choiceIsOk) {
 
-                if (isFirstChoiceCorrect(choice)) {
-                    choiceIsOk = true;
-                } else {
-                    System.out.println("Try again !");
+                    choice = scanner.nextLine().trim();
+
+                    if (isFirstChoiceCorrect(choice)) {
+                        choiceIsOk = true;
+                    } else {
+                        System.out.println("Try again !");
+                    }
+
+                }
+
+                switch (choice) {
+                    case "1" -> searchItinerary(m, scanner, i);
+                    case "2" -> searchSchedule(m, scanner);
+                    case "quit" -> throw new QuitException();
                 }
 
             }
-
-            switch (choice) {
-                case "1" -> searchItinerary(m, scanner, i);
-                case "2" -> searchSchedule(m, scanner);
-            }
-
+        } catch (QuitException e) {
+            System.out.println("\u001B[36m\n" + e.getMessage() + "\u001B[0m");
         }
 
     }
@@ -77,7 +84,7 @@ public class TerminalApplication {
      * @return true if our choice is corect
      */
     private static boolean isFirstChoiceCorrect(String choice) {
-        return choice.equals("1") || choice.equals("2");
+        return choice.equals("1") || choice.equals("2") || choice.equals("quit");
     }
 
     /**
@@ -86,7 +93,7 @@ public class TerminalApplication {
      * @param m       the map we use for data
      * @param scanner the scanner for terminal
      */
-    private static void searchItinerary(Map m, Scanner scanner, Itinerary itinerary) {
+    private static void searchItinerary(Map m, Scanner scanner, Itinerary itinerary) throws QuitException {
 
         ArrayList<Station> chosen_1 = new ArrayList<>();
         ArrayList<Station> chosen_2 = new ArrayList<>();
@@ -114,7 +121,7 @@ public class TerminalApplication {
         }
 
         if (station1.trim().equalsIgnoreCase("quit")) {
-            // TODO
+            throw new QuitException();
         }
         // we start from our position, not an existing station
         else if (station1.trim().equalsIgnoreCase("lp")) {
@@ -147,7 +154,7 @@ public class TerminalApplication {
         }
 
         if (station2.trim().equalsIgnoreCase("quit")) {
-            // TODO
+            throw new QuitException();
         }
         // we start from our position, not an existing station
         else if (station2.trim().equalsIgnoreCase("lp")) {
@@ -166,7 +173,11 @@ public class TerminalApplication {
             System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
             try {
                 // we convert string to int
-                preference = Integer.parseInt(scanner.nextLine());
+                String choice = scanner.nextLine();
+                if (choice.trim().equals("quit")) {
+                    throw new QuitException();
+                }
+                preference = Integer.parseInt(choice);
             } catch (NumberFormatException e) {
                 System.out.println("Veuillez renseigner un entier");
             }
@@ -189,7 +200,7 @@ public class TerminalApplication {
      * @return List of all the stations (with numbers to choose from) that have the name <code>name</code>,
      * or a single station or nothing if no station found.
      */
-    private static Station multi_choice(String name, Map m, Scanner scanner) {
+    private static Station multi_choice(String name, Map m, Scanner scanner) throws QuitException {
         ArrayList<Station> stations = m.getStationsByName(name);
         if (stations.size() > 1) {
             System.out.println("Multiple stations with the name " + name + " found. Choose one from the list below:");
@@ -208,10 +219,10 @@ public class TerminalApplication {
             while (num_chosen == 0 || num_chosen > i - 1) {
                 try {
                     String read = scanner.nextLine();
-                    if (read.trim().equalsIgnoreCase("quit")) break;
+                    if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
                     num_chosen = Integer.parseInt(read);
                     System.out.println(stations.get(num_chosen - 1) + " was chosen");
-                } catch (Exception e) {
+                } catch (NumberFormatException e) {
                     System.out.println("You need to choose a valid number ! Try again ! ");
                 }
             }
@@ -277,7 +288,7 @@ public class TerminalApplication {
      * @param scanner       Same scanner for the whole app.
      * @return chosen Station
      */
-    private static Station multi_choice_similar(ArrayList<Station> possibilities, Scanner scanner) {
+    private static Station multi_choice_similar(ArrayList<Station> possibilities, Scanner scanner) throws QuitException {
         System.out.println("But possibilites found. Choose one from the list below:");
         int i = 1;
         for (Station s : possibilities) {
@@ -293,10 +304,10 @@ public class TerminalApplication {
         while (num_chosen == 0 || num_chosen > i - 1) {
             try {
                 String read = scanner.nextLine();
-                if (read.trim().equalsIgnoreCase("quit")) break;
+                if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
                 num_chosen = Integer.parseInt(read);
                 System.out.println(possibilities.get(num_chosen - 1) + " was chosen");
-            } catch (Exception e) {
+            } catch (NumberFormatException e) {
                 System.out.println("You need to choose a valid number ! Try again ! ");
             }
         }
@@ -492,10 +503,10 @@ public class TerminalApplication {
     /**
      * Search all schedules for a station in a line
      *
-     * @param m the map we use for data
+     * @param m       the map we use for data
      * @param scanner the scanner for terminal
      */
-    private static void searchSchedule(Map m, Scanner scanner) {
+    private static void searchSchedule(Map m, Scanner scanner) throws QuitException {
 
         // Afficher les lignes
         ArrayList<String> linesNames = printLines(m);
@@ -543,7 +554,7 @@ public class TerminalApplication {
      * @param linesNames all the name's lines
      * @return the choice of the line
      */
-    private static String askChoiceLine(Scanner scanner, ArrayList<String> linesNames) {
+    private static String askChoiceLine(Scanner scanner, ArrayList<String> linesNames) throws QuitException {
 
         System.out.println("\n\u001B[34mSelect your line :\u001B[0m");
         String choice = "";
@@ -559,7 +570,11 @@ public class TerminalApplication {
                 System.out.println("Try again !");
             }
         }
-        return choice;
+        if (choice.equals("quit")) {
+            throw new QuitException();
+        } else {
+            return choice;
+        }
     }
 
     /**
@@ -570,7 +585,7 @@ public class TerminalApplication {
      * @return true if the choice is correct
      */
     private static boolean isChoiceLineCorrect(String choice, ArrayList<String> linesNames) {
-        return linesNames.contains(choice);
+        return linesNames.contains(choice) || choice.equals("quit");
     }
 
     /**
@@ -620,7 +635,7 @@ public class TerminalApplication {
      * @param stations all the stations of a line
      * @return the station
      */
-    private static Station askChoiceStation(Scanner scanner, ArrayList<Station> stations) {
+    private static Station askChoiceStation(Scanner scanner, ArrayList<Station> stations) throws QuitException {
 
         System.out.println("\n\u001B[34mSelect your station :\u001B[0m");
         String choice = "";
@@ -633,19 +648,23 @@ public class TerminalApplication {
             if (isChoiceStationCorrect(choice, stations)) {
                 choiceIsOk = true;
             } else {
-                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice),stations);
-                if(!list_2.isEmpty()) return multi_choice_similar(list_2, scanner);
+                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice), stations);
+                if (!list_2.isEmpty()) return multi_choice_similar(list_2, scanner);
                 System.out.println("Try again !");
             }
 
         }
 
-        for (Station station : stations) {
-            if (station.getName().equals(choice)) {
-                return station;
+        if (choice.equals("quit")) {
+            throw new QuitException();
+        } else {
+            for (Station station : stations) {
+                if (station.getName().equals(choice)) {
+                    return station;
+                }
             }
+            return null;
         }
-        return null;
     }
 
     /**
@@ -661,7 +680,7 @@ public class TerminalApplication {
                 return true;
             }
         }
-        return false;
+        return choice.equals("quit");
     }
 
     /**
