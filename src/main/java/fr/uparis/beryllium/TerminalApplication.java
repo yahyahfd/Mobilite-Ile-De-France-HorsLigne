@@ -38,7 +38,7 @@ public class TerminalApplication {
         m = Parser.readMapHoraire("newtimetables.csv", m);
 
         // instance itinerary with all stations of the map
-        Itinerary i = new Itinerary(m.getAllStations());
+        Itinerary i = new Itinerary(m.getStations());
 
         Scanner scanner = new Scanner(System.in);
 
@@ -104,6 +104,8 @@ public class TerminalApplication {
         System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
         String station1 = "";
 
+        // Choix de la 1ere station
+
         while (station1.isEmpty() || chosen_1.size() == 0) {
             station1 = scanner.nextLine();
             station1 = station1.trim();
@@ -119,17 +121,16 @@ public class TerminalApplication {
                 else  System.out.println("No station with the name " + station1 + " was found !"); System.out.println("Try again!");
             }
         }
-
         if (station1.trim().equalsIgnoreCase("quit")) {
             throw new QuitException();
-        }
-        // we start from our position, not an existing station
-        else if (station1.trim().equalsIgnoreCase("lp")) {
+        } else if (station1.trim().equalsIgnoreCase("lp")) {
             String name = "localPositionStart";
             addStationByCoordonnees(scanner, m, name);
             chosen_1 = (m.getStationsByName(name));
             localpositionStart = true;
         }
+
+        // Choix de la 2eme station
 
         System.out.print("\u001B[32mEnter your second station's name: (lp : local position) \u001B[0m");
         String station2 = "";
@@ -152,21 +153,18 @@ public class TerminalApplication {
                 station2 = "";
             }
         }
-
         if (station2.trim().equalsIgnoreCase("quit")) {
             throw new QuitException();
-        }
-        // we start from our position, not an existing station
-        else if (station2.trim().equalsIgnoreCase("lp")) {
+        } else if (station2.trim().equalsIgnoreCase("lp")) {
             String name = "localPositionDest";
             addStationByCoordonnees(scanner, m, name);
             chosen_2 = (m.getStationsByName(name));
             localpositionDest = true;
         }
 
-        // list of choice of preferences
+        // Choix de la preference
+
         ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
-        // while the given preference is not right, we ask again
         int preference = -1;
         while (preference < 0 || !typePreference.contains(preference)) {
             // how do they want to travel
@@ -204,29 +202,7 @@ public class TerminalApplication {
         ArrayList<Station> stations = m.getStationsByName(name);
         if (stations.size() > 1) {
             System.out.println("Multiple stations with the name " + name + " found. Choose one from the list below:");
-            int i = 1;
-            for (Station s : stations) {
-                ArrayList<String> neighborLines = s.getNeighboringLines();
-                if (neighborLines.isEmpty()) {
-                    System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
-                } else {
-                    System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
-                }
-                i++;
-            }
-
-            int num_chosen = 0;
-            while (num_chosen == 0 || num_chosen > i - 1) {
-                try {
-                    String read = scanner.nextLine();
-                    if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
-                    num_chosen = Integer.parseInt(read);
-                    System.out.println(stations.get(num_chosen - 1) + " was chosen");
-                } catch (NumberFormatException e) {
-                    System.out.println("You need to choose a valid number ! Try again ! ");
-                }
-            }
-            return stations.get(num_chosen - 1);
+            return chooseAStation(stations, scanner);
         } else if (stations.size() == 0) {
             System.out.println("No station with the name " + name + " was found !");
             return null;
@@ -236,10 +212,42 @@ public class TerminalApplication {
     }
 
     /**
+     * Choose a station between a list of stations print
+     *
+     * @param stations list of stations
+     * @param scanner  the scanner for terminal
+     * @return the station choosen
+     */
+    private static Station chooseAStation(ArrayList<Station> stations, Scanner scanner) throws QuitException {
+        int i = 1;
+        for (Station s : stations) {
+            ArrayList<String> neighborLines = s.getNeighboringLines();
+            if (neighborLines.isEmpty()) {
+                System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
+            } else {
+                System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
+            }
+            i++;
+        }
+        int num_chosen = 0;
+        while (num_chosen == 0 || num_chosen > i - 1) {
+            try {
+                String read = scanner.nextLine();
+                if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
+                num_chosen = Integer.parseInt(read);
+                System.out.println(stations.get(num_chosen - 1) + " was chosen");
+            } catch (NumberFormatException e) {
+                System.out.println("You need to choose a valid number ! Try again ! ");
+            }
+        }
+        return stations.get(num_chosen - 1);
+    }
+
+    /**
      * This method is used to find stations who have similar name in case the user didn't spell correctly
      *
-     * @param name Name of the station to look for
-     * @param stations    The stations used in this app
+     * @param name     Name of the station to look for
+     * @param stations The stations used in this app
      * @return List of all the stations (with numbers to choose from) that have similar name <code>name</code>,
      * or a single station or nothing if no station found.
      */
@@ -289,29 +297,9 @@ public class TerminalApplication {
      * @return chosen Station
      */
     private static Station multi_choice_similar(ArrayList<Station> possibilities, Scanner scanner) throws QuitException {
+        System.out.println("No station with this name was found !");
         System.out.println("But possibilites found. Choose one from the list below:");
-        int i = 1;
-        for (Station s : possibilities) {
-            ArrayList<String> neighborLines = s.getNeighboringLines();
-            if (neighborLines.isEmpty()) {
-                System.out.println(i + ") " + s + ": Terminus (pas de correspondances)");
-            } else {
-                System.out.println(i + ") " + s + ": " + s.getNeighboringLines());
-            }
-            i++;
-        }
-        int num_chosen = 0;
-        while (num_chosen == 0 || num_chosen > i - 1) {
-            try {
-                String read = scanner.nextLine();
-                if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
-                num_chosen = Integer.parseInt(read);
-                System.out.println(possibilities.get(num_chosen - 1) + " was chosen");
-            } catch (NumberFormatException e) {
-                System.out.println("You need to choose a valid number ! Try again ! ");
-            }
-        }
-        return possibilities.get(num_chosen - 1);
+        return chooseAStation(possibilities, scanner);
     }
 
     /**
