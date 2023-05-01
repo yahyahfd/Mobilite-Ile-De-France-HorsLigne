@@ -2,16 +2,9 @@ package fr.uparis.beryllium.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
-import java.io.Serial;
-import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.LinkedHashMap;
-import java.util.List;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -19,14 +12,17 @@ import java.util.stream.Collectors;
  * such as the location, the neighbors and the schedules. 
  */
 public class Station {
+
     /**
      * Our station's name.
      */
     private final String name;
+
     /**
      * Our station's location.
      */
     private final Location location;
+
     /**
      * The neighboring stations of our stations.
      */
@@ -39,38 +35,99 @@ public class Station {
      * neighbor has this line (if to reach a certain neighbor, we need to take this line).
      */
     private final LinkedHashMap<Line, ArrayList<LocalTime>> lineSchedules = new LinkedHashMap<>();
-    
+
+    /**
+     * Constructor of our station.
+     *
+     * @param name     name of our station
+     * @param location location of our station
+     */
+    public Station(String name, Location location) {
+        this.name = name;
+        this.location = location;
+    }
+
+    /**
+     * Getter for name.
+     *
+     * @return <code>name</code>
+     */
+    public String getName() {
+        return name;
+    }
+
+    /**
+     * Getter for nextStations, neighbors of our current station.
+     *
+     * @return <code>nextStations</code>
+     */
+    public HashMap<Station, ArrayList<NeighborData>> getNextStations() {
+        return nextStations;
+    }
+
+    /**
+     * Getter for location.
+     *
+     * @return <code>location</code>
+     */
+    public Location getLocation() {
+        return location;
+    }
+
     /**
      * Getter for the schedule of a certain line.
-     * 
-     * @param line line for which we are looking for the ArrayList of schedules
+     *
+     * @param line line for which we're looking for the ArrayList of schedules
      * @return the ArrayList of schedules if found, null otherwise
      */
     public ArrayList<LocalTime> getSchedulesOfLine(Line line) {
         return lineSchedules.get(line);
     }
 
-    public boolean containsScheduleOnLine(Line line,LocalTime schedule){
-        ArrayList<LocalTime> mySchedule = getSchedulesOfLine(line);
-        return mySchedule !=null && mySchedule.contains(schedule); 
-    }
-    
-    // ce getter sert-il vraiment à quelque chose si on a la méthode d'avant?
     /**
      * Getter for lineSchedules.
-     * 
+     *
      * @return <code>lineSchedules</code>
      */
-    public LinkedHashMap<Line, ArrayList<LocalTime>> getLineSchedules(){
+    public LinkedHashMap<Line, ArrayList<LocalTime>> getLineSchedules() {
         return lineSchedules;
+    }
+
+    /**
+     * All neighboring lines, with the variant in line
+     *
+     * @return all lines of the current station to reach a neighboring station
+     */
+    public ArrayList<String> getNeighboringLines() {
+        HashSet<String> result = new HashSet<>();
+        nextStations.forEach((station, neighborDataList) -> {
+            for (NeighborData nData : neighborDataList) {
+                if (!nData.getLine().getName().equals("--MARCHE--")) {
+                    result.add(nData.getLine().getName());
+                }
+            }
+        });
+        return new ArrayList<>(result);
+    }
+
+    public ArrayList<String> getNeighboringLinesWithoutVariant(){
+        HashSet<String> result = getNeighboringLines().stream().map(lineName -> {
+            return ! lineName.equals("--MARCHE--") ? lineName.split("\\.")[0] : lineName;
+        }).collect(Collectors.toCollection(HashSet::new));
+        return new ArrayList<>(result);
+    }
+
+    public boolean containsScheduleOnLine(Line line, LocalTime schedule) {
+        ArrayList<LocalTime> mySchedule = getSchedulesOfLine(line);
+        return mySchedule != null && mySchedule.contains(schedule);
     }
 
     /**
      * Add time schedules for a specific line of this station.
      * Doesn't check if a neighbor can be reached with this line.
-     * This checking wouldn't be needed anyways thanks to our
+     * This checking wouldn't be needed anyway thanks to our
      * path searching algorithm.
-     * 
+     *
      * @param line line to be added
      * @param time time to be added to the line
      */
@@ -92,85 +149,6 @@ public class Station {
         neighbors.forEach((station,duration)->{
             station.propagateSchedules(time.plusSeconds(duration), line);
         });
-    }
-
-    /**
-     * Constructor of our station.
-     * 
-     * @param name name of our station
-     * @param location location of our station
-     */
-    public Station(String name, Location location) {
-        this.name = name;
-        this.location = location;
-    }
-
-    /**
-     * Getter for name.
-     * 
-     * @return <code>name</code>
-     */
-    public String getName() {
-        return name;
-    }
-
-    /**
-     * Getter for nextStations, neighbors of our current station.
-     * 
-     * @return <code>nextStations</code>
-     */
-    public HashMap<Station, ArrayList<NeighborData>> getNextStations() {
-        return nextStations;
-    }
-
-    /**
-     * Getter for location.
-     * 
-     * @return <code>location</code>
-     */
-    public Location getLocation() {
-        return location;
-    }
-
-    /**
-     * All neighboring lines.
-     *
-     * @return all lines of the current station to reach a neighboring station
-     */
-    public ArrayList<String> getNeighboringLines(){
-        HashSet<String> result = new HashSet<>();
-        nextStations.forEach((station, neighborDataList) -> {
-            for(NeighborData nData:neighborDataList){
-                result.add(nData.getLine().getName());
-            }
-        });
-        return new ArrayList<>(result);
-    }
-
-    public ArrayList<String> getNeighboringLinesWithoutVariant(){
-        HashSet<String> result = getNeighboringLines().stream().map(lineName -> {
-            return ! lineName.equals("--MARCHE--") ? lineName.split("\\.")[0] : lineName;
-        }).collect(Collectors.toCollection(HashSet::new));
-            return new ArrayList<>(result);
-    }
-
-    public void setNeighboringLines(ArrayList<String> neighboringLines) {
-        nextStations.forEach((station, neighborDataList) -> {
-            for(NeighborData nData:neighborDataList){
-                if(neighboringLines.contains(nData.getLine().toString())){
-                    nData.setLine(new Line(nData.getLine().toString()));
-                }
-            }
-        });
-    }
-
-    public NeighborData getNeighborDataOfLine(String lineName, Station station){
-        for(NeighborData nd : nextStations.get(station)){
-            if(nd.getLine().getName().equals(lineName)){
-                return nd;
-            }
-        }
-        return null;
     }
 
     /**
@@ -238,7 +216,7 @@ public class Station {
             for(NeighborData nData: neighborDataArrayList){
                 if(nData.compareNeighborData(n)){
                     canAdd = false;
-                    break; // If nData exists we just stop
+                    break; // If nData exists, we just stop
                 }                
             }
             if(canAdd) neighborDataArrayList.add(n);
@@ -259,27 +237,6 @@ public class Station {
         return this.name.equals(station.name) && this.location.sameLocation(station.location);
     }
 
-
-    /**
-     * Check if the Neighbor exist in the list for nextStations
-     *
-     * @param list     the list of the neighbors
-     * @param duration the duration between 2 stations
-     * @param l        the line used between 2 stations
-     * @param dist     the distance between 2 stations
-     * @return true if the neighbor already exist in the list of nextStations
-     */
-    public boolean neighborDataIsIn(ArrayList<NeighborData> list, Duration duration, Line l, Double dist) {
-        for (NeighborData n : list) {
-            if (n.getDuration().equals(duration) && n.getDistance().equals(dist) && n.getLine() == l) return true;
-        }
-        return false;
-    }
-
-
-    // à revoir, walkingline nécessaire? le parsing de temps pas conforme au parsing
-    // on peut directement spécifier les stations au lieu de calculer comparer chaque station -> trop long pour rien
-    // retarde le chargement 
     /**
      * Add all the walking neighbors.
      *
@@ -297,14 +254,12 @@ public class Station {
             double secondsInAnHour = 3600;
             double time = (distance * secondsInAnHour)/speedHumanWalk;
             String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
-            // ^ à modifier? Dans le parser on conserve les millis, mais pas ici
 
             // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)
             this.addNextStation(s, walkingLine, stringTime, distance, true);
             if(!addFirstStation){
                 s.addNextStation(this, walkingLine, stringTime, distance, true);
             }
-            // addFirstStation vraiment nécessaire? ça sert à quoi au juste?
         }
     }
 
@@ -333,12 +288,6 @@ public class Station {
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
-    @JsonIgnore
-    public String toString() {
-        return name;
-    }
-
-    //// pas correct, à revoir, memes remarques que pour la version add walking neighbors
     /**
      * Remove all occurrences of the temporary station which was added
      *
@@ -362,7 +311,7 @@ public class Station {
     public LocalTime getNextTrainTime(Line line, LocalTime time) {
         ArrayList<LocalTime> schedule = this.getSchedulesOfLine(line);
         // there is no horaire for this station on the given line
-        if(schedule == null){
+        if(schedule == null) {
             return null;
         }
         for (LocalTime localTime : schedule) {
@@ -373,4 +322,8 @@ public class Station {
         return null;
     }
 
+    @JsonIgnore
+    public String toString() {
+        return name;
+    }
 }

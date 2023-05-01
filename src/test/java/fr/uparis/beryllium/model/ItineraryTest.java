@@ -67,7 +67,6 @@ public class ItineraryTest {
         assertNotNull(path_2);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_2, timeWeLeft));
 
         ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
         assertEquals(8.598552886278775, distCountTime.get(stations_2.get(0)).getLeft());
@@ -78,7 +77,6 @@ public class ItineraryTest {
         assertNotNull(path_3);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_3, timeWeLeft));
 
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
         assertEquals(400008, distCountTime.get(stations_3.get(0)).getRight());
