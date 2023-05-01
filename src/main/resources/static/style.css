@@ -49,11 +49,6 @@
   color: #2d1987;
 }
 
-#schedules_btn{
-  background-color: #809b85;
-  border: none;
-}
-
 /* Style reset and other stylings */
 * {
   margin: 0;
@@ -287,11 +282,5 @@ input[type="submit"]:hover{
 }
 
 #schedules h2{
-  margin-top: 400px;
-}
-
-#schedule_form{
-  display: none;
-  justify-content: stretch;
-  grid-template-columns: 100%;
+  margin-top: 200px;
 }

@@ -1,7 +1,9 @@
 package fr.uparis.beryllium.controller;
 
 import java.time.LocalTime;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -94,6 +96,44 @@ public class MapController {
     } catch (Exception e) {
       e.printStackTrace();
     }
+  }
+
+
+  /**
+   * This method allows us to send an HTTP GET request to get all schedules of a station for a line
+   * @param stationName
+   * @param lineName
+   * @return
+   * @throws FormatException
+   */
+  @GetMapping("/schedules")
+  public List<String> getSchedules(@RequestParam String stationName, @RequestParam String lineName) throws FormatException {
+    List<String> schedules = new ArrayList<>();
+    ArrayList<Line> lines = map.searcheLines(lineName);
+    ArrayList<Station> stations = map.getStationsByName(stationName);
+
+    DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
+
+    List<LocalTime> times = new ArrayList<>();
+
+    for (Station station : stations) {
+      for (Line line : lines) {
+
+        List<LocalTime> tmp = station.getSchedulesOfLine(line);
+        if(tmp != null) {
+          times.addAll(tmp);
+          Collections.sort(times);
+        }
+      }
+    }
+
+    for (LocalTime time : times) {
+      schedules.add(time.format(formatter));
+    }
+
+
+
+    return schedules;
   }
 
 

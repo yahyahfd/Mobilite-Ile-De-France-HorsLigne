@@ -86,6 +86,21 @@ public class Map {
         return null;
     }
 
+
+    /**
+     * Looking for lines with a given name in our map
+     * @param name
+     * @return
+     */
+    public ArrayList<Line> searcheLines(String name) {
+        ArrayList<Line> result = new ArrayList<Line>();
+        for (Line l : lines) {
+            if(l.getLineNameWithoutVariant().equals(name))
+                result.add(l);
+        }
+        return result;
+    }
+
     /**
      * Creates a new line and adds to our map
      * 
