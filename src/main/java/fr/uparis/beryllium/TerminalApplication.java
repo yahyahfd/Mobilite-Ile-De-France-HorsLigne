@@ -531,16 +531,14 @@ public class TerminalApplication {
         String choice = "";
         boolean choiceIsOk = false;
 
-        ArrayList<Station> stations = m.getStations();
-
         while (!choiceIsOk) {
 
             choice = scanner.nextLine().trim();
 
-            if (isChoiceStationCorrect(choice, stations)) {
+            if (isChoiceStationCorrect(choice, m)) {
                 choiceIsOk = true;
             } else {
-                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice), stations);
+                ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice), m.getStations());
                 if (!list_2.isEmpty()) return multi_choice_similar(m, list_2, scanner);
                 System.out.println("Try again !");
             }
@@ -557,17 +555,16 @@ public class TerminalApplication {
     /**
      * Check if the choice of the station is correct
      *
-     * @param choice   the choice of the station
-     * @param stations all the stations
+     * @param choice the choice of the station
+     * @param m      the map
      * @return true if the choice is correct
      */
-    private static boolean isChoiceStationCorrect(String choice, ArrayList<Station> stations) {
-        for (Station station : stations) {
-            if (station.getName().equals(choice)) {
-                return true;
-            }
+    private static boolean isChoiceStationCorrect(String choice, Map m) {
+        if (m.getStationsByName(choice).size() == 0) {
+            return false;
+        } else {
+            return choice.equals("quit");
         }
-        return choice.equals("quit");
     }
 
     /**
@@ -690,20 +687,13 @@ public class TerminalApplication {
             }
         });
 
-        LocalTime actualTime = LocalTime.now();
-
-        List<LocalTime> newSchedules;
-        if (schedules.get(schedules.size() - 1).isBefore(actualTime)) {
-            newSchedules = schedules.subList(0, 15);
-        } else {
-            newSchedules = schedules.stream().filter(l -> l.isAfter(actualTime)).toList();
-            newSchedules = newSchedules.subList(0, (Math.min(newSchedules.size(), 15)));
-        }
-
-        System.out.println("It's actually " + actualTime.getHour() + ":" + actualTime.getMinute() + ":" + actualTime.getSecond() + ", the next trains are at : ");
-
-        for (LocalTime localTime : newSchedules) {
+        int count = 1;
+        for (LocalTime localTime : schedules) {
             System.out.print(localTime + "  --  ");
+            if (count % 10 == 0) {
+                System.out.println("\n");
+            }
+            count++;
         }
 
         System.out.println();
