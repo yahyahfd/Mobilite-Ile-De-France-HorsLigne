@@ -89,21 +89,20 @@ main{
 }
 
 .left{
-  background-color: #4c4f52;
+  background-color: #809b85;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
 .right{
-  background-color: #8cb0d4;
   height: 100%;
 }
 
 .tab {
   padding: 10px;
   border: none;
-  background-color: #767a7e;
+  background-color: #93a897;
   cursor: pointer;
   color: white;
   display: inline-block;
@@ -113,7 +112,7 @@ main{
 }
 
 .tab.active {
-  background-color: #4c4f52;
+  background-color: #93a897;
   font-weight: bold;
   font-size: larger;
   text-shadow: 2px 2px 6px rgba(255, 255, 255, 0.5);
@@ -134,7 +133,7 @@ main{
 
 
 .tabs {
-  background-color: #333;
+  background-color: #93a897;
   display: flex;
 }
 
@@ -180,23 +179,6 @@ main{
 
 }
 
-/* 
-si taille< x:
-90% height main
-10% height tabs?
-active = menu
-switch entre les 2 
-*/
-
-
-
-
-
-
-
-
-
-
 /* Form */
 form {
   display: grid;
@@ -217,19 +199,19 @@ input[type="submit"],
   padding: 15px;
   font-size: 1.2rem;
   border: none;
-  border-radius: 10px;
-  margin: 5px;
+    border-radius: 10px;
+    margin: 5px;
 }
 
 input[type="submit"]{
-  background-color: #333;
-  color: #fff;
+  background-color: #fff;
+  color: #809b85;
   cursor: pointer;
 }
 
 input[type="submit"]:hover{
-  color: #333;
-  background-color: #fff;
+  color: #fff;
+  background-color: #9bbeb2;
   cursor: pointer;
 }
 
@@ -251,8 +233,8 @@ input[type="submit"]:hover{
   justify-content: center;
   flex-direction: column;
   padding: 10px;
-  background-color: #696f75;
-  border: 2px solid #a8a8a8;
+  background-color: #93a897;
+  border: 2px solid #a9a3a3;
   margin: 10px 1vw;
 }
 

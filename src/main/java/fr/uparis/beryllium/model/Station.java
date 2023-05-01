@@ -1,102 +1,210 @@
 package fr.uparis.beryllium.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-
 import java.time.Duration;
+import java.time.LocalTime;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
 
+/**
+ * Our station class. Used to store all the data needed for each station,
+ * such as the location, the neighbors and the schedules. 
+ */
 public class Station {
+    /**
+     * Our station's name.
+     */
     private final String name;
-    private Localisation usedLocalisation;
-    private HashMap<String, Localisation> localisations = new HashMap<>();
+    /**
+     * Our station's location.
+     */
+    private final Location location;
+    /**
+     * The neighboring stations of our stations.
+     */
     @JsonIgnore
-    private final Map<Station, ArrayList<NeighborData>> nextStations = new HashMap<>();
+    private final HashMap<Station, ArrayList<NeighborData>> nextStations = new HashMap<>();
 
-    public Station(String n, Localisation localisation, String lineNumber) {
-        name = n;
-        localisations.put(lineNumber, localisation);
+    /**
+     * The line schedules of our station. Each station can have multiple lines, therefore,
+     * we stock here an ArrayList of all the times for each line, if at least one
+     * neighbor has this line (if to reach a certain neighbor, we need to take this line).
+     */
+    private final LinkedHashMap<Line, ArrayList<LocalTime>> lineSchedules = new LinkedHashMap<>();
+    
+    /**
+     * Getter for the schedule of a certain line.
+     * 
+     * @param line line for which we are looking for the ArrayList of schedules
+     * @return the ArrayList of schedules if found, null otherwise
+     */
+    public ArrayList<LocalTime> getSchedulesOfLine(Line line) {
+        return lineSchedules.get(line);
     }
 
+    public boolean containsScheduleOnLine(Line line,LocalTime schedule){
+        ArrayList<LocalTime> mySchedule = getSchedulesOfLine(line);
+        return mySchedule !=null && mySchedule.contains(schedule); 
+    }
+    
+    // ce getter sert-il vraiment à quelque chose si on a la méthode d'avant?
+    /**
+     * Getter for lineSchedules.
+     * 
+     * @return <code>lineSchedules</code>
+     */
+    public LinkedHashMap<Line, ArrayList<LocalTime>> getLineSchedules(){
+        return lineSchedules;
+    }
+
+    /**
+     * Add time schedules for a specific line of this station.
+     * Doesn't check if a neighbor can be reached with this line.
+     * This checking wouldn't be needed anyways thanks to our
+     * path searching algorithm.
+     * 
+     * @param line line to be added
+     * @param time time to be added to the line
+     */
+    private void addLineSchedule(Line line, LocalTime time){
+        if(lineSchedules.containsKey(line)){
+            lineSchedules.get(line).add(time);
+        }else{
+            ArrayList<LocalTime> times = new ArrayList<>();
+            times.add(time);
+            lineSchedules.put(line,times);
+        }
+        Collections.sort(lineSchedules.get(line));
+    }
+    
+    public void propagateSchedules(LocalTime time, Line line){
+        if(!this.containsLine(line)) return; // juste pour la premiere vérification
+        this.addLineSchedule(line, time);
+        HashMap<Station,Long> neighbors = getNeighborsForLine(line.getName());
+        neighbors.forEach((station,duration)->{
+            station.propagateSchedules(time.plusSeconds(duration), line);
+        });
+    }
+
+    /**
+     * Constructor of our station.
+     * 
+     * @param name name of our station
+     * @param location location of our station
+     */
+    public Station(String name, Location location) {
+        this.name = name;
+        this.location = location;
+    }
+
+    /**
+     * Getter for name.
+     * 
+     * @return <code>name</code>
+     */
     public String getName() {
         return name;
     }
 
-    public Map<Station, ArrayList<NeighborData>> getNextStations() {
+    /**
+     * Getter for nextStations, neighbors of our current station.
+     * 
+     * @return <code>nextStations</code>
+     */
+    public HashMap<Station, ArrayList<NeighborData>> getNextStations() {
         return nextStations;
     }
 
-    public HashMap<String, Localisation> getLocalisations() {
-        return localisations;
-    }
-
-    public Localisation getLocalisation() {
-        return usedLocalisation;
+    /**
+     * Getter for location.
+     * 
+     * @return <code>location</code>
+     */
+    public Location getLocation() {
+        return location;
     }
 
     /**
-     * All neighboring lines
+     * All neighboring lines.
      *
-     * @return all lines of the current station to reach a neighbor station
+     * @return all lines of the current station to reach a neighboring station
      */
-    public ArrayList<String> getNeighboringLines() {
-        ArrayList<String> result = new ArrayList<>();
+    public ArrayList<String> getNeighboringLines(){
+        HashSet<String> result = new HashSet<>();
         nextStations.forEach((station, neighborDataList) -> {
-            for (NeighborData nd : neighborDataList) {
-                String lineName = nd.getLine().getLineNameWithoutVariant();
-                if (!result.contains(lineName)) {
-                    result.add(lineName);
+            for(NeighborData nData:neighborDataList){
+                result.add(nData.getLine().getName());
+            }
+        });
+        return new ArrayList<>(result);
+    }
+
+    public void setNeighboringLines(ArrayList<String> neighboringLines) {
+        nextStations.forEach((station, neighborDataList) -> {
+            for(NeighborData nData:neighborDataList){
+                if(neighboringLines.contains(nData.getLine().toString())){
+                    nData.setLine(new Line(nData.getLine().toString()));
                 }
             }
         });
-        return result;
     }
 
     public NeighborData getNeighborDataOfLine(String lineName, Station station){
         for(NeighborData nd : nextStations.get(station)){
-            if(nd.getLine().getLineName().equals(lineName)){
+            if(nd.getLine().getName().equals(lineName)){
                 return nd;
             }
         }
         return null;
     }
 
-    public void setLocalisation(Localisation localisation) {
-        usedLocalisation = localisation;
-    }
-
-    public void setLocalisations(HashMap<String, Localisation> localisations) {
-        this.localisations = localisations;
-    }
-
     /**
-     * ...
-     *
-     * @param localisation
-     * @return
+     * Checks whether a line is present in any of our neighbors.
+     * 
+     * @return true if the line is present in at least a neighbor, false otherwise
      */
-    public boolean hasThisLocalisation(Localisation localisation) {
-        for (Localisation localisationI : localisations.values()) {
-            if (localisationI.sameLocalisation(localisation)) {
-                return true;
-            }
+    private boolean containsLine(Line line){
+        if(line == null) return false;
+        ArrayList<String> neighboringLines = getNeighboringLines();
+        for(String l : neighboringLines){
+            if(l.equals(line.getName())) return true;
         }
         return false;
     }
 
     /**
-     * Add station as a neighbor
-     *
-     * @param station        the neighbor station
-     * @param line           the line with which you can reach s
-     * @param durationArray  the time with which you can reach s
-     * @param distance       the distance between these stations
-     * @param addWalkingNeig
-     * @param localisation   the localisation of the starting point
+     * Gets all the neighbors that we can reach using a certain line.
+     * 
+     * @param lineName name of the line
+     * @return ArrayList of all the neighbors that we can reach using <code>lineName</code>
      */
-    public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig, Localisation localisation) {
+    private HashMap<Station,Long> getNeighborsForLine(String lineName){
+        HashMap<Station,Long> resultStations = new HashMap<>();
+        nextStations.forEach((station, neighborDataList) -> {
+            for(NeighborData nData:neighborDataList){
+                if(nData.getLine().getName().equals(lineName)){
+                    long d = nData.getDuration().getSeconds();
+                    resultStations.put(station,d);
+                }
+            }
+        });
+        return resultStations;
+    }
+
+    /**
+     * Add station as a neighbor.
+     *
+     * @param station        the neighboring station
+     * @param line           the line to use to get <code>station</code>
+     * @param durationArray  the time it takes to reach <code>station</code>
+     * @param distance       the distance to travel to reach <code>station</code>
+     * @param addWalkingNeig
+     */
+    public void addNextStation(Station station, Line line, String[] durationArray, Double distance, Boolean addWalkingNeig) {
         Duration duration = Duration.ZERO;
         // we get the duration from the csv
         if(!addWalkingNeig){
@@ -115,18 +223,31 @@ public class Station {
 
         if (nextStations.containsKey(station)) {
             ArrayList<NeighborData> neighborDataArrayList = nextStations.get(station);
-            if (!neighborDataIsIn(neighborDataArrayList, duration, line, distance)) {
-                neighborDataArrayList.add(n);
+            boolean canAdd = true;
+            for(NeighborData nData: neighborDataArrayList){
+                if(nData.compareNeighborData(n)){
+                    canAdd = false;
+                    break; // If nData exists we just stop
+                }                
             }
+            if(canAdd) neighborDataArrayList.add(n);
         } else {
             ArrayList<NeighborData> tmp = new ArrayList<>();
             tmp.add(n);
             nextStations.put(station, tmp);
         }
-        if (addWalkingNeig) {
-            localisations.put(line.getLineName(), localisation);
-        }
     }
+
+    /**
+     * Checks if two stations are the same.
+     * 
+     * @param station station to compare to this
+     * @return true if same stations, false otherwise
+     */
+    public boolean sameStation(Station station){
+        return this.name.equals(station.name) && this.location.sameLocation(station.location);
+    }
+
 
     /**
      * Check if the Neighbor exist in the list for nextStations
@@ -144,99 +265,101 @@ public class Station {
         return false;
     }
 
+
+    // à revoir, walkingline nécessaire? le parsing de temps pas conforme au parsing
+    // on peut directement spécifier les stations au lieu de calculer comparer chaque station -> trop long pour rien
+    // retarde le chargement 
     /**
-     * Add all the walking neighbors
+     * Add all the walking neighbors.
      *
      * @param walkingLine the walking line
      * @param allStations the list of all existing stations
      * @param radius the distance we want the neighbors to be in
-     * @param addFirstStation
-     * @param st the localisation of the starting point
+     * @param addFirstStation 
      */
-    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius, Boolean addFirstStation, Localisation st) {
-        //List<Station> reacheable1kmStations = allStations.stream().filter(s -> (s.isWithinARadius(this, radius) && !s.equals(this))).collect(Collectors.toList());;
-        for (Station s: allStations) {
-            List<Localisation> destLocalisation = s.localisations.values().stream().toList();
-                for (Localisation dest : destLocalisation) {
-                    if (dest.getLongitude() != st.getLongitude() && dest.getLatitude() != st.getLatitude()) {
-                        List<Localisation> startLocalisation = localisations.values().stream().toList();
-                        for (Localisation start : startLocalisation) {
-                            if (s.isWithinARadius(start, dest, radius)) {
-                                double distance = s.getDistanceToAStation(start, dest); // ?
-                                double time = s.getWalkingTimeInSecondsFromADistance(distance);
-                                String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
-                                // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)
-                                this.addNextStation(s, walkingLine, stringTime, distance, true, start);
-                                if (!addFirstStation) {
-                                    s.addNextStation(this, walkingLine, stringTime, distance, true, dest);
-                                }
-                            }
-                        }
-                    }
-                }
+    public void addWalkingNeighbours(Line walkingLine, ArrayList<Station> allStations, double radius, Boolean addFirstStation) {
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> 
+        (this.isWithinARadius(radius, s.location) && !this.sameStation(s))).toList();
+        for (Station s : reacheable1kmStations) {
+            double distance = this.getDistanceToAStation(s.location);
+            double speedHumanWalk = 8.0;
+            double secondsInAnHour = 3600;
+            double time = (distance * secondsInAnHour)/speedHumanWalk;
+            String[] stringTime = {"0", String.valueOf(time).split("\\.")[0]};
+            // ^ à modifier? Dans le parser on conserve les millis, mais pas ici
 
+            // we only add neighbors to the initial station, because it's temporary (we don't touch the "real" stations)
+            this.addNextStation(s, walkingLine, stringTime, distance, true);
+            if(!addFirstStation){
+                s.addNextStation(this, walkingLine, stringTime, distance, true);
+            }
+            // addFirstStation vraiment nécessaire? ça sert à quoi au juste?
         }
     }
 
     /**
-     * Check if the station is in the radius we wanted
+     * Check if the station is within the radius we wanted.
      *
-     * @param start localisation of the starting point
-     * @param dest localisation of the destination point
+     * @param dest location of the destination point
      * @param radius the radius we wanted to be in (in km)
-     * @return a boolean that determines if the station is in the radius away or less
+     * @return a boolean that determines if the station is within the <code>radius</code>
      */
-    public boolean isWithinARadius(Localisation start, Localisation dest, double radius) {
-        double distance = getDistanceToAStation(start, dest);
-        return distance <= radius;
+    public boolean isWithinARadius(double radius, Location dest){
+        return getDistanceToAStation(dest)<= radius;
     }
-
+    
     /**
-     * Calculate the distance to the other station
+     * Calculate the distance between our station and the destination point.
      *
-     * @param start localisation of the starting point
-     * @param dest localisation of the destination point
-     * @return the distance between our station and the other station in km
+     * @param dest location of the destination point
+     * @return the distance between our station and the destination point in km
      */
-    public double getDistanceToAStation(Localisation start, Localisation dest) {
-        double x0 = start.getLongitude() * 111;
-        double y0 = start.getLatitude() * (111.11 * Math.cos(Math.toRadians(start.getLongitude())));
+    public double getDistanceToAStation(Location dest){
+        double x0 = this.location.getLongitude() * 111;
+        double y0 = this.location.getLatitude() * (111.11 * Math.cos(Math.toRadians(this.location.getLongitude())));
         double x = dest.getLongitude() * 111;
         double y = dest.getLatitude() * (111.11 * Math.cos(Math.toRadians(dest.getLongitude())));
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
-    /**
-     * Calculate the time it takes to cover a distance
-     *
-     * @param distance the distance between 2 stations in km
-     * @return the time it takes to cover the distance
-     */
-    private double getWalkingTimeInSecondsFromADistance(double distance) {
-        double speedHumanWalk = 8.0;
-        double timeHumanWalk = 3600;
-        
-        return (distance * timeHumanWalk) / speedHumanWalk;
+    @JsonIgnore
+    public String toString() {
+        return name;
     }
 
+    //// pas correct, à revoir, memes remarques que pour la version add walking neighbors
     /**
      * Remove all occurrences of the temporary station which was added
      *
      * @param allStations all the stations
      * @param radius distance between the two stations
-     * @param start localisation of the starting point
-     * @param dest localisation of the destination point
+     * @param start location of the starting point
+     * @param dest location of the destination point
      */
-    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius, Localisation start, Localisation dest) {
-        // get all stations where we added the temporary station 
-        List<Station> reacheable1kmStations = allStations.stream().filter(s -> s.isWithinARadius(start, dest, radius) && !s.equals(this)).toList();
+    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius, Location start, Location dest) {
+        // get all stations where we added the temporary station
+        // Pas correct, si on veut retirer toutes les stations temporaires rajoutée
+        // Il faut supprimer toutes les stations dont le nom de line est marche
+        List<Station> reacheable1kmStations = allStations.stream().filter(s -> 
+        (this.isWithinARadius(radius, s.location) && !this.sameStation(s))).toList();
         // for all these stations, we remove the temporary station from nextstation
         for (Station s : reacheable1kmStations) {
             s.nextStations.remove(this);
         }
     }
 
-    public String toString() {
-        return name;
+    public LocalTime getNextTrainTime(Line line, LocalTime time) {
+        ArrayList<LocalTime> schedule = this.getSchedulesOfLine(line);
+        // there is no horaire for this station on the given line
+        if(schedule == null){
+            return null;
+        }
+        for (LocalTime localTime : schedule) {
+            if (localTime.equals(time) || localTime.isAfter(time)) {
+                return localTime;
+            }
+        }
+        return null;
     }
+
 }

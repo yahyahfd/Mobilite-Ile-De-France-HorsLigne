@@ -33,15 +33,15 @@ public class TerminalApplication {
         Scanner scanner  = new Scanner(System.in);
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m\n");
-        Station chosen_1 = null;
-        Station chosen_2 = null;
+        ArrayList<Station> chosen_1 = new ArrayList<>();
+        ArrayList<Station> chosen_2 = new ArrayList<>();
         boolean localpositionStart = false;
         boolean localpositionDest = false;
         while (true) {
             System.out.println("\u001B[34m\nLet's check if there is a route for you\u001B[0m");
             System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
             String station1 = "";
-            while (station1.isEmpty() || chosen_1 == null) {
+            while (station1.isEmpty() || chosen_1.size() == 0) {
                 station1 = scanner.nextLine();
                 station1 = station1.trim();
                 if (station1.isEmpty()) {
@@ -49,11 +49,10 @@ public class TerminalApplication {
                 }
                 if (station1.trim().equalsIgnoreCase("quit")) break;
                 if (station1.trim().equalsIgnoreCase("lp")) break;
-                chosen_1 = multi_choice(station1,m,scanner);
-                if(chosen_1 == null){
-                    ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1),m);
-                    if(!list_1.isEmpty()) chosen_1 = multi_choice_similar(list_1, scanner);
-                    else System.out.println("Try again!");
+                chosen_1 = m.getStationsByName(station1);
+                if(chosen_1.size() == 0){
+                    System.out.println("No station with the name " + station1 + " was found !");
+                    System.out.println("Try again!");
                 }
             }
             if (station1.trim().equalsIgnoreCase("quit")) break;
@@ -61,24 +60,24 @@ public class TerminalApplication {
             if (station1.trim().equalsIgnoreCase("lp")){
                 String name = "localPositionStart";
                 addStationByCoordonnees(scanner, m, name);
-                chosen_1 = (m.getStationsByName(name)).get(0);
+                chosen_1 = (m.getStationsByName(name));
                 localpositionStart = true;
             }
 
             System.out.print("\u001B[32mEnter your second station's name: (lp : local position) \u001B[0m");
             String station2 = "";
-            while(station2.isEmpty() || chosen_2 == null){
+            while(station2.isEmpty() || chosen_2.size() == 0){
                 station2 = scanner.nextLine();
                 station2 = station2.trim();
                 if (station2.isEmpty()) {
                     System.out.println("Empty String");
                 }
                 if (station2.trim().equalsIgnoreCase("quit")) break;
-                chosen_2 = multi_choice(station2,m,scanner);
-                if(chosen_2 == null){
-                    ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2),m);
-                    if(!list_2.isEmpty()) chosen_2 = multi_choice_similar(list_2, scanner);
-                    else System.out.println("Try again!");
+                if (station2.trim().equalsIgnoreCase("lp")) break;
+                chosen_2 = m.getStationsByName(station2);
+                if (chosen_2.size() == 0) {
+                    System.out.println("No station with the name " + station2 + " was found !");
+                    System.out.println("Try again!");
                 }
             }
             if (station2.trim().equalsIgnoreCase("quit")) break;
@@ -86,7 +85,7 @@ public class TerminalApplication {
             if (station2.trim().equalsIgnoreCase("lp")){
                 String name = "localPositionDest";
                 addStationByCoordonnees(scanner, m, name);
-                chosen_2 = (m.getStationsByName(name)).get(0);
+                chosen_2 = (m.getStationsByName(name));
                 localpositionDest = true;
             }
             // list of choice of preferences
@@ -95,7 +94,7 @@ public class TerminalApplication {
             int preference = -1;
             while(preference < 0 || !typePreference.contains(preference)){
                 // how do they want to travel
-                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
+                System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = unitary / 2 = shortest time : \u001B[0m");
                 try{
                     // we convert string to int
                     preference = Integer.parseInt(scanner.nextLine());
@@ -103,39 +102,46 @@ public class TerminalApplication {
                     System.out.println("Veuillez renseigner un entier");
                 }
             }
-            if (chosen_1 != null && chosen_2 != null) {
+            if (chosen_1.size()>0 && chosen_2.size()>0) {
 
                 // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
                 if (localpositionStart) {
-                    m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    // On prend la premiere station de ce nom? //////////////////////
+                    // m.walkToBestStation(chosen_1, true, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    // m.walkToBestStation(chosen_1, true, chosen_2.getLocalisation());
                 }
                 // we add the neighbors for the destination station
                 if (localpositionDest) {
-                    m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    // m.walkToBestStation(chosen_2, false, (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    // m.walkToBestStation(chosen_2, false, chosen_1.getLocalisation());
                 }
                 // instance itinerary with all stations of the map
-                Itinerary i = new Itinerary(m.getAllStations());
+                Itinerary i = new Itinerary(m.getStations());
                 // default, actual time, else, the time the user enter
                 LocalTime timeWeLeft = LocalTime.now();
                 // get the shortest way depending on the preference
-                HashMap<Station, Line> route = i.shortestWay(chosen_1, chosen_2, preference, timeWeLeft);
+                HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
+                // HashMap<Station, Line> route = i.shortestWay(chosen_1.get(0), chosen_2.get(0), preference);
+                
                 // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
                 // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
                 // We add the method (the algorithm) to look for the path
                 if (route == null) {
-                    System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m");
+                    System.out.println("Looks like there is no route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m");
                 } else {
-                    System.out.println("Route to go from \u001B[31m" + chosen_1.getName() + "\u001B[0m to \u001B[31m" + chosen_2.getName() + "\u001B[0m :\n");
+                    System.out.println("Route to go from \u001B[31m" + station1 + "\u001B[0m to \u001B[31m" + station2 + "\u001B[0m :\n");
                     System.out.println(i.showPath(route, timeWeLeft));
                 }
                 // if we added temporary station, we remove them of the list of stations
                 if (localpositionStart) {
-                    m.removeStation(chosen_1);
+                    // m.removeStation(chosen_1);
                 }
                 if (localpositionDest) {
-                    chosen_2.removeWalkingNeighbours(m.getAllStations(), chosen_1.getDistanceToAStation((Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]),
-                            (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
-                    m.removeStation(chosen_2);
+                    // removewalkingneighbours pas correct (regarder commentaire sur méthode)
+                    // chosen_2.removeWalkingNeighbours(m.getStations(), chosen_1.getDistanceToAStation((Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]),
+                    //         (Localisation) chosen_1.getLocalisations().values().toArray()[0], (Localisation) chosen_2.getLocalisations().values().toArray()[0]);
+                    
+                            // m.removeStation(chosen_2);
                 }
             }
         }
@@ -262,7 +268,7 @@ public class TerminalApplication {
      */
     public static ArrayList<Station> similar_names(String name, Map m){
         ArrayList<Station> similar = new ArrayList<>();
-        for( Station s : m.getAllStations()) {
+        for( Station s : m.getStations()) {
             String nameS = StringUtils.stripAccents(s.getName());
             if (nameS.length() >= name.length() && nameS.toLowerCase().contains(name.toLowerCase())) {
                 similar.add(s);

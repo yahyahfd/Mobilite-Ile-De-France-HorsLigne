@@ -12,11 +12,11 @@ class StationTest {
     @Test
     void isWithinA1KmRadius() {
         // Given
-        Station station1 = new Station("Félix Faure", new Localisation(48.84268433479664, 2.2918472203679703), "1");
-        Station station2 = new Station("Commerce", new Localisation(48.84461151236847, 2.293796842192864), "2");
+        Station station1 = new Station("Félix Faure", new Location(48.84268433479664, 2.2918472203679703));
+        Station station2 = new Station("Commerce", new Location(48.84461151236847, 2.293796842192864));
 
         // When
-        boolean result = station1.isWithinARadius(station1.getLocalisations().get("1"), station2.getLocalisations().get("2"), 1);
+        boolean result = station1.isWithinARadius(1,station2.getLocation());
 
         // Assert
         assert (result);
@@ -25,27 +25,29 @@ class StationTest {
     @Test
     void isNotWithinA1KmRadius() {
         // Given
-        Station station1 = new Station("Boucicaut", new Localisation(48.841024160993214, 2.2879184311245595), "1");
-        Station station2 = new Station("Opéra", new Localisation(48.87059812248669, 2.332135072925294), "2");
+        Station station1 = new Station("Boucicaut", new Location(48.841024160993214, 2.2879184311245595));
+        Station station2 = new Station("Opéra", new Location(48.87059812248669, 2.332135072925294));
         
-        boolean result = station1.isWithinARadius(station1.getLocalisations().get("1"), station2.getLocalisations().get("2"), 1);
+        
+        boolean result = station1.isWithinARadius(1,station2.getLocation());
 
         // Assert
         assert (!result);
     }
 
+    // faux/modifier add walkingneighbors
     @Test
     void addWalkingNeighbours() {
         // Given
         Line walkingLine = new Line("--MARCHE--");
-        Station station1 = new Station("République", new Localisation(48.86742161002706, 2.363149406900382), "1");
-        Station voisin1 = new Station("Filles du Calvaire", new Localisation(48.8630698834507, 2.366745297742701), "2");
-        Station voisin2 = new Station("Saint-Sébastien - Froissart", new Localisation(48.8609681457564, 2.3672615397172687), "3");
-        Station voisin3 = new Station("République", new Localisation(48.86748513277203, 2.3632563242479026),"4");
+        Station station1 = new Station("République", new Location(48.86742161002706, 2.363149406900382));
+        Station voisin1 = new Station("Filles du Calvaire", new Location(48.8630698834507, 2.366745297742701));
+        Station voisin2 = new Station("Saint-Sébastien - Froissart", new Location(48.8609681457564, 2.3672615397172687));
+        Station voisin3 = new Station("République", new Location(48.86748513277203, 2.3632563242479026));
         ArrayList<Station> liste = new ArrayList<>(List.of(voisin1, voisin2, voisin3));
         
         // When
-        station1.addWalkingNeighbours(walkingLine, liste, 1, false, station1.getLocalisations().get("1"));
+        station1.addWalkingNeighbours(walkingLine, liste, 1, false);
         
         // Assert
         assert (station1.getNextStations().keySet().containsAll(liste));
@@ -54,13 +56,14 @@ class StationTest {
         assert (station1.getNextStations().get(voisin3).get(0).getLine().equals(walkingLine));
     }
     
+    // faux/modifier remove walkingneighbors
     @Test
     void removeWalkingNeighbours() {
         // Given
         Line line = new Line("--MARCHE--");
-        Station station1 = new Station("Félix Faure", new Localisation(48.84268433479664, 2.2918472203679703), "1");
-        Station station2 = new Station("Commerce", new Localisation(48.84461151236847, 2.293796842192864),"2");
-        Station station3 = new Station("Opéra", new Localisation(48.87059812248669, 2.332135072925294), "3");
+        Station station1 = new Station("Félix Faure", new Location(48.84268433479664, 2.2918472203679703));
+        Station station2 = new Station("Commerce", new Location(48.84461151236847, 2.293796842192864));
+        Station station3 = new Station("Opéra", new Location(48.87059812248669, 2.332135072925294));
         ArrayList<Station> allStations = new ArrayList<>(List.of(station1, station2, station3));
 
         java.util.Map<Station, ArrayList<NeighborData>> nextS = new HashMap<>();
@@ -72,10 +75,10 @@ class StationTest {
         nei.add(new NeighborData(line, duration, dist));
         nextS.put(station2, nei);
         nextS.put(station3, nei);
-        station1.addNextStation(station3, line, h, dist, false, station3.getLocalisations().get("3"));
+        station1.addNextStation(station3, line, h, dist, true);
 
         // When
-        station1.removeWalkingNeighbours(allStations, 1, station1.getLocalisations().get("1"), station3.getLocalisations().get("3"));
+        station1.removeWalkingNeighbours(allStations, 1.0, station1.getLocation(), station3.getLocation());
 
         // Assert
         assert (station1.getNextStations().containsKey(station3));

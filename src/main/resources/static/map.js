@@ -26,24 +26,21 @@ fetch('http://localhost:8080/stations')
     .then(response => response.json())
     .then(data => {
         data.forEach(station => {
-            var lines = station.neighboringLines.join('<br>');
-            var localisations = station.localisations;
-            var markers = [];
+            
+            if(!departList.includes(station.name)){
+                var lines = station.neighboringLines.join('<br>');
+                var location = station.location
 
-            for(let i in localisations){
-                var marker = L.marker([localisations[i].latitude, localisations[i].longitude])
+                var marker = L.marker([location.latitude, location.longitude])
                     .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
-                markers.push(marker);
+
+                markersLayer.addLayer(marker);
+
+                // Adding station names + location to datalist of both inputs
+                departList.push(station.name);
+                arriveeList.push(station.name);
             }
 
-            markersLayer.addLayer(L.layerGroup(markers));
-            // var marker = L.marker([station.localisation.latitude, station.localisation.longitude])
-            //     .bindPopup(station.name + '<br>' + " Lignes: " + '<br>' + lines); //label for each marker
-            //markersLayer.addLayer(marker);
-
-            // Adding station names + localisation to datalist of both inputs
-            departList.push(station.name);
-            arriveeList.push(station.name);
         });
         map.addLayer(markersLayer);
     })
@@ -60,6 +57,8 @@ const itinerary = document.getElementById('itinerary');
 const drawing_menu = document.getElementById('second_left');
 const main_menu = document.getElementById('first_left');
 
+let isDrawed = false;
+
 const back_button = document.getElementById('back_button');
 back_button.addEventListener('click', function () {
     main_menu.style.display = 'block';
@@ -71,26 +70,11 @@ back_button.addEventListener('click', function () {
 
     tab1.innerHTML = "Menu";
     tab2.innerHTML = "Map";
+    isDrawed = false;
 });
-
-// var resetBtn = document.getElementById('resetZoom');
-// // Reset map to initial state
-// resetBtn.addEventListener('click', function () {
-//     map.setView([48.856614, 2.3522219], 12);
-//     map.removeLayer(itineraryLayer);
-//     map.addLayer(markersLayer);
-// });
 
 form.addEventListener('submit', function (event) {
     event.preventDefault();
-
-    // if (selectedOption === 'plus-rapide') {
-    //   // Code pour trouver l'itinéraire le plus rapide
-    // } else if (selectedOption === 'plus-court') {
-    //   // Code pour trouver l'itinéraire le plus court
-    // } else if (selectedOption === 'moins-marche') {
-    //   // Code pour trouver l'itinéraire avec moins de marche
-    // }
 
     // We get out selected travel option
     var optionsSelect = document.getElementById('options');
@@ -113,69 +97,102 @@ form.addEventListener('submit', function (event) {
     const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
 
 
-    var urlLines = `/shortest-way/lines?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
-
-    var linesItinerary = null;
-
-    fetch(urlLines)
+    fetch(url)
         .then(response => response.json())
-        .then(dataLines => {
-            linesItinerary = dataLines;
-            fetch(url)
-            .then(response => response.json())
-            .then(data => {
-                if (data.length == 0) { // No path found
-                    errorMessage.style.display = "block";
-                    errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
-                } else {// We draw a path on our map (need to add a written path later here)
-                    errorMessage.style.display = "none";
-                    main_menu.style.display = "none";
-                    drawing_menu.style.display = "block";
-                    itineraryLayer.clearLayers();
-                    var current_station = null;
-                    const latLngs = [];
+        .then(data => {
+            if (data.length == 0) { // No path found
+                errorMessage.style.display = "block";
+                errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
+            } else {// We draw a path on our map (need to add a written path later here)
+                errorMessage.style.display = "none";
+                main_menu.style.display = "none";
+                drawing_menu.style.display = "block";
+                itineraryLayer.clearLayers();
+                var current_station = null; 
+                const latLngs = [];
 
-                    // We place each station on the map and draw a line between each two consecutive stations
-                    data.forEach(station => {
-                        var stationName = station.name;
-                        var lineName = linesItinerary[stationName].lineNameWithoutVariant;
-                        itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + stationName + '</span>';
-                        if (station != data[data.length - 1]) itinerary.innerHTML += "<span class='separator'> <i class='fa-solid fa-down-long'></i></span>";
-                        console.log(station.localisation);
-                        var latitude = station.localisation.latitude;
-                        var longitude = station.localisation.longitude;
-                        latLngs.push([latitude, longitude]);
-                        var lines = station.neighboringLines.join('<br>');
-                        var marker = L.marker([latitude, longitude])
-                            .bindPopup(
-                                stationName + getLinesLogoColor(lines));
-                        if (current_station != null) {
-                            var polyline = L.polyline([current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 });
-                            itineraryLayer.addLayer(polyline);
-                            polyline.bindTooltip(lineName, {permanent: false, direction: "center"});
-                        }
-                        current_station = marker;
-                        itineraryLayer.addLayer(marker);
-                    });
-                    map.removeLayer(markersLayer);
-                    map.addLayer(itineraryLayer);
-                    map.fitBounds(latLngs);
-                    map.setZoom(13);
-                    document.getElementById("tab2").classList.add("active");
-                    document.getElementById("tab1").classList.remove("active");
-                    document.getElementById("menu2").classList.add("active");
-                    document.getElementById("menu1").classList.remove("active");
-                    tab1.innerHTML = "Textuel";
-                    tab2.innerHTML = "Visuel";
-                    map.invalidateSize();
+                let shortestPath = new Map();
+
+                let length = data['stations'].length;
+                for (let i = 0; i < length; i++) {
+                    shortestPath.set(data['stations'][i], data['lines'][i]);
                 }
-            })
+
+                console.log("isDrawed : " + isDrawed);
+
+                
+                // We place each station on the map and draw a line between each two consecutive stations
+                for (let [station, line] of shortestPath) {
+                
+                    var stationName = station.name;
+                    var lineName = line.lineNameWithoutVariant;
+                    
+
+                    if(! isDrawed) {
+                        itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 
+                        stationName + '</span>';
+                                        
+
+                        if (station != data['stations'][length - 1]) {
+
+                            if(lineName == '--MARCHE--') {
+                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i></span>";
+                            } else {
+                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+                            }
+                                
+                            const idLine = document.getElementById('line');
+                            idLine.id += lineName;
+                            idLine.style.color = getColorByLineName(lineName);
+                        }
+                    }
+
+                    var latitude = station.location.latitude;
+                    var longitude = station.location.longitude;
+                    latLngs.push([latitude, longitude]);
+                    var lines = station.neighboringLines.join('<br>');
+                    var marker = L.marker([latitude, longitude])
+                        .bindPopup(
+                            station.name + getLinesLogoColor(lines)
+                        );
+                    if (current_station != null) {
+                        var polyline = L.polyline(
+                            [current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 }
+                        );
+                        if(lineName == '--MARCHE--') {
+                            polyline.setStyle({color: getColorByLineName(lineName), dashArray: '5, 15'});
+                        }
+                        itineraryLayer.addLayer(polyline);
+                        polyline.bindPopup(lineName, {permanent: false, direction: "center"});
+                    }
+                    current_station = marker;
+                    itineraryLayer.addLayer(marker);
+                
+                }
+
+                isDrawed = true;
+
+                map.removeLayer(markersLayer);
+                map.addLayer(itineraryLayer);
+                map.fitBounds(latLngs);
+                map.setZoom(13);
+                document.getElementById("tab2").classList.add("active");
+                document.getElementById("tab1").classList.remove("active");
+                document.getElementById("menu2").classList.add("active");
+                document.getElementById("menu1").classList.remove("active");
+                tab1.innerHTML = "Textuel";
+                tab2.innerHTML = "Visuel";
+                map.invalidateSize();
+                
+            }
+            
         })
-        .catch(error => { // Bad syntax or empty inputs
-               console.log(error);
-               errorMessage.style.display = "block";
-               errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
-        });
+            
+    .catch(error => { // Bad syntax or empty inputs
+        console.log(error);
+        errorMessage.style.display = "block";
+        errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+    });
 
 });
 
@@ -239,7 +256,9 @@ function getColorByLineName(lineName) {
 function getLinesLogoColor(lines){
     var result = '';
     lines.split('<br>').forEach(line => {
-        result += '<br> <i class="fa-solid fa-train fa-beat fa-xl" style="color: '+getColorByLineName(line)+ ';"></i> &emsp;' + line+'<br>';
+        if(line != '--MARCHE--'){
+            result += '<br> <i class="fa-solid fa-train fa-beat fa-xl" style="color: '+getColorByLineName(line)+ ';"></i> &emsp;' + line+'<br>';
+        }
     });
     return result;
 }

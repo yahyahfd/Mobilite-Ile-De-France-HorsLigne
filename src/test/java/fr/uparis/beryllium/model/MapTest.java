@@ -16,12 +16,12 @@ class MapTest {
         m.addStation(48.84461151236847, 2.293796842192864, "Commerce");
         m.addStation(48.87059812248669, 2.332135072925294, "Opéra");
 
-        Station start = m.getAllStations().get(0);
-        Station station1 = m.getAllStations().get(1);
-        Station dest = m.getAllStations().get(2);
+        Station start = m.getStations().get(0);
+        Station station1 = m.getStations().get(1);
+        Station dest = m.getStations().get(2);
         
         // When
-        m.walkToBestStation(start, true, start.getLocalisations().get("--MARCHE--"), (Localisation) dest.getLocalisations().values().toArray()[0]);
+        m.walkToBestStation(start, true, dest.getLocation());
 
         // Assert
         System.out.println(start.getNextStations().keySet());

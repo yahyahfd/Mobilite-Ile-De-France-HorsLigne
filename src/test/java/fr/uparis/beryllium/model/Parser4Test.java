@@ -13,8 +13,9 @@ public class Parser4Test {
         map = Parser.readMapHoraire("src/test/resources/testCsvHoraire.csv", map);
         assertNotNull(map);
         Line line = map.searchLine("8.1");
+        Station station = map.getStationsByName("Lourmel").get(0);
         LocalTime time = LocalTime.of(10, 42);
 
-        assertEquals(time, line.getStationTimes(map.getStationByName("Lourmel")).get(0));
+        assertEquals(time, station.getSchedulesOfLine(line).get(0));
     }
 }
