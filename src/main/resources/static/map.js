@@ -190,13 +190,23 @@ form.addEventListener('submit', function (event) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            if (data.length == 0) { // No path found
+            console.log(data);
+            if (data['stations'].length <= 1 || data['lines'].length == 0) { // No path found
+                let syntaxeMessage = " Suivez la syntaxe imposée dans les suggestions !";
+                if (departValue.length == 0 && arriveeValue.length == 0) {
+                    errorMessage.innerHTML = "Le départ et l'arrivée ne sont pas spécifiés !" +syntaxeMessage;
+                } else if (departValue.length == 0) {
+                    errorMessage.innerHTML = "Le départ n'est pas spécifié ! " +syntaxeMessage;
+                } else if (arriveeValue.length == 0) {
+                    errorMessage.innerHTML = "L'arrivée n'est pas spécifiée ! " +syntaxeMessage;
+                } else if(arriveeValue == departValue){
+                    errorMessage.innerHTML = "Vous ne pouvez pas voyager vers la même station." +syntaxeMessage;
+                }
+                else {
+                    errorMessage.innerHTML = "Aucun chemin trouvé suivant les stations spécifiées. " +syntaxeMessage;
+                }
                 errorMessage.style.display = "block";
-                errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
             } else {// We draw a path on our map (need to add a written path later here)
-                errorMessage.style.display = "none";
-                main_menu.style.display = "none";
-                drawing_menu.style.display = "block";
                 itineraryLayer.clearLayers();
                 const latLngs = [];
 
@@ -222,16 +232,19 @@ form.addEventListener('submit', function (event) {
                                         
 
                         if (station != data['stations'][length - 1]) {
-
+                            let lineNumber = "<span id='linename'>&nbsp;"+lineName+"</span>";
                             if(lineName == '--MARCHE--') {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i></span>";
+                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i>"+lineNumber+"</span>";
                             } else {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+lineNumber+"</span>";
                             }
                                 
                             const idLine = document.getElementById('line');
                             idLine.id += lineName;
                             idLine.style.color = getColorByLineName(lineName);
+                            const idLineNumber = document.getElementById('linename');
+                            idLineNumber.id += lineName;
+                            idLineNumber.style.color = "#000";
                         }
                     }
 
@@ -292,6 +305,9 @@ form.addEventListener('submit', function (event) {
                 tab2.innerHTML = "Visuel";
                 map.invalidateSize();
                 
+                errorMessage.style.display = "none";
+                main_menu.style.display = "none";
+                drawing_menu.style.display = "block";
             }
             
         })
@@ -299,7 +315,7 @@ form.addEventListener('submit', function (event) {
     .catch(error => { // Bad syntax or empty inputs
         console.log(error);
         errorMessage.style.display = "block";
-        errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+        errorMessage.textContent = "Une erreur s'est produite. Vous ne pouvez pas chercher un itinéraire vers la même station.";
     });
 
 });
