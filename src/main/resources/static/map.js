@@ -21,27 +21,42 @@ var itineraryLayer = L.layerGroup();
 var departList = [];
 var arriveeList = [];
 
+var neighboringLinesWithoutVariant = new Map();
+var locationsMap = new Map();
+
 // GET stations list and adding them to the map (to layergroup then layergroup to map)
 fetch('http://localhost:8080/stations')
     .then(response => response.json())
     .then(data => {
         data.forEach(station => {
-            
+
+            var location;
+        
+            var lines = station.neighboringLinesWithoutVariant.join('<br>');
+
             if(!departList.includes(station.name)){
-                var lines = station.neighboringLines.join('<br>');
-                var location = station.location
+                
+                location = station.location;
+                locationsMap.set(station.name, location);
 
-                var marker = L.marker([location.latitude, location.longitude])
-                    .bindPopup(station.name + getLinesLogoColor(lines)); //label for each marker
-
-                markersLayer.addLayer(marker);
-
+                neighboringLinesWithoutVariant.set(station.name, lines);
                 // Adding station names + location to datalist of both inputs
                 departList.push(station.name);
                 arriveeList.push(station.name);
+            
+            }else {
+                neighboringLinesWithoutVariant.set(station.name, Array.from(new Set((neighboringLinesWithoutVariant.get(station.name) + '<br>' + lines).split('<br>'))).join('<br>'));
             }
-
         });
+
+        for (let [station, lines] of neighboringLinesWithoutVariant) {
+            var location = locationsMap.get(station);
+            var marker = L.marker([location.latitude, location.longitude])
+            .bindPopup(station + getLinesLogoColor(lines)); //label for each marker
+
+            markersLayer.addLayer(marker);
+        }
+
         map.addLayer(markersLayer);
     })
     .catch(error => console.error(error));
@@ -56,14 +71,51 @@ const itinerary = document.getElementById('itinerary');
 
 const drawing_menu = document.getElementById('second_left');
 const main_menu = document.getElementById('first_left');
+const schedules = document.getElementById('schedules');
+var schedules_html = schedules.innerHTML;
+const schedules_form = document.getElementById('schedule_form');
 
 let isDrawed = false;
+
+
+const schedules_btn = document.getElementById('schedules_btn');
+console.log(schedules_btn);
+schedules_btn.addEventListener('click', function () {
+    console.log("schedules_btn clicked");
+    let h2 = document.getElementById('sc_h2');
+    h2.style.marginTop = "200px";
+    if(schedules_form.style.display == "none" || schedules_form.style.display == "") {
+        schedules_form.style.display = "grid";
+    } else {
+        schedules_form.style.display = "none";
+    }
+});
+
+const table_sc = document.getElementById('table_schedules');
+
+schedules_form.addEventListener('submit', function (event) {
+    event.preventDefault();
+    const station_sc = document.getElementById('station_sc').value;
+    const line_sc = document.getElementById('line_sc').value;
+
+    const url = `/schedules?station=${station_sc}&line=${line_sc}`;
+
+    fetch(url)
+        .then(response => response.json())
+        .then(data => {
+            console.log(data);
+        })
+        .catch(error => console.error(error));
+
+});
+
 
 const back_button = document.getElementById('back_button');
 back_button.addEventListener('click', function () {
     main_menu.style.display = 'block';
     drawing_menu.style.display = 'none';
     itinerary.innerHTML = '';
+    schedules.innerHTML = schedules_html;
     map.setView([48.856614, 2.3522219], 13);
     map.removeLayer(itineraryLayer);
     map.addLayer(markersLayer);
@@ -74,6 +126,9 @@ back_button.addEventListener('click', function () {
 });
 
 form.addEventListener('submit', function (event) {
+
+    schedules.innerHTML = '';
+
     event.preventDefault();
 
     // We get out selected travel option
@@ -108,21 +163,19 @@ form.addEventListener('submit', function (event) {
                 main_menu.style.display = "none";
                 drawing_menu.style.display = "block";
                 itineraryLayer.clearLayers();
-                var current_station = null; 
                 const latLngs = [];
 
-                let shortestPath = new Map();
+                var nextStation = null;
+                var length = data['stations'].length;
 
-                let length = data['stations'].length;
-                for (let i = 0; i < length; i++) {
-                    shortestPath.set(data['stations'][i], data['lines'][i]);
-                }
-
-                console.log("isDrawed : " + isDrawed);
-
-                
                 // We place each station on the map and draw a line between each two consecutive stations
-                for (let [station, line] of shortestPath) {
+                for (let i = 0; i < length-1; i++) {
+
+                    var station = data['stations'][i];
+                    var line = data['lines'][i+1];
+
+                    nextStation = data['stations'][i+1];
+                    var nextStationName = nextStation.name;
                 
                     var stationName = station.name;
                     var lineName = line.lineNameWithoutVariant;
@@ -149,26 +202,46 @@ form.addEventListener('submit', function (event) {
 
                     var latitude = station.location.latitude;
                     var longitude = station.location.longitude;
+                    var nextStationLatitude = nextStation.location.latitude;
+                    var nextStationLongitude = nextStation.location.longitude;
                     latLngs.push([latitude, longitude]);
-                    var lines = station.neighboringLines.join('<br>');
+                    var lines = neighboringLinesWithoutVariant.get(stationName);
+                    var linesNextStation = neighboringLinesWithoutVariant.get(nextStationName);
                     var marker = L.marker([latitude, longitude])
                         .bindPopup(
                             station.name + getLinesLogoColor(lines)
                         );
-                    if (current_station != null) {
-                        var polyline = L.polyline(
-                            [current_station.getLatLng(), marker.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 }
+                    var markerNextStation = L.marker([nextStationLatitude, nextStationLongitude])
+                        .bindPopup(
+                            nextStation.name + getLinesLogoColor(linesNextStation)
                         );
-                        if(lineName == '--MARCHE--') {
-                            polyline.setStyle({color: getColorByLineName(lineName), dashArray: '5, 15'});
-                        }
-                        itineraryLayer.addLayer(polyline);
-                        polyline.bindPopup(lineName, {permanent: false, direction: "center"});
+                    var polyline = L.polyline(
+                        [marker.getLatLng(), markerNextStation.getLatLng()], { color: getColorByLineName(lineName), weight: 10, opacity:3 }
+                    );
+                    if(lineName == '--MARCHE--') {
+                        polyline.setStyle({color: getColorByLineName(lineName), dashArray: '5, 15'});
                     }
-                    current_station = marker;
+                    itineraryLayer.addLayer(polyline);
+                    polyline.bindPopup(lineName, {permanent: false, direction: "center"});
                     itineraryLayer.addLayer(marker);
                 
                 }
+
+                var lastStation = nextStation;
+                var lastStationName = lastStation.name;
+                var lastStationLatitude = lastStation.location.latitude;
+                var lastStationLongitude = lastStation.location.longitude;
+                var linesLastStation = neighboringLinesWithoutVariant.get(lastStationName);
+                var markerLastStation = L.marker([lastStationLatitude, lastStationLongitude])
+                    .bindPopup(
+                        lastStation.name + getLinesLogoColor(linesLastStation)
+                    );
+                itineraryLayer.addLayer(markerLastStation);
+
+                itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 
+                lastStationName + '</span>';
+
+
 
                 isDrawed = true;
 
