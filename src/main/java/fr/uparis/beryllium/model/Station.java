@@ -1,6 +1,9 @@
 package fr.uparis.beryllium.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+
+import java.io.Serial;
+import java.io.Serializable;
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -9,6 +12,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 /**
  * Our station class. Used to store all the data needed for each station,
@@ -141,6 +145,13 @@ public class Station {
             }
         });
         return new ArrayList<>(result);
+    }
+
+    public ArrayList<String> getNeighboringLinesWithoutVariant(){
+        HashSet<String> result = getNeighboringLines().stream().map(lineName -> {
+            return ! lineName.equals("--MARCHE--") ? lineName.split("\\.")[0] : lineName;
+        }).collect(Collectors.toCollection(HashSet::new));
+            return new ArrayList<>(result);
     }
 
     public void setNeighboringLines(ArrayList<String> neighboringLines) {

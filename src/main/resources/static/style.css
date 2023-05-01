@@ -45,6 +45,14 @@
 	font-family: "Font Awesome 6 Free";
 	font-weight: 900
 }
+.fa-clock{
+  color: #2d1987;
+}
+
+#schedules_btn{
+  background-color: #809b85;
+  border: none;
+}
 
 /* Style reset and other stylings */
 * {
@@ -276,4 +284,14 @@ input[type="submit"]:hover{
 #second_left.show {
   display: flex;
   flex-direction: column;
+}
+
+#schedules h2{
+  margin-top: 400px;
+}
+
+#schedule_form{
+  display: none;
+  justify-content: stretch;
+  grid-template-columns: 100%;
 }
