@@ -46,6 +46,11 @@ public class Station {
         return lineSchedules.get(line);
     }
 
+    public boolean containsScheduleOnLine(Line line,LocalTime schedule){
+        ArrayList<LocalTime> mySchedule = getSchedulesOfLine(line);
+        return mySchedule !=null && mySchedule.contains(schedule); 
+    }
+    
     // ce getter sert-il vraiment à quelque chose si on a la méthode d'avant?
     /**
      * Getter for lineSchedules.

@@ -114,8 +114,8 @@ public class Parser {
         // On stocke nos stations initiales (qui contiennent la ligne lineString)
         ArrayList<Station> stations = map.getStationsByName(stationString);
         LocalTime[] timeOfStation = {LocalTime.of(Integer.parseInt(time[0]), Integer.parseInt(time[1]))};
-
         for(Station s: stations){
+            if(s.containsScheduleOnLine(line,timeOfStation[0])) continue;
             s.propagateSchedules(timeOfStation[0], line);
         }
     }

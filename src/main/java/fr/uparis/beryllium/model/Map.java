@@ -153,21 +153,4 @@ public class Map {
         // we add the stations that are within this perimeter as neighbors of the position
         start.addWalkingNeighbours(walkingLine, this.getStations(), radius, addFirstStation);
     }
-
-    //// inutile vu la méthode getStationsByName
-    /**
-     * Method used in terminal mode to get the first station with <code>name</code>
-     * as a name
-     * 
-     * @param name
-     * @return The first station with the corresponding name (can be null if no
-     *         station found)
-     */
-    public Station getStationByName(String name) {
-        for (Station s : stations) {
-            if (StringUtils.stripAccents(s.getName()).equalsIgnoreCase(StringUtils.stripAccents(name)))
-                return s;
-        }
-        return null;
-    }
 }
