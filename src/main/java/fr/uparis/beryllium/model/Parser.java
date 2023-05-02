@@ -24,12 +24,11 @@ public class Parser {
      *
      * @param csvFile String of the path to the file
      * @return A map of the network described by
-     * @throws FormatException if the appropriate format isn't respected
      */
-    public static Map readMap(String csvFile) throws FormatException {
+    public static Map readMap(String csvFile) {
 
         Map map = Map.getMapInstance();
-        if(map.isMapLoaded()){
+        if (map.isMapLoaded()) {
             return map;
         }
         try {
@@ -52,7 +51,10 @@ public class Parser {
             LOGGER.error("File not found", e);
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
+        } catch (FormatException e) {
+            LOGGER.error("CSV's format is incorrect", e);
         }
+
         map.setMapLoaded();
         return map;
 
@@ -60,17 +62,17 @@ public class Parser {
 
     /**
      * Static method that is used to parse the timetables data file containing
+     *
      * @param csvFile
      * @param map
      * @return
-     * @throws FormatException
      */
 
-    public static Map readMapHoraire(String csvFile, Map map) throws FormatException{
+    public static Map readMapHoraire(String csvFile, Map map) {
 
         try {
 
-            String[] HEADERS = {"line", "station", "time","variant"};
+            String[] HEADERS = {"line", "station", "time", "variant"};
 
             Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
             if (!it.hasNext()) {
@@ -88,6 +90,8 @@ public class Parser {
             LOGGER.error("File not found", e);
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
+        } catch (FormatException e) {
+            LOGGER.error("CSV's format is incorrect", e);
         }
 
         return map;
