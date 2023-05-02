@@ -212,11 +212,26 @@ form.addEventListener('submit', function (event) {
 
                 var nextStation = null;
                 var length = data['stations'].length;
-                var dates = data['times'];
-                var distCountTime = data['distCountTime'];
-                var dist_totale = distCountTime[length-1].left;
-                var time_totale = distCountTime[length-1].right;
-                itinerary.innerHTML += "<span class='station_name'>-- Trajet : "+time_totale+" min. ~ "+dist_totale+" Km.</span>";
+                var dates = data['dates'];
+                var dist_total = data['distTotal'].toFixed(2);
+                var time_total = data['timeTotal'];
+                
+                var hourStart = data['startingTime'][0];
+                if(hourStart<10) hourStart = '0'+hourStart;
+                var minuteStart = data['startingTime'][1];
+                if(minuteStart<10) minuteStart = '0'+minuteStart;
+
+                var hourFinish = data['endingTime'][0];
+                if(hourFinish<10) hourFinish = '0'+hourFinish;
+                var minuteFinish = data['endingTime'][1];
+                if(minuteFinish<10) minuteFinish = '0'+minuteFinish;
+
+                var startingtime = hourStart+":"+minuteStart;
+                var endingtime = hourFinish+":"+minuteFinish;
+                console.log(startingtime);
+                console.log(endingtime);
+                itinerary.innerHTML += "<div class='station_name'>"+startingtime+" - "+endingtime+
+                "<span class='span_time'>&nbsp;("+time_total+" min ~ "+dist_total+" Km)</span></div>";
                 // var distTimeLines = data['distTimeLines'];
                 // We place each station on the map and draw a line between each two consecutive stations
                 // var previousLineName = null;
@@ -225,7 +240,6 @@ form.addEventListener('submit', function (event) {
                     var station = data['stations'][i];
                     var line = data['lines'][i+1];
 
-                    var date = dates[i];
                     nextStation = data['stations'][i+1];
                     var nextStationName = nextStation.name;
                 
@@ -240,7 +254,6 @@ form.addEventListener('submit', function (event) {
                     //     console.log(timeLine);
                     //     previousLineName = lineName;
                     // }
-
                     if(! isDrawed) {                                        
                         if (station != data['stations'][length - 1]) {
                             let lineNumber = "<span id='linename'>&nbsp;"+lineName+"</span>";
@@ -249,8 +262,15 @@ form.addEventListener('submit', function (event) {
                                 "</span><span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i>"+
                                 lineNumber+"</span>";
                             } else {
-                                itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
-                                " - take the train at "+ date+ "</span><span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+
+
+                                var date = dates[i];
+                                console.log(date);
+                                var hour = date[0];
+                                var min = date[1];
+                                if(hour<10) hour = '0'+hour;
+                                if(min<10) min = '0'+min;
+                                itinerary.innerHTML += "<div class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
+                                "<span class='span_time'>&nbsp;- at "+ hour+":"+min+ "</span></div><span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+
                                 lineNumber+"</span>";
                             }
                                 

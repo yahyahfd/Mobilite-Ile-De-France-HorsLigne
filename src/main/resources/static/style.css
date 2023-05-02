@@ -275,6 +275,10 @@ input[type="submit"]:hover{
   font-weight : bolder;
 }
 
+.span_time{
+  font-weight: initial;
+}
+
 .separator {
   display: flex;
   align-items: center;

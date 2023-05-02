@@ -11,7 +11,6 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedList;
 import java.util.Map;
-import java.util.Objects;
 
 /**
  * Our Itinerary computing class.
@@ -122,23 +121,26 @@ public class Itinerary{
 
 			switch (preference) {
 				case 0 -> {
-					if (dist < minDistance) {
+					if(Double.compare(dist,minDistance)<0){
 						minDistance = dist;
 						resultStation = s;
 					}
 				}
-				case 2 -> {
-					if (count < minCount) {
-						minCount = count;
-						resultStation = s;
-					}
-				}
+
 				case 1 -> {
-					if (time < minTime) {
+					if(Long.compare(time,minTime)<0){
 						minTime = time;
 						resultStation = s;
 					}
 				}
+
+				case 2 -> {
+					if(Integer.compare(count,minCount)<0){
+						minCount = count;
+						resultStation = s;
+					}
+				}
+
 				default -> throw new IllegalArgumentException
 						("Invalid preference value " + preference
 								+ ". It's supposed to be a value between 0 and 2");
@@ -174,7 +176,7 @@ public class Itinerary{
 				String lineName = nData.getLine().getName();
 				LocalTime nextTrainTime = null;
 				// if we walk, we don't have wainting time
-				if (!Objects.equals(lineName, "--MARCHE--")) {
+				if(!lineName.equals("--MARCHE--")){
 					// for the next train time, we compare hour:minutes:seconds (not millis)
 					nextTrainTime = neighborStation.getNextTrainTime(nData.getLine(), actualTime.withNano(0));
 					// ^waiting time to take the station
@@ -201,32 +203,34 @@ public class Itinerary{
 					switch(preference){
 						case 0 ->{
 							// even if it's the shortest dist, if we don't have any train to go there, we don't take this road
-							if(distWeight<neighborDistCountTime.getLeft() && (timeToWait != Long.MAX_VALUE)) swap = true;
+							if(Double.compare(distWeight,neighborDistCountTime.getLeft())<0 
+							&& (Long.compare(timeToWait, Long.MAX_VALUE)!=0)) swap = true;
 						}
 						case 1 ->{
-							if(timeWeight<neighborDistCountTime.getRight()) swap = true;
+							if(Long.compare(timeWeight,neighborDistCountTime.getRight())<0) swap = true;
 						}
 						case 2 ->{
-							if(countWeight<neighborDistCountTime.getMiddle() && (timeToWait != Long.MAX_VALUE)) swap = true;
+							if(Integer.compare(countWeight,neighborDistCountTime.getMiddle())<0 
+							&& (Long.compare(timeToWait, Long.MAX_VALUE)!=0)) swap = true;
 						}
 						default -> {
 							throw new IllegalArgumentException
-							("Invalid preference value " + preference
+							("Invalid preference value " + preference 
 							+ ". It's supposed to be a value between 0 and 2");
+						} 
+					}
+					// in each case, we update the time and dist to go to the neighbor station
+					if(swap){
+						// for each station taken, we remember the horaire we took the train
+						if(nextTrainTime != null){
+							itineraryTimes.put(station,nextTrainTime);
 						}
+						neighborDistCountTime.setLeft(distWeight);
+						neighborDistCountTime.setMiddle(countWeight);
+						neighborDistCountTime.setRight(timeWeight);
+						MutablePair<Station,Line> statLine = new MutablePair<>(station, nData.getLine());
+						bestPreviousNeighbors.put(neighborStation, statLine);
 					}
-				}
-				// in each case, we update the time and dist to go to the neighbor station
-				if(swap){
-					// for each station taken, we remember the horaire we took the train
-					if(nextTrainTime != null){
-						itineraryTimes.put(station,nextTrainTime);
-					}
-					neighborDistCountTime.setLeft(distWeight);
-					neighborDistCountTime.setMiddle(countWeight);
-					neighborDistCountTime.setRight(timeWeight);
-					MutablePair<Station,Line> statLine = new MutablePair<>(station, nData.getLine());
-					bestPreviousNeighbors.put(neighborStation, statLine);
 				}
 			}
 		});
@@ -324,19 +328,22 @@ public class Itinerary{
 				Long time = distCountTimeToStart.get(s2).getRight();
 				switch (preference) {
 					case 0 -> {
-						if (dist < minDist) {
+						if(Double.compare(dist, minDist)<=0 && Integer.compare(count,minCount)<0){
+							minCount = count;
 							minDist = dist;
 							res = tmp;
 						}
 					}
-					case 2 -> {
-						if (count < minCount) {
+
+					case 1 -> {
+						if(Integer.compare(count,minCount)<0){
 							minCount = count;
 							res = tmp;
 						}
 					}
-					case 1 -> {
-						if (time < minTime) {
+					case 2 -> {
+						if (Long.compare(time,minTime)<=0 && Integer.compare(count,minCount)<0) {
+							minCount = count;
 							minTime = time;
 							res = tmp;
 						}
@@ -345,8 +352,10 @@ public class Itinerary{
 							("Invalid preference value " + preference
 									+ ". It's supposed to be a value between 0 and 2");
 				}
+				System.out.println(count+" "+time+" "+dist);
 			}
 		}
+		System.out.println(minCount+" "+minTime+" ");
 		return res;
 	}
 
@@ -378,7 +387,7 @@ public class Itinerary{
 		return lineRes;
 	}
 
-	public LinkedList<LocalTime> getTimes(HashMap<Station, Line> res){
+	public LinkedList<LocalTime> getDates(HashMap<Station, Line> res){
 		LinkedList<LocalTime> timeRes = new LinkedList<>();
 		for(Station s : res.keySet()){
 			timeRes.add(itineraryTimes.get(s));
