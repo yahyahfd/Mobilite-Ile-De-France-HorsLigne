@@ -163,7 +163,8 @@ public class TerminalApplication {
                     System.out.println("\nNo station with the name " + station2 + " was found !");
                     System.out.println("Try again!");
                 }
-            } else if (chosen_2 == chosen_1) {
+            }
+            if (chosen_2.containsAll(chosen_1)) {
                 System.out.println("This is your start station, please enter another!");
                 chosen_2 = null;
                 station2 = "";
