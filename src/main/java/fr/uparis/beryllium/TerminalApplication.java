@@ -2,15 +2,22 @@ package fr.uparis.beryllium;
 
 import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.exceptions.QuitException;
+import fr.uparis.beryllium.model.Itinerary;
+import fr.uparis.beryllium.model.Line;
 import fr.uparis.beryllium.model.Map;
-import fr.uparis.beryllium.model.*;
+import fr.uparis.beryllium.model.Parser;
+import fr.uparis.beryllium.model.Station;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.MutableTriple;
 
 import java.time.Duration;
 import java.time.LocalTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.Scanner;
 
 import static java.lang.Character.toLowerCase;
 
@@ -368,8 +375,6 @@ public class TerminalApplication {
         // get the shortest way depending on the preference
         LocalTime timeWeLeft = LocalTime.now();
         HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
-        HashMap<Station, MutableTriple<Double, Integer, Long>> distCountTimeToStart = i.getDistCountTimeToStart();
-        HashMap<Station, LocalTime> itineraryTimes = i.getItineraryTimes();
         // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
         // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
         // We add the method (the algorithm) to look for the path
@@ -377,7 +382,7 @@ public class TerminalApplication {
             System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.get(0).getName() + "\u001B[0m to \u001B[31m" + chosen_2.get(0).getName() + "\u001B[0m");
         } else {
             System.out.println("Route to go from \u001B[31m" + chosen_1.get(0).getName() + "\u001B[0m to \u001B[31m" + chosen_2.get(0).getName() + "\u001B[0m :\n");
-            System.out.println(showPath(route, distCountTimeToStart, itineraryTimes, timeWeLeft));
+            System.out.println(showPath(route, timeWeLeft, i));
         }
         // if we added temporary station, we remove them of the list of stations
         if (localpositionStart) {
@@ -392,13 +397,12 @@ public class TerminalApplication {
     /**
      * Show the shortest way to go from a station to another
      *
-     * @param res                  Res of the algorithm
-     * @param distCountTimeToStart couples of distances and time for stations
-     * @param itineraryTimes       couple of stations and time
-     * @param timeWeLeft           the time we left
+     * @param res        Res of the algorithm
+     * @param timeWeLeft the time we left
+     * @param itinerary  the itinerary
      * @return a string of the stations and line in order
      */
-    private static String showPath(HashMap<Station, Line> res, HashMap<Station, MutableTriple<Double, Integer, Long>> distCountTimeToStart, HashMap<Station, LocalTime> itineraryTimes, LocalTime timeWeLeft) {
+    private static String showPath(HashMap<Station, Line> res, LocalTime timeWeLeft, Itinerary itinerary) {
         ArrayList<Station> stationRes = new ArrayList<>();
         ArrayList<Line> lineRes = new ArrayList<>();
         StringBuilder path = new StringBuilder();
@@ -422,13 +426,13 @@ public class TerminalApplication {
             path.append(blue_bold).append("Heure de départ: ").append(timeWeLeft).append("\n");
             while (i < stationRes.size()) {
                 if (i == 0) {
-                    MutableTriple<Double, Integer, Long> distCountTimeFromDestination = distCountTimeToStart.get(stationRes.get(stationRes.size() - 1));
+                    MutableTriple<Double, Integer, Long> distCountTimeFromDestination = itinerary.getDistCountTimeToStart().get(stationRes.get(stationRes.size() - 1));
                     Duration d = Duration.ZERO;
                     d = d.plusMillis(distCountTimeFromDestination.getRight());
                     path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distCountTimeFromDestination.getLeft()).append("km.\n");
-                    distTime = getDistTimeForALine(stationRes, lineRes, i, distCountTimeToStart);
+                    distTime = itinerary.getDistTimeForALine(stationRes, lineRes, i);
                     path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
-                    LocalTime horaire = itineraryTimes.get(stationRes.get(i));
+                    LocalTime horaire = itinerary.getItineraryTimes().get(stationRes.get(i));
                     path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName());
                     if (horaire != null && !Objects.equals(lineRes.get(i).getName(), "--MARCHE--")) {
                         path.append(" - ").append(horaire);
@@ -437,10 +441,10 @@ public class TerminalApplication {
                 } else {
                     if (i != 1) {
                         if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
-                            MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i - 1, distCountTimeToStart);
+                            MutablePair<Double, Long> tempDistTime = itinerary.getDistTimeForALine(stationRes, lineRes, i - 1);
                             path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
                             path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName());
-                            LocalTime horaire = itineraryTimes.get(stationRes.get(i - 1));
+                            LocalTime horaire = itinerary.getItineraryTimes().get(stationRes.get(i - 1));
                             if (horaire != null && !Objects.equals(lineRes.get(i).getName(), "--MARCHE--")) {
                                 path.append(" - ").append(horaire);
                             }
@@ -464,37 +468,6 @@ public class TerminalApplication {
         }
         return path.toString();
     }
-
-    /**
-     * Get distance and time traveled on a line
-     *
-     * @param stationRes           list of all the station
-     * @param lineRes              list of all the line
-     * @param position             the position of the station in the stationRes
-     * @param distCountTimeToStart couples of distances and time for stations
-     * @return a couple of distance/time which represent the distance and time to travel the line of the station at the position
-     */
-    private static MutablePair<Double, Long> getDistTimeForALine(ArrayList<Station> stationRes, ArrayList<Line> lineRes, int position, HashMap<Station, MutableTriple<Double, Integer, Long>> distCountTimeToStart) {
-
-        MutableTriple<Double, Integer, Long> distTimeStart = new MutableTriple<>(0.0, 0, 0L);
-        if (position != 0) {
-            distTimeStart = distCountTimeToStart.get(stationRes.get(position));
-        }
-        int tempPos = position + 2;
-        while (tempPos < stationRes.size()) {
-            if (lineRes.get(position + 1) != lineRes.get(tempPos)) break;
-            tempPos++;
-        }
-        MutableTriple<Double, Integer, Long> distTimeDestination = distCountTimeToStart.get(stationRes.get(tempPos - 1));
-        MutablePair<Double, Long> result = new MutablePair<>();
-        result.setLeft(distTimeDestination.getLeft() - distTimeStart.getLeft());
-        Duration d = Duration.ZERO;
-        d = d.plusMillis(distTimeDestination.getRight() - distTimeStart.getRight());
-        result.setRight(d.toMinutes() + 1); // 40s => 1min pour arrondir
-        return result;
-    }
-
-
 
 
     /**

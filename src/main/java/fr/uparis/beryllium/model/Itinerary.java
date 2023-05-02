@@ -5,8 +5,13 @@ import org.apache.commons.lang3.tuple.MutableTriple;
 
 import java.time.Duration;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
 import java.util.Map;
-import java.util.*;
+import java.util.Objects;
 
 /**
  * Our Itinerary computing class.
@@ -135,8 +140,8 @@ public class Itinerary{
 					}
 				}
 				default -> throw new IllegalArgumentException
-				("Invalid preference value " + preference
-						+ ". It's supposed to be a value between 0 and 2");
+						("Invalid preference value " + preference
+								+ ". It's supposed to be a value between 0 and 2");
 			}
 		}
 		return resultStation;
@@ -205,8 +210,8 @@ public class Itinerary{
 						if (timeWeight < neighborDistCountTime.getRight()) swap = true;
 					}
 					default -> throw new IllegalArgumentException
-					("Invalid preference value " + preference
-					+ ". It's supposed to be a value between 0 and 2");
+							("Invalid preference value " + preference
+									+ ". It's supposed to be a value between 0 and 2");
 				}
 				// in each case, we update the time and dist to go to the neighbor station
 				if(swap){
@@ -342,14 +347,14 @@ public class Itinerary{
 		return res;
 	}
 
-    /**
+	/**
 	 * This method is used to return an ordered list of all stations in a path
 	 *
 	 * @param res HashMap of the path calculated by shortestWay Method
 	 * @return An ordered list of stations in the path (can be empty)
 	 */
 	public LinkedList<Station> getPathStations(HashMap<Station, Line> res){
-		if(res == null){
+		if (res == null) {
 			return new LinkedList<>();
 		}
 
@@ -359,8 +364,8 @@ public class Itinerary{
 		return stationRes;
 	}
 
-	public LinkedList<Line> getPathLines(HashMap<Station, Line> res){
-		if(res == null){
+	public LinkedList<Line> getPathLines(HashMap<Station, Line> res) {
+		if (res == null) {
 			return new LinkedList<>();
 		}
 
@@ -368,6 +373,34 @@ public class Itinerary{
 		Collections.reverse(lineRes);
 
 		return lineRes;
+	}
+
+	/**
+	 * Get distance and time traveled on a line
+	 *
+	 * @param stationRes list of all the station
+	 * @param lineRes    list of all the line
+	 * @param position   the position of the station in the stationRes
+	 * @return a couple of distance/time which represent the distance and time to travel the line of the station at the position
+	 */
+	public MutablePair<Double, Long> getDistTimeForALine(ArrayList<Station> stationRes, ArrayList<Line> lineRes, int position) {
+
+		MutableTriple<Double, Integer, Long> distTimeStart = new MutableTriple<>(0.0, 0, 0L);
+		if (position != 0) {
+			distTimeStart = this.distCountTimeToStart.get(stationRes.get(position));
+		}
+		int tempPos = position + 2;
+		while (tempPos < stationRes.size()) {
+			if (lineRes.get(position + 1) != lineRes.get(tempPos)) break;
+			tempPos++;
+		}
+		MutableTriple<Double, Integer, Long> distTimeDestination = this.distCountTimeToStart.get(stationRes.get(tempPos - 1));
+		MutablePair<Double, Long> result = new MutablePair<>();
+		result.setLeft(distTimeDestination.getLeft() - distTimeStart.getLeft());
+		Duration d = Duration.ZERO;
+		d = d.plusMillis(distTimeDestination.getRight() - distTimeStart.getRight());
+		result.setRight(d.toMinutes() + 1); // 40s => 1min pour arrondir
+		return result;
 	}
 
 
