@@ -123,7 +123,7 @@ public class TerminalApplication {
             if (station1.trim().equalsIgnoreCase("quit")) break;
             if (station1.trim().equalsIgnoreCase("lp")) break;
             chosen_1 = m.getStationsByName(station1);
-            if (chosen_1.size() == 0) {
+            if (chosen_1.size() == 0 && !station1.isEmpty()) {
                 ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1), m.getStations());
                 if (!list_1.isEmpty()) {
                     chosen_1 = multi_choice_similar(m, list_1, scanner);
@@ -155,7 +155,7 @@ public class TerminalApplication {
             if (station2.trim().equalsIgnoreCase("quit")) break;
             if (station2.trim().equalsIgnoreCase("lp")) break;
             chosen_2 = m.getStationsByName(station2);
-            if (chosen_2.size() == 0) {
+            if (chosen_2.size() == 0 && !station2.isEmpty()) {
                 ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2), m.getStations());
                 if (!list_2.isEmpty()) {
                     chosen_2 = multi_choice_similar(m, list_2, scanner);
@@ -163,7 +163,7 @@ public class TerminalApplication {
                     System.out.println("\nNo station with the name " + station2 + " was found !");
                     System.out.println("Try again!");
                 }
-            }else if(chosen_2 == chosen_1){
+            } else if (chosen_2 == chosen_1) {
                 System.out.println("This is your start station, please enter another!");
                 chosen_2 = null;
                 station2 = "";
