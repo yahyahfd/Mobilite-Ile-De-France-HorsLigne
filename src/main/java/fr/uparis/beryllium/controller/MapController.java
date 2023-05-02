@@ -76,10 +76,12 @@ public class MapController {
   public void shortestWay(@RequestParam String depart, @RequestParam String arrivee,
                                  @RequestParam Integer preference, HttpServletResponse response) throws FormatException {
     try {
+      LocalTime timeWeLeft = LocalTime.now();
+      // LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
-        LocalTime timeWeLeft = LocalTime.now();
+
         shortestPath = itinerary.shortestMultiplePaths(start, dest, preference, timeWeLeft);
       }
 
@@ -90,6 +92,20 @@ public class MapController {
       jsonObject.put("stations", itinerary.getPathStations(shortestPath));
       jsonObject.put("lines", itinerary.getPathLines(shortestPath));
 
+      jsonObject.put("times",itinerary.getTimes(shortestPath));
+      jsonObject.put("distCountTime",itinerary.getDistCountTimes(shortestPath));
+      jsonObject.put("startingtime",timeWeLeft);
+
+      jsonObject.put("distTimeLines",itinerary.getDistTimesForLines(shortestPath));
+
+      
+      // heure de départ
+      // --trajet durée totale ~ distance totale
+      // durée ligne + distance ligne
+      // heure de départ pour chaque station
+      // stocker horaire totale
+      // stocker distance totale
+      // stocker heure à laquelle on prend chaque train?
       String responseString = pathMapper.writeValueAsString(jsonObject);
 
       response.setContentType("application/json");

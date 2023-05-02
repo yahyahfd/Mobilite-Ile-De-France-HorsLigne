@@ -212,31 +212,46 @@ form.addEventListener('submit', function (event) {
 
                 var nextStation = null;
                 var length = data['stations'].length;
-
+                var dates = data['times'];
+                var distCountTime = data['distCountTime'];
+                var dist_totale = distCountTime[length-1].left;
+                var time_totale = distCountTime[length-1].right;
+                itinerary.innerHTML += "<span class='station_name'>-- Trajet : "+time_totale+" min. ~ "+dist_totale+" Km.</span>";
+                // var distTimeLines = data['distTimeLines'];
                 // We place each station on the map and draw a line between each two consecutive stations
+                // var previousLineName = null;
                 for (let i = 0; i < length-1; i++) {
 
                     var station = data['stations'][i];
                     var line = data['lines'][i+1];
 
+                    var date = dates[i];
                     nextStation = data['stations'][i+1];
                     var nextStationName = nextStation.name;
                 
                     var stationName = station.name;
                     var lineName = line.lineNameWithoutVariant;
-                    
+                    // if(lineName != previousLineName){ // On print la durée totale de la ligne
+                    //     var distTimeLine = distTimeLines.pop;
+                    //     var distLine = distTimeLine.left;
+                    //     var timeLine = distTimeLine.right;
+                    //     console.log(lineName+"---------");
+                    //     console.log(distLine);
+                    //     console.log(timeLine);
+                    //     previousLineName = lineName;
+                    // }
 
-                    if(! isDrawed) {
-                        itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 
-                        stationName + '</span>';
-                                        
-
+                    if(! isDrawed) {                                        
                         if (station != data['stations'][length - 1]) {
                             let lineNumber = "<span id='linename'>&nbsp;"+lineName+"</span>";
                             if(lineName == '--MARCHE--') {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i>"+lineNumber+"</span>";
+                                itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
+                                "</span><span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i>"+
+                                lineNumber+"</span>";
                             } else {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+lineNumber+"</span>";
+                                itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
+                                " - take the train at "+ date+ "</span><span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+
+                                lineNumber+"</span>";
                             }
                                 
                             const idLine = document.getElementById('line');

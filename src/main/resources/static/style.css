@@ -17,11 +17,34 @@
 	font-display: block;
 	src: url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.woff2) format("woff2"), url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.ttf) format("truetype")
 }
-
+@keyframes fa-beat {
+  0%, 90% {
+    -webkit-transform: scale(1);
+            transform: scale(1); }
+  45% {
+    -webkit-transform: scale(var(--fa-beat-scale, 1.25));
+            transform: scale(var(--fa-beat-scale, 1.25)); } }
+            
 /* Styling fontawesome SVGs (imported) */
 .fa-location-dot:before{content:"\f3c5"}
 .fa-chevron-left:before{content:"\f053"}
 .fa-down-long:before{content:"\f309"}
+.fa-train::before {content: "\f238"; }
+
+
+.fa-beat {
+  -webkit-animation-name: fa-beat;
+          animation-name: fa-beat;
+  -webkit-animation-delay: var(--fa-animation-delay, 0s);
+          animation-delay: var(--fa-animation-delay, 0s);
+  -webkit-animation-direction: var(--fa-animation-direction, normal);
+          animation-direction: var(--fa-animation-direction, normal);
+  -webkit-animation-duration: var(--fa-animation-duration, 1s);
+          animation-duration: var(--fa-animation-duration, 1s);
+  -webkit-animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+          animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  -webkit-animation-timing-function: var(--fa-animation-timing, ease-in-out);
+          animation-timing-function: var(--fa-animation-timing, ease-in-out); }
 
 .fa-location-dot {
   font-size: 1.2rem;
