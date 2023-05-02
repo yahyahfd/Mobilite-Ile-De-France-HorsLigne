@@ -72,38 +72,68 @@ const itinerary = document.getElementById('itinerary');
 const drawing_menu = document.getElementById('second_left');
 const main_menu = document.getElementById('first_left');
 const schedules = document.getElementById('schedules');
-var schedules_html = schedules.innerHTML;
 const schedules_form = document.getElementById('schedule_form');
 
 let isDrawed = false;
 
 
-const schedules_btn = document.getElementById('schedules_btn');
-console.log(schedules_btn);
-schedules_btn.addEventListener('click', function () {
-    console.log("schedules_btn clicked");
-    let h2 = document.getElementById('sc_h2');
-    h2.style.marginTop = "200px";
-    if(schedules_form.style.display == "none" || schedules_form.style.display == "") {
-        schedules_form.style.display = "grid";
-    } else {
-        schedules_form.style.display = "none";
-    }
-});
-
 const table_sc = document.getElementById('table_schedules');
 
 schedules_form.addEventListener('submit', function (event) {
     event.preventDefault();
-    const station_sc = document.getElementById('station_sc').value;
-    const line_sc = document.getElementById('line_sc').value;
+    const station_list = document.getElementById('station-list');
+    const line_list = document.getElementById('line-list');
+    const station_sc_input = document.getElementById('station_sc');
+    autoComplete(station_sc_input, station_list,departList)
+    const line_sc_input = document.getElementById('line_sc');
 
-    const url = `/schedules?station=${station_sc}&line=${line_sc}`;
+    const station_sc = encodeURIComponent(station_sc_input.value);
+    const line_sc = encodeURIComponent(line_sc_input.value);
+
+    const horairesTable = document.createElement('table');
+    const horairesTableHead = document.createElement('thead');
+    const trhead = document.createElement('tr');
+    const horairesTableBody = document.createElement('tbody');
+
+    const win = window.open('', 'Schedules', 'width='+screen.width+',height='+screen.height);
+
+    const url = `/schedules?stationName=${station_sc}&lineName=${line_sc}`;
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            console.log(data);
+
+            const nb_col = Math.ceil(data.length/100);
+
+            for(let i = 0; i < nb_col; i++){
+                const th = document.createElement('th');
+                th.textContent = `Colonne ${i+1}`;
+                trhead.appendChild(th);
+            }
+            horairesTableHead.appendChild(trhead);
+            horairesTable.appendChild(horairesTableHead);
+
+            let row = document.createElement('tr');
+            let i = 0;
+            data.forEach(function(horaire){
+                const cell = document.createElement('td');
+                cell.textContent = horaire;
+                row.appendChild(cell);
+                i++;
+                if(i%nb_col == 0){
+                    horairesTableBody.appendChild(row);
+                    row = document.createElement('tr');
+                }
+            });
+            horairesTableBody.appendChild(row);
+
+            horairesTable.appendChild(horairesTableBody);
+
+            win.document.body.appendChild(horairesTable);
+            
+            //stylé le tableau
+            win.document.body.style.backgroundColor = "#93a897";
+
         })
         .catch(error => console.error(error));
 
@@ -115,7 +145,6 @@ back_button.addEventListener('click', function () {
     main_menu.style.display = 'block';
     drawing_menu.style.display = 'none';
     itinerary.innerHTML = '';
-    schedules.innerHTML = schedules_html;
     map.setView([48.856614, 2.3522219], 13);
     map.removeLayer(itineraryLayer);
     map.addLayer(markersLayer);
@@ -126,8 +155,6 @@ back_button.addEventListener('click', function () {
 });
 
 form.addEventListener('submit', function (event) {
-
-    schedules.innerHTML = '';
 
     event.preventDefault();
 
