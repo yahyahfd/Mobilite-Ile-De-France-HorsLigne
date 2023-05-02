@@ -95,44 +95,52 @@ schedules_form.addEventListener('submit', function (event) {
     const trhead = document.createElement('tr');
     const horairesTableBody = document.createElement('tbody');
 
-    const win = window.open('', 'Schedules', 'width='+screen.width+',height='+screen.height);
-
     const url = `/schedules?stationName=${station_sc}&lineName=${line_sc}`;
 
     fetch(url)
         .then(response => response.json())
         .then(data => {
 
-            const nb_col = Math.ceil(data.length/100);
-
-            for(let i = 0; i < nb_col; i++){
-                const th = document.createElement('th');
-                th.textContent = `Colonne ${i+1}`;
-                trhead.appendChild(th);
-            }
-            horairesTableHead.appendChild(trhead);
-            horairesTable.appendChild(horairesTableHead);
-
-            let row = document.createElement('tr');
-            let i = 0;
-            data.forEach(function(horaire){
-                const cell = document.createElement('td');
-                cell.textContent = horaire;
-                row.appendChild(cell);
-                i++;
-                if(i%nb_col == 0){
-                    horairesTableBody.appendChild(row);
-                    row = document.createElement('tr');
-                }
-            });
-            horairesTableBody.appendChild(row);
-
-            horairesTable.appendChild(horairesTableBody);
-
-            win.document.body.appendChild(horairesTable);
+            if(data.length == 0){
             
-            //stylé le tableau
-            win.document.body.style.backgroundColor = "#93a897";
+                window.alert("Aucun horaire n'a été trouvé pour cette station et cette ligne, il se peut que la ligne ne passe pas par cette station ou que la station n'existe pas.");
+            
+            } else {
+
+                const win = window.open('', 'Schedules', 'width='+screen.width+',height='+screen.height);
+
+                const nb_col = Math.ceil(data.length/100);
+
+                for(let i = 0; i < nb_col; i++){
+                    const th = document.createElement('th');
+                    th.textContent = `Colonne ${i+1}`;
+                    trhead.appendChild(th);
+                }
+                horairesTableHead.appendChild(trhead);
+                horairesTable.appendChild(horairesTableHead);
+    
+                let row = document.createElement('tr');
+                let i = 0;
+                data.forEach(function(horaire){
+                    const cell = document.createElement('td');
+                    cell.textContent = horaire;
+                    row.appendChild(cell);
+                    i++;
+                    if(i%nb_col == 0){
+                        horairesTableBody.appendChild(row);
+                        row = document.createElement('tr');
+                    }
+                });
+                horairesTableBody.appendChild(row);
+    
+                horairesTable.appendChild(horairesTableBody);
+    
+                win.document.body.appendChild(horairesTable);
+                
+                //stylé le tableau
+                win.document.body.style.backgroundColor = "#93a897";
+
+            }
 
         })
         .catch(error => console.error(error));

@@ -6,6 +6,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
+
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
@@ -18,6 +21,8 @@ import net.minidev.json.JSONObject;
 
 @RestController
 public class MapController {
+
+  private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
   /**
    * We stock our filled map here
@@ -41,6 +46,7 @@ public class MapController {
    * is launched. Is used to initialize all the needed attributes
    */
   public MapController() throws FormatException {
+    LOGGER.info("Loading data...");
     Map m = Parser.readMap("map_data.csv");
     map = Parser.readMapHoraire("newtimetables.csv", m);
     stations = map.getStations();

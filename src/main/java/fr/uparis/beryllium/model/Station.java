@@ -288,25 +288,6 @@ public class Station {
         return Math.sqrt(Math.pow(x - x0, 2.0) + Math.pow(y - y0, 2.0));
     }
 
-    /**
-     * Remove all occurrences of the temporary station which was added
-     *
-     * @param allStations all the stations
-     * @param radius distance between the two stations
-     * @param start location of the starting point
-     * @param dest location of the destination point
-     */
-    public void removeWalkingNeighbours(ArrayList<Station> allStations, double radius, Location start, Location dest) {
-        // get all stations where we added the temporary station
-        // Pas correct, si on veut retirer toutes les stations temporaires rajoutée
-        // Il faut supprimer toutes les stations dont le nom de line est marche
-        List<Station> reacheable1kmStations = allStations.stream().filter(s -> 
-        (this.isWithinARadius(radius, s.location) && !this.sameStation(s))).toList();
-        // for all these stations, we remove the temporary station from nextstation
-        for (Station s : reacheable1kmStations) {
-            s.nextStations.remove(this);
-        }
-    }
 
     public LocalTime getNextTrainTime(Line line, LocalTime time) {
         ArrayList<LocalTime> schedule = this.getSchedulesOfLine(line);
