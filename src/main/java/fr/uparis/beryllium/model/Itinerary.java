@@ -197,21 +197,24 @@ public class Itinerary{
 				}
 				MutableTriple<Double, Integer, Long> neighborDistCountTime = distCountTimeToStart.get(neighborStation);
 				boolean swap = false;
-				switch (preference) {
-					case 0 -> {
-						// even if it's the shortest dist, if we don't have any train to go there, we don't take this road
-						if (distWeight < neighborDistCountTime.getLeft() && (timeToWait != Long.MAX_VALUE)) swap = true;
-					}
-					case 2 -> {
-						if (countWeight < neighborDistCountTime.getMiddle() && (timeToWait != Long.MAX_VALUE))
-							swap = true;
-					}
-					case 1 -> {
-						if (timeWeight < neighborDistCountTime.getRight()) swap = true;
-					}
-					default -> throw new IllegalArgumentException
+				if(neighborDistCountTime != null){
+					switch(preference){
+						case 0 ->{
+							// even if it's the shortest dist, if we don't have any train to go there, we don't take this road
+							if(distWeight<neighborDistCountTime.getLeft() && (timeToWait != Long.MAX_VALUE)) swap = true;
+						}
+						case 1 ->{
+							if(timeWeight<neighborDistCountTime.getRight()) swap = true;
+						}
+						case 2 ->{
+							if(countWeight<neighborDistCountTime.getMiddle() && (timeToWait != Long.MAX_VALUE)) swap = true;
+						}
+						default -> {
+							throw new IllegalArgumentException
 							("Invalid preference value " + preference
-									+ ". It's supposed to be a value between 0 and 2");
+							+ ". It's supposed to be a value between 0 and 2");
+						}
+					}
 				}
 				// in each case, we update the time and dist to go to the neighbor station
 				if(swap){

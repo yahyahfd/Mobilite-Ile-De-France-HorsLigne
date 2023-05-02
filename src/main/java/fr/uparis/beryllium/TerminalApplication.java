@@ -388,10 +388,12 @@ public class TerminalApplication {
         // if we added temporary station, we remove them of the list of stations
         if (localpositionStart) {
             m.removeStation(chosen_1.get(0));
+            localpositionStart = false;
         }
         if (localpositionDest) {
-            chosen_2.get(0).removeWalkingNeighbours(m.getStations(), chosen_1.get(0).getDistanceToAStation(chosen_2.get(0).getLocation()), chosen_1.get(0).getLocation(), chosen_2.get(0).getLocation());
+            chosen_2.get(0).getNextStations().clear();
             m.removeStation(chosen_2.get(0));
+            localpositionDest = false;
         }
     }
 
