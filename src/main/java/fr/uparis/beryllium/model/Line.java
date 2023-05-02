@@ -8,10 +8,10 @@ public class Line {
 
     /**
      * Name of the lane: "number.variant".
-     * 
+     *
      * @see Parser#readMap(String) details on syntax here
      */
-    private String lineName;
+    private final String lineName;
 
     /**
      * Constructor of a line.

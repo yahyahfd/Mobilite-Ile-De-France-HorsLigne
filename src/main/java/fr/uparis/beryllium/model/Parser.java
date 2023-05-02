@@ -1,19 +1,18 @@
 package fr.uparis.beryllium.model;
 
+import fr.uparis.beryllium.exceptions.FormatException;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
+import org.apache.commons.csv.CSVRecord;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
+
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.Iterator;
-
-import org.apache.commons.csv.CSVFormat;
-import org.apache.commons.csv.CSVParser;
-import org.apache.commons.csv.CSVRecord;
-import fr.uparis.beryllium.exceptions.FormatException;
-
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 public class Parser {
 
@@ -25,12 +24,11 @@ public class Parser {
      *
      * @param csvFile String of the path to the file
      * @return A map of the network described by
-     * @throws FormatException if the appropriate format isn't respected
      */
-    public static Map readMap(String csvFile) throws FormatException {
+    public static Map readMap(String csvFile) {
 
         Map map = Map.getMapInstance();
-        if(map.isMapLoaded()){
+        if (map.isMapLoaded()) {
             return map;
         }
         try {
@@ -53,7 +51,10 @@ public class Parser {
             LOGGER.error("File not found", e);
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
+        } catch (FormatException e) {
+            LOGGER.error("CSV's format is incorrect", e);
         }
+
         map.setMapLoaded();
         return map;
 
@@ -61,17 +62,17 @@ public class Parser {
 
     /**
      * Static method that is used to parse the timetables data file containing
+     *
      * @param csvFile
      * @param map
      * @return
-     * @throws FormatException
      */
 
-    public static Map readMapHoraire(String csvFile, Map map) throws FormatException{
+    public static Map readMapHoraire(String csvFile, Map map) {
 
         try {
 
-            String[] HEADERS = {"line", "station", "time","variant"};
+            String[] HEADERS = {"line", "station", "time", "variant"};
 
             Iterator<CSVRecord> it = getCsvRecordIterator(csvFile, HEADERS);
             if (!it.hasNext()) {
@@ -89,6 +90,8 @@ public class Parser {
             LOGGER.error("File not found", e);
         } catch (IOException e) {
             LOGGER.error("Error while reading the file", e);
+        } catch (FormatException e) {
+            LOGGER.error("CSV's format is incorrect", e);
         }
 
         return map;
@@ -106,7 +109,7 @@ public class Parser {
         CSVRecord record = it.next();
 
         String stationString = record.get("station");
-        String time[] = record.get("time").split(":");
+        String[] time = record.get("time").split(":");
         String variant = record.get("variant");
         String lineString = record.get("line") + "." + variant;
         Line line = map.searchLine(lineString);
@@ -119,7 +122,6 @@ public class Parser {
             s.propagateSchedules(timeOfStation[0], line);
         }
     }
-
 
     /**
      * Static method that is used to fill the map with the data extracted from the csv file
@@ -144,30 +146,21 @@ public class Parser {
         // Add line with variant in the name
         String newLinename = lineInCsv[0] + "." + lineInCsv[2];
         Line line = map.searchLine(newLinename);
-        line = line == null?map.addLine(lineInCsv[0] + "." + lineInCsv[2]):line;
+        line = line == null ? map.addLine(lineInCsv[0] + "." + lineInCsv[2]) : line;
 
         // If they exist, search function returns their object in map's lists
         // Else, it creates a new object, put it in map's lists and return it
         Station stat1 = map.searchStation(firstStation, firstStationLocation);
         Station stat2 = map.searchStation(secondStation, secondStationLocation);
 
-        // Add station to line's list
-        // addStation verify if the station is already in the list or not
-        // line.addStation(stat1);
-        // line.addStation(stat2);
-
         // Add neighbours
         Line walkingLine = new Line("--MARCHE--");
         int radius1km = 1;
-        // for(String s: duration){
-        //     System.out.println(s);
-        // }
-        /*à revoir */
-        /* */   stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance) / 10, false);
-        /* */   stat1.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
-        /* */   stat2.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
-        /*à revoir */
-   
+        stat1.addNextStation(stat2, line, duration, Double.parseDouble(distance) / 10, false);
+        stat1.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
+        stat2.addWalkingNeighbours(walkingLine, map.getStations(), radius1km, false);
+
+
     }
 
     /**

@@ -2,8 +2,6 @@ package fr.uparis.beryllium.model;
 
 import fr.uparis.beryllium.exceptions.FormatException;
 import org.apache.commons.lang3.tuple.MutableTriple;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 import org.junit.jupiter.api.Test;
 
 import java.time.LocalTime;
@@ -13,8 +11,6 @@ import java.util.HashMap;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 public class ItineraryTest {
-
-    private static final Logger LOGGER = LogManager.getLogger(ItineraryTest.class);
 
     @Test
     public void testItineraryConstructor(){
@@ -32,7 +28,7 @@ public class ItineraryTest {
         stations.add(new Station("goal",new Location(9, 10)));
         stations.add(new Station("goal",new Location(8, 10)));
         stations.add(new Station("goal",new Location(11, 10)));
-        
+
         Itinerary itinerary = new Itinerary(stations);
         assertNotNull(itinerary, "Itinerary wasn't initialized correctly");
         assertEquals(stations,itinerary.getAllStations());
@@ -57,8 +53,6 @@ public class ItineraryTest {
         assertNotNull(path_1);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_1, timeWeLeft));
-        
         ArrayList<Station> stations_1 = new ArrayList<>(path_1.keySet());
         assertEquals(3, distCountTime.get(stations_1.get(0)).getMiddle());
 
@@ -73,7 +67,6 @@ public class ItineraryTest {
         assertNotNull(path_2);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_2, timeWeLeft));
 
         ArrayList<Station> stations_2 = new ArrayList<>(path_2.keySet());
         assertEquals(8.598552886278775, distCountTime.get(stations_2.get(0)).getLeft());
@@ -84,7 +77,6 @@ public class ItineraryTest {
         assertNotNull(path_3);
 
         //List is reverse, a first element is the end of the path found
-        LOGGER.info(itinerary.showPath(path_3, timeWeLeft));
 
         ArrayList<Station> stations_3 = new ArrayList<>(path_3.keySet());
         assertEquals(400008, distCountTime.get(stations_3.get(0)).getRight());

@@ -13,11 +13,13 @@ public class NeighborData {
      * from our starting station.
      */
     private Line line;
+
     /**
      * The time it takes to reach this station
      * from our starting station.
      */
     private final Duration duration;
+
     /**
      * The distance between our starting station
      * and this station. 
@@ -85,13 +87,6 @@ public class NeighborData {
      */
     public Double getDistance() {
         return distance;
-    }
-
-    // Pas nécessaire ? on peut juste faire un println(line) ou line.toString là où on veut etc
-    // Changer le toString pour qu'il soit plus parlant
-    // (Line,time,distance)
-    public String toString(){
-        return line.getName() + " " ;
     }
 
 }
