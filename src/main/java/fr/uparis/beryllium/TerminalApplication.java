@@ -120,8 +120,8 @@ public class TerminalApplication {
             if (station1.isEmpty()) {
                 System.out.println("Empty String, try again");
             }
-            if (station1.trim().equalsIgnoreCase("quit")) break;
-            if (station1.trim().equalsIgnoreCase("lp")) break;
+            if (station1.trim().equalsIgnoreCase("quit") ||
+                    station1.trim().equalsIgnoreCase("lp")) break;
             chosen_1 = m.getStationsByName(station1);
             if (chosen_1.size() == 0 && !station1.isEmpty()) {
                 ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1), m.getStations());
@@ -152,8 +152,8 @@ public class TerminalApplication {
             if (station2.isEmpty()) {
                 System.out.println("Empty String");
             }
-            if (station2.trim().equalsIgnoreCase("quit")) break;
-            if (station2.trim().equalsIgnoreCase("lp")) break;
+            if (station2.trim().equalsIgnoreCase("quit") ||
+                    station2.trim().equalsIgnoreCase("lp")) break;
             chosen_2 = m.getStationsByName(station2);
             if (chosen_2.size() == 0 && !station2.isEmpty()) {
                 ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2), m.getStations());
@@ -534,11 +534,7 @@ public class TerminalApplication {
      * @return true if the choice is correct
      */
     private static boolean isChoiceStationCorrect(String choice, Map m) {
-        if (m.getStationsByName(choice).size() == 0) {
-            return false;
-        } else {
-            return choice.equals("quit");
-        }
+        return m.getStationsByName(choice).size() != 0;
     }
 
     /**
