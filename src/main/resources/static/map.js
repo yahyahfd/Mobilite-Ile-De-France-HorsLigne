@@ -232,9 +232,7 @@ form.addEventListener('submit', function (event) {
                 console.log(endingtime);
                 itinerary.innerHTML += "<div class='station_name'>"+startingtime+" - "+endingtime+
                 "<span class='span_time'>&nbsp;("+time_total+" min ~ "+dist_total+" Km)</span></div>";
-                // var distTimeLines = data['distTimeLines'];
                 // We place each station on the map and draw a line between each two consecutive stations
-                // var previousLineName = null;
                 for (let i = 0; i < length-1; i++) {
 
                     var station = data['stations'][i];
@@ -245,15 +243,6 @@ form.addEventListener('submit', function (event) {
                 
                     var stationName = station.name;
                     var lineName = line.lineNameWithoutVariant;
-                    // if(lineName != previousLineName){ // On print la durée totale de la ligne
-                    //     var distTimeLine = distTimeLines.pop;
-                    //     var distLine = distTimeLine.left;
-                    //     var timeLine = distTimeLine.right;
-                    //     console.log(lineName+"---------");
-                    //     console.log(distLine);
-                    //     console.log(timeLine);
-                    //     previousLineName = lineName;
-                    // }
                     if(! isDrawed) {                                        
                         if (station != data['stations'][length - 1]) {
                             let lineNumber = "<span id='linename'>&nbsp;"+lineName+"</span>";

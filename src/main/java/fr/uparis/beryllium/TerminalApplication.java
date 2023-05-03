@@ -39,7 +39,7 @@ public class TerminalApplication {
 
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
-        System.out.println("\033[1;30mLoading data...\u001B[0m");
+        System.out.println("\033[1;30mLoading data... Might take some time...\u001B[0m");
 
         //we parse the map
         Map m = Parser.readMap("map_data.csv");
@@ -166,7 +166,7 @@ public class TerminalApplication {
             }
             if (chosen_2.containsAll(chosen_1)) {
                 System.out.println("This is your start station, please enter another!");
-                chosen_2 = null;
+                chosen_2.clear();
                 station2 = "";
             }
         }

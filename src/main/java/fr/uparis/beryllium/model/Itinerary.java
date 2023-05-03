@@ -203,15 +203,38 @@ public class Itinerary{
 					switch(preference){
 						case 0 ->{
 							// even if it's the shortest dist, if we don't have any train to go there, we don't take this road
-							if(Double.compare(distWeight,neighborDistCountTime.getLeft())<0 
-							&& (Long.compare(timeToWait, Long.MAX_VALUE)!=0)) swap = true;
+							// or if same distance, but better time, we take it
+							if(
+								(Long.compare(timeToWait, Long.MAX_VALUE)!=0) 
+								&& 
+								(
+									(Double.compare(distWeight,neighborDistCountTime.getLeft())<0)
+									|| 
+									(
+										(Double.compare(distWeight,neighborDistCountTime.getLeft())== 0)
+										&& 
+										(Long.compare(timeWeight,neighborDistCountTime.getRight())<0)
+									)
+								)
+							)swap = true;
 						}
 						case 1 ->{
 							if(Long.compare(timeWeight,neighborDistCountTime.getRight())<0) swap = true;
 						}
 						case 2 ->{
-							if(Integer.compare(countWeight,neighborDistCountTime.getMiddle())<0 
-							&& (Long.compare(timeToWait, Long.MAX_VALUE)!=0)) swap = true;
+							if(
+								(Long.compare(timeToWait, Long.MAX_VALUE)!=0)
+								&&
+								(
+									(Integer.compare(countWeight,neighborDistCountTime.getMiddle())<0)
+									|| 
+									(
+										(Double.compare(countWeight,neighborDistCountTime.getMiddle())== 0)
+										&&
+										(Long.compare(timeWeight,neighborDistCountTime.getRight())<0)
+									)
+								)
+							) swap = true;
 						}
 						default -> {
 							throw new IllegalArgumentException
@@ -319,6 +342,8 @@ public class Itinerary{
 		double minDist = Double.MAX_VALUE;
 		Integer minCount = Integer.MAX_VALUE;
 		Long minTime = Long.MAX_VALUE;
+		HashMap<Station, MutableTriple<Double, Integer, Long>> dataToStart = new HashMap<>();
+		HashMap<Station, LocalTime> dataTimes = new HashMap<>();
 		for (Station s1 : start) {
 			for (Station s2 : dest) {
 				HashMap<Station, Line> tmp = shortestWay(s1, s2, preference, timeWeLeft);
@@ -328,8 +353,11 @@ public class Itinerary{
 				Long time = distCountTimeToStart.get(s2).getRight();
 				switch (preference) {
 					case 0 -> {
-						if(Double.compare(dist, minDist)<=0 && Integer.compare(count,minCount)<0){
-							minCount = count;
+						if(Double.compare(dist, minDist)<0){
+							dataToStart.clear();
+							dataToStart.putAll(distCountTimeToStart);
+							dataTimes.clear();
+							dataTimes.putAll(itineraryTimes);
 							minDist = dist;
 							res = tmp;
 						}
@@ -337,12 +365,20 @@ public class Itinerary{
 
 					case 1 -> {
 						if(Integer.compare(count,minCount)<0){
+							dataToStart.clear();
+							dataToStart.putAll(distCountTimeToStart);
+							dataTimes.clear();
+							dataTimes.putAll(itineraryTimes);
 							minCount = count;
 							res = tmp;
 						}
 					}
 					case 2 -> {
 						if (Long.compare(time,minTime)<=0 && Integer.compare(count,minCount)<0) {
+							dataToStart.clear();
+							dataToStart.putAll(distCountTimeToStart);
+							dataTimes.clear();
+							dataTimes.putAll(itineraryTimes);
 							minCount = count;
 							minTime = time;
 							res = tmp;
@@ -352,10 +388,12 @@ public class Itinerary{
 							("Invalid preference value " + preference
 									+ ". It's supposed to be a value between 0 and 2");
 				}
-				System.out.println(count+" "+time+" "+dist);
 			}
 		}
-		System.out.println(minCount+" "+minTime+" ");
+		distCountTimeToStart.clear();
+		distCountTimeToStart.putAll(dataToStart);
+		itineraryTimes.clear();
+		itineraryTimes.putAll(dataTimes);
 		return res;
 	}
 
@@ -408,114 +446,6 @@ public class Itinerary{
 		}
 		Collections.reverse(distCountTimes);
 		return distCountTimes;
-	}
-
-	public LinkedList<MutableTriple<Double,Integer,Long>> getDistTimesForLines(HashMap<Station, Line> res){
-		LinkedList<MutableTriple<Double,Integer,Long>> result = new LinkedList<>();
-		LinkedList<String> linesVisited = new LinkedList<>();
-		res.forEach((station,line)->{
-			if(line.getLineNameWithoutVariant().equals(linesVisited.peekLast())){
-				MutableTriple<Double,Integer,Long> tmp = result.removeLast();
-				MutableTriple<Double,Integer,Long> tmp2 = distCountTimeToStart.get(station);
-				tmp.setLeft(Double.sum(tmp.getLeft(),tmp2.getLeft()));
-				tmp.setMiddle(Integer.sum(tmp.getMiddle(),tmp2.getMiddle()));
-				tmp.setRight(Long.sum(tmp.getRight(),tmp2.getRight()));
-				result.add(tmp);
-			}else{
-				MutableTriple<Double,Integer,Long> tmp = new MutableTriple<>();
-				MutableTriple<Double,Integer,Long> tmp2 = distCountTimeToStart.get(station);
-				tmp.setLeft(tmp2.getLeft());
-				tmp.setMiddle(tmp2.getMiddle());
-				tmp.setRight(tmp2.getRight());
-				result.add(tmp);
-				linesVisited.add(line.getLineNameWithoutVariant());
-			}
-		});
-		Collections.reverse(result);
-		return result;
-	}
-
-	// // à modifier/déplacer vers le terminalAPP, reverse dans la méthode de calcul plutot, et traitement dans le TERMINAL./////////////
-	// public String showPath(HashMap<Station, Line> route) {
-	// 	StringBuilder res = new StringBuilder();
-	// 	route.forEach((station,line)->{
-	// 		res.append(line+"\n");
-	// 		res.append(station+"\n");
-	// 	});
-	// 	return res.toString();
-	// }
-
-	/**
-     * Show the shortest way to go from a station to another
-	 *
-     * @param res Res of the algorithm
-     * @return a string of the stations and line in order
-     */
-	public String showPath(HashMap<Station, Line> res, LocalTime timeWeLeft) {
-		ArrayList<Station> stationRes = new ArrayList<>();
-		ArrayList<Line> lineRes = new ArrayList<>();
-		StringBuilder path = new StringBuilder();
-		if (res == null) {
-			path.append("Il n'existe aucun chemin");
-		} else {
-			// pour remettre dans le bon sens si c'est dans le mauvais
-			for (Map.Entry<Station, Line> r : res.entrySet()) {
-				stationRes.add(0, r.getKey());
-				lineRes.add(0, r.getValue());
-			}
-			// afficher le chemin du depart jusqu'a dest
-			int i = 0;
-			String downArrow = "↓";
-
-			String normalColor = "\033[0m";
-			String blue_bold = "\033[1;34m";
-			String purple_bold = "\033[1;35m";
-			String yellow_bold = "\033[1;33m";
-			MutablePair<Double, Long> distTime;
-			path.append(blue_bold).append("Heure de départ: ").append(timeWeLeft);
-			while (i < stationRes.size()) {
-				if (i == 0 ) {
-					MutableTriple<Double,Integer,Long> distTimeFromDestination = distCountTimeToStart.get(stationRes.get(stationRes.size() - 1));
-					Duration d = Duration.ZERO;
-					d = d.plusMillis((long) (distTimeFromDestination.getRight() - 0));
-					path.append(yellow_bold).append("	-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTimeFromDestination.getLeft()).append("km.\n");
-					distTime = getDistTimeForALine(stationRes, lineRes, i);
-					path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getName()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
-					LocalTime horaire = itineraryTimes.get(stationRes.get(i));
-					path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName());
-					if(horaire != null && lineRes.get(i).getName() != "--MARCHE--"){
-						path.append(" - "+horaire);
-					}
-					path.append("\n");
-				} else {
-					if (i != 1) {
-						if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
-							MutablePair<Double, Long> tempDistTime = getDistTimeForALine(stationRes, lineRes, i - 1);
-							path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getName()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
-							path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName());
-							LocalTime horaire = itineraryTimes.get(stationRes.get(i-1));
-							if(horaire != null && lineRes.get(i).getName() != "--MARCHE--"){
-								path.append(" - "+horaire);
-							}
-							path.append("\n");
-						}
-					}
-					if (i + 1 < stationRes.size()) {
-						if (lineRes.get(i) != lineRes.get(i + 1) && lineRes.get(i) != null) {
-							path.append(purple_bold).append(downArrow).append("     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
-						} else {
-							path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
-						}
-					} else if (i + 1 == stationRes.size()) {
-						path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
-					} else {
-						path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
-					}
-				}
-				i++;
-			}
-		}
-		return path.toString();
 	}
 
 	/**

@@ -20,8 +20,14 @@ import jakarta.servlet.http.HttpServletResponse;
 import net.minidev.json.JSONObject;
 
 @RestController
+/**
+ * Map Controller class that allows us to make HTTP requests
+ */
 public class MapController {
 
+  /**
+   * Logger to print a message saying that we are loading the data (parsing)
+   */
   private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
   /**
@@ -46,7 +52,7 @@ public class MapController {
    * is launched. Is used to initialize all the needed attributes
    */
   public MapController() throws FormatException {
-    LOGGER.info("Loading data...");
+    LOGGER.info("\033[1;30mLoading data... Might take some time...\u001B[0m");
     Map m = Parser.readMap("map_data.csv");
     map = Parser.readMapHoraire("newtimetables.csv", m);
     stations = map.getStations();
@@ -76,8 +82,7 @@ public class MapController {
   public void shortestWay(@RequestParam String depart, @RequestParam String arrivee,
                                  @RequestParam Integer preference, HttpServletResponse response) throws FormatException {
     try {
-      // LocalTime timeWeLeft = LocalTime.now();
-      LocalTime timeWeLeft = LocalTime.of(10, 0, 0);
+      LocalTime timeWeLeft = LocalTime.now();
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
@@ -91,7 +96,6 @@ public class MapController {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put("stations", itinerary.getPathStations(shortestPath));
       jsonObject.put("lines", itinerary.getPathLines(shortestPath));
-
       jsonObject.put("dates",itinerary.getDates(shortestPath));
       jsonObject.put("startingTime",timeWeLeft);
       Double totalDist = itinerary.getDistCountTimes(shortestPath).getLast().getLeft();
@@ -99,18 +103,6 @@ public class MapController {
       jsonObject.put("distTotal",totalDist);
       jsonObject.put("timeTotal",totalTime);
       jsonObject.put("endingTime",timeWeLeft.plusMinutes(totalTime));
-      
-      jsonObject.put("distTimeLines",itinerary.getDistTimesForLines(shortestPath));
-
-      // heure de départ
-      // --trajet durée totale ~ distance totale
-      // durée ligne + distance ligne
-      // heure de départ pour chaque station
-      // stocker horaire totale
-      // stocker distance totale
-      // stocker heure à laquelle on prend chaque train?
-      jsonObject.put("distcounttimes",itinerary.getDistCountTimes(shortestPath));
-      
       String responseString = pathMapper.writeValueAsString(jsonObject);
 
       response.setContentType("application/json");
@@ -125,7 +117,6 @@ public class MapController {
       shortestPath = null;
     }
   }
-
 
   /**
    * This method allows us to send an HTTP GET request to get all schedules of a station for a line
@@ -158,15 +149,6 @@ public class MapController {
     for (LocalTime time : times) {
       schedules.add(time.format(formatter));
     }
-
-
-
     return schedules;
   }
-
-
-
-
-
-
 }
