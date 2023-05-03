@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.Character.toLowerCase;
-
 /**
  * The Controller is considered the main in our MVC
  */
@@ -34,6 +33,7 @@ public class TerminalApplication {
      * Blue: "\u001B[34m"
      * Cyan: "\u001B[36m"
      * Color resetting at the end of each string: "\u001B[0m"
+     * @throws UnsupportedEncodingException
      */
     public static void main(String[] args) throws FormatException {
 
@@ -81,6 +81,7 @@ public class TerminalApplication {
             }
         } catch (QuitException e) {
             System.out.println("\u001B[36m\n" + e.getMessage() + "\u001B[0m");
+            scanner.close();
         }
 
     }
