@@ -1,6 +1,5 @@
 package fr.uparis.beryllium;
 
-import fr.uparis.beryllium.exceptions.FormatException;
 import fr.uparis.beryllium.exceptions.QuitException;
 import fr.uparis.beryllium.model.Itinerary;
 import fr.uparis.beryllium.model.Line;
@@ -35,7 +34,7 @@ public class TerminalApplication {
      * Color resetting at the end of each string: "\u001B[0m"
      * @throws UnsupportedEncodingException
      */
-    public static void main(String[] args) throws FormatException {
+    public static void main(String[] args) {
 
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
@@ -438,13 +437,13 @@ public class TerminalApplication {
                     path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
                     LocalTime horaire = itinerary.getItineraryTimes().get(stationRes.get(i));
                     path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName());
-                    if (horaire != null && !Objects.equals(lineRes.get(i).getName(), "--MARCHE--")) {
+                    if (horaire != null && !lineRes.get(i).getName().equals("--MARCHE--")) {
                         path.append(" - ").append(horaire);
                     }
                     path.append("\n");
                 } else {
                     if (i != 1) {
-                        if (lineRes.get(i) != lineRes.get(i - 1) && lineRes.get(i) != null) {
+                        if (!lineRes.get(i).getName().equals(lineRes.get(i - 1).getName()) && lineRes.get(i) != null) {
                             MutablePair<Double, Long> tempDistTime = itinerary.getDistTimeForALine(stationRes, lineRes, i - 1);
                             path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
                             path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName());
@@ -456,7 +455,7 @@ public class TerminalApplication {
                         }
                     }
                     if (i + 1 < stationRes.size()) {
-                        if (lineRes.get(i) != lineRes.get(i + 1) && lineRes.get(i) != null) {
+                        if (!lineRes.get(i).getName().equals(lineRes.get(i + 1).getName()) && lineRes.get(i) != null) {
                             path.append(purple_bold).append(downArrow).append("     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
                         } else {
                             path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
