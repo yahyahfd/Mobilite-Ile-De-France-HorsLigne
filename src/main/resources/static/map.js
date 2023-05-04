@@ -150,6 +150,7 @@ schedules_form.addEventListener('submit', function (event) {
 
 const back_button = document.getElementById('back_button');
 back_button.addEventListener('click', function () {
+    schedules.style.display = 'block';
     main_menu.style.display = 'block';
     drawing_menu.style.display = 'none';
     itinerary.innerHTML = '';
@@ -162,9 +163,25 @@ back_button.addEventListener('click', function () {
     isDrawed = false;
 });
 
+const checked_now = document.getElementById('now');
+const time_chosen = document.getElementById('choose_time');
+
+if(checked_now.checked){
+    time_chosen.disabled = true;
+}else{
+    time_chosen.disabled = false;
+}
+
+checked_now.addEventListener('change', function () {
+    time_chosen.disabled = checked_now.checked;
+    console.log(checked_now.checked);
+})
+
 form.addEventListener('submit', function (event) {
 
     event.preventDefault();
+
+    schedules.style.display = 'none';
 
     // We get out selected travel option
     var optionsSelect = document.getElementById('options');
@@ -184,7 +201,10 @@ form.addEventListener('submit', function (event) {
     // We calculate a path (make a request to get a path)
     const departValue = encodeURIComponent(departInput.value);
     const arriveeValue = encodeURIComponent(arriveeInput.value);
-    const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}`;
+    const chosen_time_value = encodeURIComponent(time_chosen.value);
+    const time = checked_now.checked ? 'now' : chosen_time_value;
+
+    const url = `/shortest-way?depart=${departValue}&arrivee=${arriveeValue}&preference=${travel_option}&time=${time}`;
 
 
     fetch(url)

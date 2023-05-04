@@ -79,14 +79,19 @@ public class MapController {
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
-  public void shortestWay(@RequestParam String depart, @RequestParam String arrivee,
-                                 @RequestParam Integer preference, HttpServletResponse response) throws FormatException {
+  public void shortestWay(@RequestParam String depart,
+                          @RequestParam String arrivee,
+                          @RequestParam Integer preference,
+                          @RequestParam String time,
+                          HttpServletResponse response) throws FormatException {
     try {
       LocalTime timeWeLeft = LocalTime.now();
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
 
+        timeWeLeft = (time == null || time.equals("") || time.equals("now")) ? LocalTime.now()
+                : LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
         shortestPath = itinerary.shortestMultiplePaths(start, dest, preference, timeWeLeft);
       }
 

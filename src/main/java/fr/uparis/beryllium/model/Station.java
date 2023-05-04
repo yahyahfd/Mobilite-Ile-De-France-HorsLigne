@@ -110,6 +110,10 @@ public class Station {
         return new ArrayList<>(result);
     }
 
+    /**
+     * All neighboring lines, without the variant in line
+     * @return all lines of the current station to reach a neighboring station
+     */
     public ArrayList<String> getNeighboringLinesWithoutVariant(){
         HashSet<String> result = getNeighboringLines().stream().map(lineName -> {
             return ! lineName.equals("--MARCHE--") ? lineName.split("\\.")[0] : lineName;
@@ -117,6 +121,11 @@ public class Station {
         return new ArrayList<>(result);
     }
 
+    /**
+     * @param line
+     * @param schedule
+     * @return true if the station contains the schedule for the line
+     */
     public boolean containsScheduleOnLine(Line line, LocalTime schedule) {
         ArrayList<LocalTime> mySchedule = getSchedulesOfLine(line);
         return mySchedule != null && mySchedule.contains(schedule);
@@ -141,7 +150,12 @@ public class Station {
         }
         Collections.sort(lineSchedules.get(line));
     }
-    
+
+    /**
+     * @param time
+     * @param line
+     * propagate the schedule to the neighbors
+     */
     public void propagateSchedules(LocalTime time, Line line){
         if(!this.containsLine(line)) return; // juste pour la premiere vérification
         this.addLineSchedule(line, time);
@@ -289,6 +303,11 @@ public class Station {
     }
 
 
+    /**
+     * @param line
+     * @param time
+     * @return the next train time for a given line and a given time
+     */
     public LocalTime getNextTrainTime(Line line, LocalTime time) {
         ArrayList<LocalTime> schedule = this.getSchedulesOfLine(line);
         // there is no horaire for this station on the given line

@@ -16,6 +16,9 @@ import java.util.Iterator;
 
 public class Parser {
 
+    /**
+     * LOGGER to print out print  our logs (more stronng than System.out.println)
+     */
     private static final Logger LOGGER = LogManager.getLogger(Parser.class);
 
     /**
@@ -65,7 +68,7 @@ public class Parser {
      *
      * @param csvFile
      * @param map
-     * @return
+     * @return A map filled with schedules
      */
 
     public static Map readMapHoraire(String csvFile, Map map) {

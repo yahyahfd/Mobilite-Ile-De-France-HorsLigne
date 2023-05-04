@@ -44,7 +44,7 @@ public class Map {
     public void setMapLoaded() {
         isMapLoaded = true;
     }
-    
+
     public ArrayList<Line> getLines() {
         return lines;
     }
@@ -90,7 +90,7 @@ public class Map {
     /**
      * Looking for lines with a given name in our map
      * @param name
-     * @return
+     * @return all lines without variant with the name given
      */
     public ArrayList<Line> searcheLines(String name) {
         ArrayList<Line> result = new ArrayList<Line>();

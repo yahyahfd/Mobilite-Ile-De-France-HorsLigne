@@ -5,10 +5,10 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 @SpringBootApplication
-public class RouteMaster {
+public class HorsLigne {
 
     public static void main(String... args){
-        SpringApplication.run(RouteMaster.class, args);
+        SpringApplication.run(HorsLigne.class, args);
     }
 
 

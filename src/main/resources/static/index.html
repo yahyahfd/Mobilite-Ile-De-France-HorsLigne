@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Route Master</title>
+	<title>Hors Ligne</title>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
 	<script src="../Leaflet/leaflet.js"></script>
@@ -38,6 +38,14 @@
 						<option value="dist">Meilleure distance</option>
 						<option value="time">Meilleur temps</option>
 					</select>
+
+					<div id="inline_elt">
+						<div id="checking">
+							<label for="now" id="label_now"> Go now </label>
+							<input type="checkbox" id="now" name="Go now" value="Go now" checked>
+						</div>
+						<input type="time" id="choose_time" name="choose_time" value="00:00">
+					</div>
 					<input type="submit" value="Rechercher">
 				</form>
 				<div id="error_itinerary"></div>
