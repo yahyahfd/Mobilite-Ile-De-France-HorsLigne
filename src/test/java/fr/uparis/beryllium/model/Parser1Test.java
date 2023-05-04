@@ -2,12 +2,21 @@ package fr.uparis.beryllium.model;
 
 import static org.junit.jupiter.api.Assertions.*;
 import java.time.Duration;
-
 import org.junit.jupiter.api.Test;
 import fr.uparis.beryllium.exceptions.FormatException;
 
+/**
+ * One of many parser testing class
+ * 
+ * @see Parser
+ */
 public class Parser1Test {
-    
+
+    /**
+     * Test for readMap with a correct CSV
+     * 
+     * @throws FormatException
+     */
     @Test
     public void testReadMapWithCorrectCSV() throws FormatException {
 

@@ -49,7 +49,7 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .fa-beat{
+  .fa-beat {
     -webkit-animation-delay: -1ms;
     animation-delay: -1ms;
     -webkit-animation-duration: 1ms;
@@ -295,7 +295,7 @@ label {
   font-size: 1.2rem;
 }
 
-#inline_elt{
+#inline_elt {
   grid-template-columns: 1fr 2fr;
   display: grid;
   justify-content: stretch;
@@ -310,7 +310,7 @@ label {
   margin-top: 25px;
 }
 
-input[type="checkbox"]{
+input[type="checkbox"] {
   margin-right: 30px;
   margin-top: 25px;
   height: 20px;
@@ -321,7 +321,7 @@ input[type="checkbox"]{
 input[type="text"],
 input[type="submit"],
 input[type="time"],
-#options{
+#options {
   padding: 15px;
   font-size: 1.2rem;
   border: none;

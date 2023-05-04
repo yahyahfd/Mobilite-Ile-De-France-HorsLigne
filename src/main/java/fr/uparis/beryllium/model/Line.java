@@ -7,7 +7,7 @@ package fr.uparis.beryllium.model;
 public class Line {
 
     /**
-     * Name of the lane: "number.variant".
+     * Name of the line: "number.variant".
      *
      * @see Parser#readMap(String) details on syntax here
      */
@@ -31,7 +31,6 @@ public class Line {
         return lineName;
     }
 
-
     /**
      * Method used to return the linename without the variant.
      * Example: "1.1" -> "1".
@@ -53,4 +52,3 @@ public class Line {
     }
 
 }
-

@@ -1,25 +1,41 @@
 package fr.uparis.beryllium.model;
 
 import org.apache.commons.lang3.StringUtils;
-
 import java.util.ArrayList;
 
 /**
- * Our map class, designed to store all the stations
+ * Our map class is a singleton pattern, designed to store all the stations and
+ * lines.
  */
 public class Map {
 
-    // Singleton
+    /**
+     * We store our map's instance here
+     */
     private static Map mapInstance = null;
+    /**
+     * Used for our singleton to not reload the map in the parser if it's already
+     * loaded
+     */
     private boolean isMapLoaded = false;
+    /**
+     * ArrayList of lines of our map
+     */
     private final ArrayList<Line> lines = new ArrayList<>();
+    /**
+     * ArrayList of stations of our map
+     */
     private final ArrayList<Station> stations = new ArrayList<>();
 
+    /**
+     * Private constuctor for our singleton pattern
+     */
     private Map() {
     }
 
     /**
-     * Method used to get the map instance. Creates a new map if it isn't created yet
+     * Method used to get the map instance. Creates a new map if it isn't created
+     * yet
      *
      * @return An instance of the used map. Creates it if it doesn't exist.
      */
@@ -45,10 +61,20 @@ public class Map {
         isMapLoaded = true;
     }
 
+    /**
+     * Getter for lines
+     * 
+     * @return <code>lines</code>
+     */
     public ArrayList<Line> getLines() {
         return lines;
     }
 
+    /**
+     * Getter for stations
+     * 
+     * @return <code>stations</code>
+     */
     public ArrayList<Station> getStations() {
         return stations;
     }
@@ -86,16 +112,17 @@ public class Map {
         return null;
     }
 
-
     /**
      * Looking for lines with a given name in our map
-     * @param name
+     * 
+     * @param name name of the lines we're looking for
+     * 
      * @return all lines without variant with the name given
      */
-    public ArrayList<Line> searcheLines(String name) {
+    public ArrayList<Line> searchLines(String name) {
         ArrayList<Line> result = new ArrayList<Line>();
         for (Line l : lines) {
-            if(l.getLineNameWithoutVariant().equals(name))
+            if (l.getLineNameWithoutVariant().equals(name))
                 result.add(l);
         }
         return result;
@@ -107,7 +134,7 @@ public class Map {
      * @param name the name of our line
      * @return The line that was created
      */
-    public Line addLine(String name){
+    public Line addLine(String name) {
         Line newLine = new Line(name);
         lines.add(newLine);
         return newLine;
@@ -161,14 +188,9 @@ public class Map {
      * @param lDest           the location of the destination station
      */
     public void walkToBestStation(Station start, Boolean addFirstStation, Location lDest) {
-        // we get the walking line, create it if it doesn't exist
         Line getLine = this.searchLine("--MARCHE--");
-        Line walkingLine = getLine==null?addLine("--MARCHE--"):getLine;
-        // we get the distance from the starting point to the final destination (it will
-        // be our area of research)
+        Line walkingLine = getLine == null ? addLine("--MARCHE--") : getLine;
         double radius = start.getDistanceToAStation(lDest);
-        // we add the stations that are within this perimeter as neighbors of the position
         start.addWalkingNeighbours(walkingLine, this.getStations(), radius, addFirstStation);
     }
-
 }
