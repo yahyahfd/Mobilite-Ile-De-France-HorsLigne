@@ -190,19 +190,48 @@ form.addEventListener('submit', function (event) {
     fetch(url)
         .then(response => response.json())
         .then(data => {
-            if (data.length == 0) { // No path found
+            console.log(data);
+            if (data['stations'].length <= 1 || data['lines'].length == 0) { // No path found
+                let syntaxeMessage = " Suivez la syntaxe imposée dans les suggestions !";
+                if (departValue.length == 0 && arriveeValue.length == 0) {
+                    errorMessage.innerHTML = "Le départ et l'arrivée ne sont pas spécifiés !" +syntaxeMessage;
+                } else if (departValue.length == 0) {
+                    errorMessage.innerHTML = "Le départ n'est pas spécifié ! " +syntaxeMessage;
+                } else if (arriveeValue.length == 0) {
+                    errorMessage.innerHTML = "L'arrivée n'est pas spécifiée ! " +syntaxeMessage;
+                } else if(arriveeValue == departValue){
+                    errorMessage.innerHTML = "Vous ne pouvez pas voyager vers la même station." +syntaxeMessage;
+                }
+                else {
+                    errorMessage.innerHTML = "Aucun chemin trouvé suivant les stations spécifiées. " +syntaxeMessage;
+                }
                 errorMessage.style.display = "block";
-                errorMessage.textContent = "Aucun chemin trouvé suivant les stations spécifiées.";
             } else {// We draw a path on our map (need to add a written path later here)
-                errorMessage.style.display = "none";
-                main_menu.style.display = "none";
-                drawing_menu.style.display = "block";
                 itineraryLayer.clearLayers();
                 const latLngs = [];
 
                 var nextStation = null;
                 var length = data['stations'].length;
+                var dates = data['dates'];
+                var dist_total = data['distTotal'].toFixed(2);
+                var time_total = data['timeTotal'];
+                
+                var hourStart = data['startingTime'][0];
+                if(hourStart<10) hourStart = '0'+hourStart;
+                var minuteStart = data['startingTime'][1];
+                if(minuteStart<10) minuteStart = '0'+minuteStart;
 
+                var hourFinish = data['endingTime'][0];
+                if(hourFinish<10) hourFinish = '0'+hourFinish;
+                var minuteFinish = data['endingTime'][1];
+                if(minuteFinish<10) minuteFinish = '0'+minuteFinish;
+
+                var startingtime = hourStart+":"+minuteStart;
+                var endingtime = hourFinish+":"+minuteFinish;
+                console.log(startingtime);
+                console.log(endingtime);
+                itinerary.innerHTML += "<div class='station_name'>"+startingtime+" - "+endingtime+
+                "<span class='span_time'>&nbsp;("+time_total+" min ~ "+dist_total+" Km)</span></div>";
                 // We place each station on the map and draw a line between each two consecutive stations
                 for (let i = 0; i < length-1; i++) {
 
@@ -214,24 +243,32 @@ form.addEventListener('submit', function (event) {
                 
                     var stationName = station.name;
                     var lineName = line.lineNameWithoutVariant;
-                    
-
-                    if(! isDrawed) {
-                        itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>" + 
-                        stationName + '</span>';
-                                        
-
+                    if(! isDrawed) {                                        
                         if (station != data['stations'][length - 1]) {
-
+                            let lineNumber = "<span id='linename'>&nbsp;"+lineName+"</span>";
                             if(lineName == '--MARCHE--') {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i></span>";
+                                itinerary.innerHTML += "<span class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
+                                "</span><span id='line' class='separator'> <i class='fa-solid fa-person-walking fa-lg'></i>"+
+                                lineNumber+"</span>";
                             } else {
-                                itinerary.innerHTML += "<span id='line' class='separator'> <i class='fa-solid fa-down-long'></i></span>";
+
+                                var date = dates[i];
+                                console.log(date);
+                                var hour = date[0];
+                                var min = date[1];
+                                if(hour<10) hour = '0'+hour;
+                                if(min<10) min = '0'+min;
+                                itinerary.innerHTML += "<div class='station_name'><i class='fa-solid fa-location-dot'></i>"+ stationName+
+                                "<span class='span_time'>&nbsp;- at "+ hour+":"+min+ "</span></div><span id='line' class='separator'> <i class='fa-solid fa-down-long'></i>"+
+                                lineNumber+"</span>";
                             }
                                 
                             const idLine = document.getElementById('line');
                             idLine.id += lineName;
                             idLine.style.color = getColorByLineName(lineName);
+                            const idLineNumber = document.getElementById('linename');
+                            idLineNumber.id += lineName;
+                            idLineNumber.style.color = "#000";
                         }
                     }
 
@@ -292,6 +329,9 @@ form.addEventListener('submit', function (event) {
                 tab2.innerHTML = "Visuel";
                 map.invalidateSize();
                 
+                errorMessage.style.display = "none";
+                main_menu.style.display = "none";
+                drawing_menu.style.display = "block";
             }
             
         })
@@ -299,7 +339,7 @@ form.addEventListener('submit', function (event) {
     .catch(error => { // Bad syntax or empty inputs
         console.log(error);
         errorMessage.style.display = "block";
-        errorMessage.textContent = "Tout les champs sont obligatoire. Suivez la syntaxe imposée dans les suggestions!";
+        errorMessage.textContent = "Une erreur s'est produite. Vous ne pouvez pas chercher un itinéraire vers la même station.";
     });
 
 });

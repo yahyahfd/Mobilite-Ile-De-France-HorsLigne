@@ -2,9 +2,7 @@ package fr.uparis.beryllium.model;
 
 import org.junit.jupiter.api.Test;
 
-import java.time.Duration;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 class StationTest {

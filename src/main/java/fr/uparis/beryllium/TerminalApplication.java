@@ -20,7 +20,6 @@ import java.util.Objects;
 import java.util.Scanner;
 
 import static java.lang.Character.toLowerCase;
-
 /**
  * The Controller is considered the main in our MVC
  */
@@ -34,12 +33,13 @@ public class TerminalApplication {
      * Blue: "\u001B[34m"
      * Cyan: "\u001B[36m"
      * Color resetting at the end of each string: "\u001B[0m"
+     * @throws UnsupportedEncodingException
      */
     public static void main(String[] args) throws FormatException {
 
         System.out.println("\u001B[36mWelcome to our interactive (Terminal Only) program for finding routes.");
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
-        System.out.println("\033[1;30mLoading data...\u001B[0m");
+        System.out.println("\033[1;30mLoading data... Might take some time...\u001B[0m");
 
         //we parse the map
         Map m = Parser.readMap("map_data.csv");
@@ -81,6 +81,7 @@ public class TerminalApplication {
             }
         } catch (QuitException e) {
             System.out.println("\u001B[36m\n" + e.getMessage() + "\u001B[0m");
+            scanner.close();
         }
 
     }
@@ -166,7 +167,7 @@ public class TerminalApplication {
             }
             if (chosen_2.containsAll(chosen_1)) {
                 System.out.println("This is your start station, please enter another!");
-                chosen_2 = null;
+                chosen_2.clear();
                 station2 = "";
             }
         }
