@@ -74,8 +74,9 @@ public class MapController {
    * 
    * @param depart  contains 'name' and 'localisation' of station
    * @param arrivee contains 'name' and 'localisation' of station
-	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
-   * 
+   * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
+   * @param time time we want to leave
+   * @param response  HTTP response to send
    * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
@@ -127,7 +128,7 @@ public class MapController {
    * This method allows us to send an HTTP GET request to get all schedules of a station for a line
    * @param stationName
    * @param lineName
-   * @return
+   * @return a list of all schedules of a station for a line
    * @throws FormatException
    */
   @GetMapping("/schedules")
