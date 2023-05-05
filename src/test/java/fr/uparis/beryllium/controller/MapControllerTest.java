@@ -20,18 +20,31 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-
+/**
+ * MapController testing class
+ * @see MapController
+ */
 @ExtendWith(MockitoExtension.class)
 public class MapControllerTest {
 
-
+    /**
+     * to init it before all tests
+     */
     static private MapController mapController;
 
+    /**
+     * setup method to init mapController
+     * @throws FormatException
+     */
     @BeforeAll
     public static void setUp() throws FormatException {
         mapController = new MapController();
     }
 
+    /**
+     * Test for getStations
+     * @throws FormatException
+     */
     @Test
     public void testGetStations() throws FormatException {
 
@@ -41,6 +54,11 @@ public class MapControllerTest {
         assertEquals(712, stations.size());
     }
 
+    /**
+     * Test for shortestWay
+     * @throws FormatException
+     * @throws UnsupportedEncodingException
+     */
     @Test
     public void testShortestWay() throws FormatException, UnsupportedEncodingException {
 
@@ -57,6 +75,10 @@ public class MapControllerTest {
 
     }
 
+    /**
+     * Test for getSchedules
+     * @throws FormatException
+     */
     @Test
     public void testGetSchedules() throws FormatException {
         List<String> schedules = mapController.getSchedules("Bercy", "6");

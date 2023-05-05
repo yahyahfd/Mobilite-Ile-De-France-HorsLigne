@@ -77,7 +77,6 @@ public class MapController {
    * @param preference 0: shortest distance, 1: best time, 2: closest in the tree
    * @param time       time we want to leave
    * @param response   HTTP response to send
-   * @return path from <code>depart</code> to <code>arrivee</code>
    */
   @GetMapping("/shortest-way")
   public void shortestWay(@RequestParam String depart,

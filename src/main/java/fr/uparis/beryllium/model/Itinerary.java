@@ -84,8 +84,8 @@ public class Itinerary {
 	/**
 	 * Method used to initialize the graph of distances, station counts and time
 	 * between all the stations and our starting point.
-	 * The three values are initizalized to the <code>MAX_VALUE</code>
-	 * for all the stations except for the <code>start</> station
+	 * The three values are initizalized to the MAX_VALUE
+	 * for all the stations except for the start station
 	 * which is obviously at 0.
 	 *
 	 * @param start The starting station
@@ -161,6 +161,7 @@ public class Itinerary {
 	 *
 	 * @param station    the station to verify
 	 * @param preference 0: shortest distance, 1: best time, 2: closest in the tree
+	 * @param actualTime
 	 * @throws IllegalArgumentException when you choose a preference other than 0, 1
 	 *                                  or 2
 	 */

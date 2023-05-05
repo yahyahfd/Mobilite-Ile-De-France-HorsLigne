@@ -11,6 +11,9 @@ import java.util.List;
  */
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Station testing class
+ */
 class StationTest {
 
     /**
@@ -29,6 +32,9 @@ class StationTest {
         assertEquals(true, result);
     }
 
+    /**
+     * Test for isNotWithinA1KmRadius
+     */
     @Test
     void isNotWithinA1KmRadius() {
         // Given
@@ -42,7 +48,9 @@ class StationTest {
         assertEquals(false, result);
     }
 
-    // faux/modifier add walkingneighbors
+    /**
+     * Test for addWalkingNeighbours
+     */
     @Test
     void addWalkingNeighbours() {
         // Given

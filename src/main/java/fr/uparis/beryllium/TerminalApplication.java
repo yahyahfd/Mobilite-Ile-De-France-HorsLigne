@@ -24,6 +24,7 @@ import static java.lang.Character.toLowerCase;
 public class TerminalApplication {
 
     /**
+     * @param args
      * No arguments are needed.
      * Unicodes used for colors here:
      * Red: "\u001B[31m"
@@ -93,9 +94,10 @@ public class TerminalApplication {
 
     /**
      * Search an itinerary
-     *
+     * @throws QuitException
      * @param m       the map we use for data
      * @param scanner the scanner for terminal
+     * @param itinerary the itinerary
      */
     private static void searchItinerary(Map m, Scanner scanner, Itinerary itinerary) throws QuitException {
 
@@ -196,7 +198,8 @@ public class TerminalApplication {
 
     /**
      * Choose a station from a printed list of stations
-     *
+     * @throws QuitException
+     * @param m the map we use for data
      * @param stations list of stations
      * @param scanner  the scanner for terminal
      * @return the station chosen
@@ -304,7 +307,8 @@ public class TerminalApplication {
 
     /**
      * This method proposes every possibility found for a station name
-     *
+     * @throws QuitException
+     * @param m             The map used in this app
      * @param possibilities List of possibilities
      * @param scanner       Same scanner for the whole app.
      * @return Chosen Station
@@ -348,7 +352,6 @@ public class TerminalApplication {
 
     /**
      * Find a route between two points
-     *
      * @param m                  the map
      * @param chosen_1           the first station
      * @param chosen_2           the second station
@@ -358,6 +361,7 @@ public class TerminalApplication {
      *                           station
      * @param preference         0: shortest distance, 1: best time, 2: closest in
      *                           the tree
+     * @param i                  the itinerary
      */
     private static void findRoute(Map m, ArrayList<Station> chosen_1, ArrayList<Station> chosen_2,
             boolean localpositionStart, boolean localpositionDest, int preference, Itinerary i) {
@@ -478,7 +482,7 @@ public class TerminalApplication {
 
     /**
      * Search all schedules for a station in a line
-     *
+     * @throws QuitException
      * @param m       the map we use for data
      * @param scanner the scanner for terminal
      */
@@ -495,7 +499,7 @@ public class TerminalApplication {
 
     /**
      * Ask the choice of the station
-     *
+     * @throws QuitException
      * @param scanner the scanner for terminal
      * @param m       the map
      * @return the station
@@ -571,7 +575,7 @@ public class TerminalApplication {
 
     /**
      * Ask the choice of the line
-     *
+     * @throws QuitException
      * @param scanner    the scanner for terminal
      * @param linesNames all the name's lines
      * @return the choice of the line

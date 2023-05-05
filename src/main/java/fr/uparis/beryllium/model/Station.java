@@ -172,7 +172,7 @@ public class Station {
 
     /**
      * Checks whether a line is present in any of our neighbors.
-     * 
+     * @param line line to be checked
      * @return true if the line is present in at least a neighbor, false otherwise
      */
     private boolean containsLine(Line line) {

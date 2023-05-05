@@ -72,7 +72,7 @@ public class NeighborData {
     /**
      * Getter for duration that converts it to milliseconds.
      * 
-     * @return <code>duration<code> in milliseconds
+     * @return duration in milliseconds
      */
     public Long getMillisDuration() {
         return duration.toMillis();
@@ -81,7 +81,7 @@ public class NeighborData {
     /**
      * Getter for distance.
      * 
-     * @return <code>distance<code>
+     * @return distance
      */
     public Double getDistance() {
         return distance;
