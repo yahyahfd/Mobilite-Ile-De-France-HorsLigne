@@ -1,0 +1,1 @@
+packageSearchIndex = [{"l":"All Packages","u":"allpackages-index.html"},{"l":"fr.uparis.beryllium"},{"l":"fr.uparis.beryllium.controller"},{"l":"fr.uparis.beryllium.exceptions"},{"l":"fr.uparis.beryllium.model"}];updateSearchResults();

@@ -1,58 +1,54 @@
 package fr.uparis.beryllium.model;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-
+/**
+ * Our line class. Used to stock a line object that links
+ * a station to its neighbor.
+ */
 public class Line {
 
-    private String lineName;
-    private HashMap<Station, Localisation> stations = new HashMap<>();
+    /**
+     * Name of the line: "number.variant".
+     *
+     * @see Parser#readMap(String) details on syntax here
+     */
+    private final String lineName;
 
-    Line(String name) {
+    /**
+     * Constructor of a line.
+     * 
+     * @param name line name
+     */
+    public Line(String name) {
         lineName = name;
     }
 
-    public String getLineName() {
-        return lineName;
-    }
-
-    public String getLineNameWithoutVariant() {
-        return lineName.split("\\.")[0];
-    }
-
-    //Like contains method for ArrayList but with String intead of Object
-    private boolean isIn(String name) {
-        for (Station station : stations.keySet()) {
-            if (station.getName().equals(name)) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public void addStation(Station station, Localisation localisation) {
-        if (!isIn(station.getName())) {
-            stations.put(station,localisation);
-        }
-    }
-
+    /**
+     * Getter for lineName.
+     * 
+     * @return <code>lineName</code>
+     */
     public String getName() {
         return lineName;
     }
 
-    public void setLineName(String lineName) {
-        this.lineName = lineName;
+    /**
+     * Method used to return the linename without the variant.
+     * Example: "1.1" -> "1".
+     *
+     * @return lineName without variant name
+     */
+    public String getLineNameWithoutVariant() {
+        return (!lineName.equals("--MARCHE--")) ? lineName.split("\\.")[0] : "--MARCHE--";
     }
 
-    @JsonIgnore
-    public ArrayList<Station> getStations(){
-        return (ArrayList<Station>) stations.keySet();
+    /**
+     * Method used to return the linename without the variant.
+     * Example: "1.1" -> "1".
+     * 
+     * @return lineName without variant name
+     */
+    public String toString() {
+        return lineName.split("\\.")[0];
     }
 
-    public String toString(){
-         return getLineNameWithoutVariant();
-    }
 }
-

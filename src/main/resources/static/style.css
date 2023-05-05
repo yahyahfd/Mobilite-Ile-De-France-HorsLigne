@@ -6,44 +6,139 @@
  */
 
 /* Adding fontawesome fonts (imported) */
-:root, :host {
+:root,
+:host {
   --fa-style-family-classic: 'Font Awesome 6 Free';
-  --fa-font-solid: normal 900 1em/1 'Font Awesome 6 Free'; }
+  --fa-font-solid: normal 900 1em/1 'Font Awesome 6 Free';
+}
 
 @font-face {
-	font-family: "Font Awesome 6 Free";
-	font-style: normal;
-	font-weight: 900;
-	font-display: block;
-	src: url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.woff2) format("woff2"), url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.ttf) format("truetype")
+  font-family: "Font Awesome 6 Free";
+  font-style: normal;
+  font-weight: 900;
+  font-display: block;
+  src: url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.woff2) format("woff2"), url(../fontawesome-free-6.4.0-web/webfonts/fa-solid-900.ttf) format("truetype")
+}
+
+@-webkit-keyframes fa-beat {
+
+  0%,
+  90% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  45% {
+    -webkit-transform: scale(var(--fa-beat-scale, 1.25));
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+
+@keyframes fa-beat {
+
+  0%,
+  90% {
+    -webkit-transform: scale(1);
+    transform: scale(1);
+  }
+
+  45% {
+    -webkit-transform: scale(var(--fa-beat-scale, 1.25));
+    transform: scale(var(--fa-beat-scale, 1.25));
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fa-beat {
+    -webkit-animation-delay: -1ms;
+    animation-delay: -1ms;
+    -webkit-animation-duration: 1ms;
+    animation-duration: 1ms;
+    -webkit-animation-iteration-count: 1;
+    animation-iteration-count: 1;
+    -webkit-transition-delay: 0s;
+    transition-delay: 0s;
+    -webkit-transition-duration: 0s;
+    transition-duration: 0s;
+  }
 }
 
 /* Styling fontawesome SVGs (imported) */
-.fa-location-dot:before{content:"\f3c5"}
-.fa-chevron-left:before{content:"\f053"}
-.fa-down-long:before{content:"\f309"}
+.fa-location-dot:before {
+  content: "\f3c5"
+}
+
+.fa-down-long:before {
+  content: "\f309"
+}
+
+.fa-train::before {
+  content: "\f238";
+}
+
+.fa-person-walking::before {
+  content: "\f554";
+}
+
+.fa-clock::before {
+  content: "\f017";
+}
+
+.fa-circle-left::before {
+  content: "\f359";
+}
+
+.fa-lg {
+  font-size: 1.25em;
+  line-height: 0.05em;
+  vertical-align: -0.075em;
+}
+
+.fa-xl {
+  font-size: 1.5em;
+  line-height: 0.04167em;
+  vertical-align: -0.125em;
+}
 
 .fa-location-dot {
   font-size: 1.2rem;
   margin-right: 5px;
 }
 
-.fa-chevron-left,
 .fa-down-long {
   font-size: 1.2rem;
   margin: 0 5px;
 }
 
-.fa-solid{
-	-moz-osx-font-smoothing: grayscale;
-	-webkit-font-smoothing: antialiased;
-	display: var(--fa-display, inline-block);
-	font-style: normal;
-	font-variant: normal;
-	line-height: 1;
-	text-rendering: auto;
-	font-family: "Font Awesome 6 Free";
-	font-weight: 900
+.fa-solid {
+  -moz-osx-font-smoothing: grayscale;
+  -webkit-font-smoothing: antialiased;
+  display: var(--fa-display, inline-block);
+  font-style: normal;
+  font-variant: normal;
+  line-height: 1;
+  text-rendering: auto;
+  font-family: "Font Awesome 6 Free";
+  font-weight: 900
+}
+
+.fa-clock {
+  color: #2d1987;
+}
+
+.fa-beat {
+  -webkit-animation-name: fa-beat;
+  animation-name: fa-beat;
+  -webkit-animation-delay: var(--fa-animation-delay, 0s);
+  animation-delay: var(--fa-animation-delay, 0s);
+  -webkit-animation-direction: var(--fa-animation-direction, normal);
+  animation-direction: var(--fa-animation-direction, normal);
+  -webkit-animation-duration: var(--fa-animation-duration, 1s);
+  animation-duration: var(--fa-animation-duration, 1s);
+  -webkit-animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  animation-iteration-count: var(--fa-animation-iteration-count, infinite);
+  -webkit-animation-timing-function: var(--fa-animation-timing, ease-in-out);
+  animation-timing-function: var(--fa-animation-timing, ease-in-out);
 }
 
 /* Style reset and other stylings */
@@ -75,35 +170,34 @@ body {
   font-family: Arial, sans-serif;
 }
 
-h2{
+h2 {
   text-align: center;
   margin: 2vw;
   color: white;
 }
 
 /* Main div (We divide screen) */
-main{
+main {
   height: 100%;
   display: grid;
   grid-template-columns: 25% 75%;
 }
 
-.left{
-  background-color: #4c4f52;
+.left {
+  background-color: #809b85;
   display: flex;
   flex-direction: column;
   overflow-y: auto;
 }
 
-.right{
-  background-color: #8cb0d4;
+.right {
   height: 100%;
 }
 
 .tab {
   padding: 10px;
   border: none;
-  background-color: #767a7e;
+  background-color: #93a897;
   cursor: pointer;
   color: white;
   display: inline-block;
@@ -113,7 +207,7 @@ main{
 }
 
 .tab.active {
-  background-color: #4c4f52;
+  background-color: #93a897;
   font-weight: bold;
   font-size: larger;
   text-shadow: 2px 2px 6px rgba(255, 255, 255, 0.5);
@@ -124,17 +218,19 @@ main{
 }
 
 
-.left, .rigt{
+.left,
+.rigt {
   display: none;
 }
 
-.left.active, .right.active{
+.left.active,
+.right.active {
   display: block;
 }
 
 
 .tabs {
-  background-color: #333;
+  background-color: #93a897;
   display: flex;
 }
 
@@ -143,20 +239,23 @@ main{
     display: flex;
     height: 10%;
   }
+
   main {
     grid-template-columns: 1fr;
     height: 90%;
   }
 
-  .left,.right{
+  .left,
+  .right {
     display: none;
   }
-  
-  .left.active, .right.active{
+
+  .left.active,
+  .right.active {
     display: block;
   }
 
-  label{
+  label {
     display: none;
   }
 }
@@ -167,41 +266,27 @@ main{
   .tabs {
     display: none;
   }
+
   main {
     grid-template-columns: 25% 75%;
     height: 100%;
   }
-  .left,.right{
+
+  .left,
+  .right {
     display: block;
   }
-  label{
+
+  label {
     display: inherit;
   }
 
 }
 
-/* 
-si taille< x:
-90% height main
-10% height tabs?
-active = menu
-switch entre les 2 
-*/
-
-
-
-
-
-
-
-
-
-
 /* Form */
 form {
   display: grid;
   justify-content: stretch;
-  grid-template-columns: 100%;
 }
 
 label {
@@ -210,10 +295,33 @@ label {
   font-size: 1.2rem;
 }
 
+#inline_elt {
+  grid-template-columns: 1fr 2fr;
+  display: grid;
+  justify-content: stretch;
+}
+
+#checking {
+  display: grid;
+  grid-template-columns: 4fr 1fr;
+}
+
+#label_now {
+  margin-top: 25px;
+}
+
+input[type="checkbox"] {
+  margin-right: 30px;
+  margin-top: 25px;
+  height: 20px;
+  width: 20px;
+}
+
 /* Inputs */
 input[type="text"],
 input[type="submit"],
-#options{
+input[type="time"],
+#options {
   padding: 15px;
   font-size: 1.2rem;
   border: none;
@@ -221,15 +329,15 @@ input[type="submit"],
   margin: 5px;
 }
 
-input[type="submit"]{
-  background-color: #333;
-  color: #fff;
+input[type="submit"] {
+  background-color: #fff;
+  color: #809b85;
   cursor: pointer;
 }
 
-input[type="submit"]:hover{
-  color: #333;
-  background-color: #fff;
+input[type="submit"]:hover {
+  color: #fff;
+  background-color: #9bbeb2;
   cursor: pointer;
 }
 
@@ -251,8 +359,8 @@ input[type="submit"]:hover{
   justify-content: center;
   flex-direction: column;
   padding: 10px;
-  background-color: #696f75;
-  border: 2px solid #a8a8a8;
+  background-color: #93a897;
+  border: 2px solid #a9a3a3;
   margin: 10px 1vw;
 }
 
@@ -264,6 +372,11 @@ input[type="submit"]:hover{
   display: flex;
   align-items: center;
   margin: 10px;
+  font-weight: bolder;
+}
+
+.span_time {
+  font-weight: initial;
 }
 
 .separator {
@@ -289,9 +402,24 @@ input[type="submit"]:hover{
 #second_left {
   display: none;
   width: 100%;
-} 
+}
 
 #second_left.show {
   display: flex;
   flex-direction: column;
+}
+
+#schedules h2 {
+  margin-top: 50px;
+}
+
+#schedule_form {
+  /* display: none; */
+  justify-content: stretch;
+  grid-template-columns: 100%;
+}
+
+#schedules_btn {
+  background-color: #809b85;
+  border: none;
 }
