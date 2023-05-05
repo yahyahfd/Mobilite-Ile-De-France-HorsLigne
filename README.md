@@ -12,3 +12,9 @@
 1. Go to the root of the project
 2. Run `./launch.sh -it` if you want to launch the application in interactive mode
 3. Run `./launch.sh` if you want to launch the application as a web application
+
+## Commercial
+1. Link of the youtube video :
+https://youtu.be/u4eY308ProI
+2. Link for the canva video :
+https://www.canva.com/design/DAFh14suVn8/zLr_f-8QBhfi1hVf5JuYfA/watch?utm_content=DAFh14suVn8&utm_campaign=designshare&utm_medium=link&utm_source=publishsharelink
