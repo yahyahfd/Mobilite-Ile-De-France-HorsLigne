@@ -6,7 +6,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
-
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,10 +18,10 @@ import fr.uparis.beryllium.model.*;
 import jakarta.servlet.http.HttpServletResponse;
 import net.minidev.json.JSONObject;
 
-@RestController
 /**
  * Map Controller class that allows us to make HTTP requests
  */
+@RestController
 public class MapController {
 
   /**
@@ -72,21 +71,27 @@ public class MapController {
   /**
    * Doesn't recalculate the path if it's already calculated.
    * 
-   * @param depart  contains 'name' and 'localisation' of station
-   * @param arrivee contains 'name' and 'localisation' of station
-	 * @param preference 0: shortest distance, 1: closest in the tree, 2: shortest time
-   * 
-   * @return path from <code>depart</code> to <code>arrivee</code>
+   * @param depart     contains 'name' and 'localisation' of our starting station
+   * @param arrivee    contains 'name' and 'localisation' of our destination
+   *                   station
+   * @param preference 0: shortest distance, 1: best time, 2: closest in the tree
+   * @param time       time we want to leave
+   * @param response   HTTP response to send
    */
   @GetMapping("/shortest-way")
-  public void shortestWay(@RequestParam String depart, @RequestParam String arrivee,
-                                 @RequestParam Integer preference, HttpServletResponse response) throws FormatException {
+  public void shortestWay(@RequestParam String depart,
+      @RequestParam String arrivee,
+      @RequestParam Integer preference,
+      @RequestParam String time,
+      HttpServletResponse response) throws FormatException {
     try {
-      LocalTime timeWeLeft = LocalTime.now();
+      LocalTime timeWeLeft = null;
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
 
+        timeWeLeft = (time == null || time.equals("") || time.equals("now")) ? LocalTime.now()
+            : LocalTime.parse(time, DateTimeFormatter.ofPattern("HH:mm"));
         shortestPath = itinerary.shortestMultiplePaths(start, dest, preference, timeWeLeft);
       }
 
@@ -96,13 +101,13 @@ public class MapController {
       JSONObject jsonObject = new JSONObject();
       jsonObject.put("stations", itinerary.getPathStations(shortestPath));
       jsonObject.put("lines", itinerary.getPathLines(shortestPath));
-      jsonObject.put("dates",itinerary.getDates(shortestPath));
-      jsonObject.put("startingTime",timeWeLeft);
+      jsonObject.put("dates", itinerary.getDates(shortestPath));
+      jsonObject.put("startingTime", timeWeLeft);
       Double totalDist = itinerary.getDistCountTimes(shortestPath).getLast().getLeft();
       Long totalTime = itinerary.getDistCountTimes(shortestPath).getLast().getRight();
-      jsonObject.put("distTotal",totalDist);
-      jsonObject.put("timeTotal",totalTime);
-      jsonObject.put("endingTime",timeWeLeft.plusMinutes(totalTime));
+      jsonObject.put("distTotal", totalDist);
+      jsonObject.put("timeTotal", totalTime);
+      jsonObject.put("endingTime", timeWeLeft.plusMinutes(totalTime));
       String responseString = pathMapper.writeValueAsString(jsonObject);
 
       response.setContentType("application/json");
@@ -119,16 +124,20 @@ public class MapController {
   }
 
   /**
-   * This method allows us to send an HTTP GET request to get all schedules of a station for a line
+   * This method allows us to send an HTTP GET request to get all schedules of a
+   * station for a line
+   * 
    * @param stationName
    * @param lineName
-   * @return
+   * 
+   * @return a list of all schedules of a station for a line
    * @throws FormatException
    */
   @GetMapping("/schedules")
-  public List<String> getSchedules(@RequestParam String stationName, @RequestParam String lineName) throws FormatException {
+  public List<String> getSchedules(@RequestParam String stationName, @RequestParam String lineName)
+      throws FormatException {
     List<String> schedules = new ArrayList<>();
-    ArrayList<Line> lines = map.searcheLines(lineName);
+    ArrayList<Line> lines = map.searchLines(lineName);
     ArrayList<Station> stations = map.getStationsByName(stationName);
 
     DateTimeFormatter formatter = DateTimeFormatter.ofPattern("HH:mm:ss");
@@ -139,7 +148,7 @@ public class MapController {
       for (Line line : lines) {
 
         List<LocalTime> tmp = station.getSchedulesOfLine(line);
-        if(tmp != null) {
+        if (tmp != null) {
           times.addAll(tmp);
           Collections.sort(times);
         }

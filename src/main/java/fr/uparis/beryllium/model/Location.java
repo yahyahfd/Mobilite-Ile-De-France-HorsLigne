@@ -18,7 +18,7 @@ public class Location {
     /**
      * Constructor for a location.
      * 
-     * @param latitude x coordinate of the location
+     * @param latitude  x coordinate of the location
      * @param longitude y coordinate of the location
      */
     public Location(double latitude, double longitude) {

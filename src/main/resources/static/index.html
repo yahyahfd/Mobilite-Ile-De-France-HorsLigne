@@ -3,7 +3,7 @@
 
 <head>
 	<meta charset="UTF-8">
-	<title>Route Master</title>
+	<title>HorsLigne</title>
 	<link rel="stylesheet" href="style.css">
 	<link rel="stylesheet" href="../Leaflet/leaflet.css" />
 	<script src="../Leaflet/leaflet.js"></script>
@@ -25,19 +25,27 @@
 	<main>
 		<div id="menu1" class="menu left active">
 			<div id="first_left">
-				<h2><b> Ou allons-nous ?</b></h2>
+				<h2><b> Where are we going ?</b></h2>
 				<form id="itinerary_form" action="#" method="post" autocomplete="off">
 					<label for="depart"></label>
-					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="De">
+					<input type="text" id="depart" name="depart" list="depart-list" autocomplete="off" placeholder="From">
 					<datalist id="depart-list"></datalist>
 					<label for="arrivee"></label>
-					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="A">
+					<input type="text" id="arrivee" name="arrivee" list="arrivee-list" autocomplete="off"placeholder="To">
 					<datalist id="arrivee-list"></datalist>
 					<select id="options" name="options">
-						<option value="default">Par défaut (Unitaire)</option>
-						<option value="dist">Meilleure distance</option>
-						<option value="time">Meilleur temps</option>
+						<option value="default">Default (Unitary)</option>
+						<option value="dist">Shortest distance</option>
+						<option value="time">Best time</option>
 					</select>
+
+					<div id="inline_elt">
+						<div id="checking">
+							<label for="now" id="label_now"> Go now </label>
+							<input type="checkbox" id="now" name="Go now" value="Go now" checked>
+						</div>
+						<input type="time" id="choose_time" name="choose_time" value="00:00">
+					</div>
 					<input type="submit" value="Rechercher">
 				</form>
 				<div id="error_itinerary"></div>
@@ -51,17 +59,17 @@
 			</div>
 
 			<div id="schedules">
-				<h2 id="sc_h2">Horaires des trains <i class="fa-solid fa-clock fa-xl"></i></h2>
+				<h2 id="sc_h2">Train schedules<i class="fa-solid fa-clock fa-xl"></i></h2>
 
 				<form id="schedule_form" action="#" method="post" autocomplete="off">
 					<label for="station_sc"></label>
 					<input type="text" id="station_sc" name="station" list="station-list" autocomplete="off" placeholder="Station: ">
 					<datalist id="station-list"></datalist>
 					<label for="line_sc"></label>
-					<input type="text" id="line_sc" name="line" list="line-list" autocomplete="off" placeholder="Ligne: ">
+					<input type="text" id="line_sc" name="line" list="line-list" autocomplete="off" placeholder="Line: ">
 					<datalist id="line-list"></datalist>
 
-					<input type="submit" value="Voir les horaires">
+					<input type="submit" value="See schedules">
 				</form>
 			</div>
 		</div>

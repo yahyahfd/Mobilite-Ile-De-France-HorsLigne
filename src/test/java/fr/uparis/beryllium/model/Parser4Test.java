@@ -5,8 +5,18 @@ import java.time.LocalTime;
 import org.junit.jupiter.api.Test;
 import fr.uparis.beryllium.exceptions.FormatException;
 
+/**
+ * One of many parser testing class
+ * 
+ * @see Parser
+ */
 public class Parser4Test {
 
+    /**
+     * Test for readMapHoraire with a correct CSV
+     * 
+     * @throws FormatException
+     */
     @Test
     public void testReadMapHoraireWithCorrectCsv() throws FormatException {
         Map map = Parser.readMap("src/test/resources/testCsvParser.csv");

@@ -9,7 +9,6 @@ import fr.uparis.beryllium.model.Station;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.MutableTriple;
-
 import java.time.Duration;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -17,14 +16,15 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Objects;
 import java.util.Scanner;
-
 import static java.lang.Character.toLowerCase;
+
 /**
- * The Controller is considered the main in our MVC
+ * This class is the main entry point of the terminal mode application.
  */
 public class TerminalApplication {
 
     /**
+     * @param args
      * No arguments are needed.
      * Unicodes used for colors here:
      * Red: "\u001B[31m"
@@ -39,11 +39,9 @@ public class TerminalApplication {
         System.out.println("\u001B[36mIf you ever want to leave, just type \u001B[31mquit\u001B[0m");
         System.out.println("\033[1;30mLoading data... Might take some time...\u001B[0m");
 
-        //we parse the map
         Map m = Parser.readMap("map_data.csv");
         m = Parser.readMapHoraire("newtimetables.csv", m);
 
-        // instance itinerary with all stations of the map
         Itinerary i = new Itinerary(m.getStations());
 
         Scanner scanner = new Scanner(System.in);
@@ -96,9 +94,10 @@ public class TerminalApplication {
 
     /**
      * Search an itinerary
-     *
+     * @throws QuitException
      * @param m       the map we use for data
      * @param scanner the scanner for terminal
+     * @param itinerary the itinerary
      */
     private static void searchItinerary(Map m, Scanner scanner, Itinerary itinerary) throws QuitException {
 
@@ -111,8 +110,6 @@ public class TerminalApplication {
         System.out.print("\u001B[32mEnter your first station's name: (lp : local position) \u001B[0m");
         String station1 = "";
 
-        // Choix de la 1ere station
-
         while (station1.isEmpty() || chosen_1.size() == 0) {
             station1 = scanner.nextLine();
             station1 = station1.trim();
@@ -120,7 +117,8 @@ public class TerminalApplication {
                 System.out.println("Empty String, try again");
             }
             if (station1.trim().equalsIgnoreCase("quit") ||
-                    station1.trim().equalsIgnoreCase("lp")) break;
+                    station1.trim().equalsIgnoreCase("lp"))
+                break;
             chosen_1 = m.getStationsByName(station1);
             if (chosen_1.size() == 0 && !station1.isEmpty()) {
                 ArrayList<Station> list_1 = similar_names(StringUtils.stripAccents(station1), m.getStations());
@@ -141,8 +139,6 @@ public class TerminalApplication {
             localpositionStart = true;
         }
 
-        // Choix de la 2eme station
-
         System.out.print("\u001B[32mEnter your second station's name: (lp : local position) \u001B[0m");
         String station2 = "";
         while (station2.isEmpty() || chosen_2.size() == 0) {
@@ -152,7 +148,8 @@ public class TerminalApplication {
                 System.out.println("Empty String");
             }
             if (station2.trim().equalsIgnoreCase("quit") ||
-                    station2.trim().equalsIgnoreCase("lp")) break;
+                    station2.trim().equalsIgnoreCase("lp"))
+                break;
             chosen_2 = m.getStationsByName(station2);
             if (chosen_2.size() == 0 && !station2.isEmpty()) {
                 ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(station2), m.getStations());
@@ -178,15 +175,12 @@ public class TerminalApplication {
             localpositionDest = true;
         }
 
-        // Choix de la preference
-
         ArrayList<Integer> typePreference = new ArrayList<>(List.of(0, 1, 2));
         int preference = -1;
         while (preference < 0 || !typePreference.contains(preference)) {
-            // how do they want to travel
-            System.out.print("\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
+            System.out.print(
+                    "\u001B[32mHow do you want to travel ? (0 = shortest distance / 1 = shortest time / 2 = unitary : \u001B[0m");
             try {
-                // we convert string to int
                 String choice = scanner.nextLine();
                 if (choice.trim().equals("quit")) {
                     throw new QuitException();
@@ -197,21 +191,21 @@ public class TerminalApplication {
             }
         }
 
-        if (chosen_1.size()>0 && chosen_2.size()>0) {
-
+        if (chosen_1.size() > 0 && chosen_2.size() > 0) {
             findRoute(m, chosen_1, chosen_2, localpositionStart, localpositionDest, preference, itinerary);
-
         }
     }
 
     /**
-     * Choose a station between a list of stations print
-     *
+     * Choose a station from a printed list of stations
+     * @throws QuitException
+     * @param m the map we use for data
      * @param stations list of stations
      * @param scanner  the scanner for terminal
      * @return the station chosen
      */
-    private static ArrayList<Station> chooseAStation(Map m, ArrayList<Station> stations, Scanner scanner) throws QuitException {
+    private static ArrayList<Station> chooseAStation(Map m, ArrayList<Station> stations, Scanner scanner)
+            throws QuitException {
 
         int i = 1;
         ArrayList<String> stationNames = new ArrayList<>();
@@ -248,7 +242,8 @@ public class TerminalApplication {
         while (num_chosen == 0 || num_chosen > i - 1) {
             try {
                 String read = scanner.nextLine();
-                if (read.trim().equalsIgnoreCase("quit")) throw new QuitException();
+                if (read.trim().equalsIgnoreCase("quit"))
+                    throw new QuitException();
                 num_chosen = Integer.parseInt(read);
                 System.out.println(stationNames.get(num_chosen - 1) + " was chosen");
             } catch (NumberFormatException e) {
@@ -259,12 +254,13 @@ public class TerminalApplication {
     }
 
     /**
-     * This method is used to find stations who have similar name in case the user didn't spell correctly
+     * This method is used to find stations that have similar names in case the user
+     * misspelled it
      *
      * @param name     Name of the station to look for
      * @param stations The stations used in this app
-     * @return List of all the stations (with numbers to choose from) that have similar name <code>name</code>,
-     * or a single station or nothing if no station found.
+     * @return List of all the stations (with numbers to choose from) that have a
+     *         similar name to <code>name</code> or nothing if no station was found
      */
     public static ArrayList<Station> similar_names(String name, ArrayList<Station> stations) {
         ArrayList<Station> similar = new ArrayList<>();
@@ -280,18 +276,23 @@ public class TerminalApplication {
                 boolean abandon = false;
                 while (index != name.length() && index != nameS.length() && !abandon) {
                     if (!notTheSameWordAnymore) {
-                        if (toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index))) sameLetters++;
+                        if (toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index)))
+                            sameLetters++;
                         else {
                             notTheSameWordAnymore = true;
                             diff++;
                         }
                     } else {
-                        if (diff >= 2) abandon = true;
-                        else if (index + 1 < nameS.length() && toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index + 1))
-                                || toLowerCase(name.charAt(index - 1)) == toLowerCase(nameS.charAt(index)) || toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index))) {
+                        if (diff >= 2)
+                            abandon = true;
+                        else if (index + 1 < nameS.length()
+                                && toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index + 1))
+                                || toLowerCase(name.charAt(index - 1)) == toLowerCase(nameS.charAt(index))
+                                || toLowerCase(name.charAt(index)) == toLowerCase(nameS.charAt(index))) {
                             sameLetters++;
                             notTheSameWordAnymore = false;
-                        } else diff++;
+                        } else
+                            diff++;
                     }
                     index++;
                 }
@@ -306,12 +307,14 @@ public class TerminalApplication {
 
     /**
      * This method proposes every possibility found for a station name
-     *
+     * @throws QuitException
+     * @param m             The map used in this app
      * @param possibilities List of possibilities
      * @param scanner       Same scanner for the whole app.
-     * @return chosen Station
+     * @return Chosen Station
      */
-    private static ArrayList<Station> multi_choice_similar(Map m, ArrayList<Station> possibilities, Scanner scanner) throws QuitException {
+    private static ArrayList<Station> multi_choice_similar(Map m, ArrayList<Station> possibilities, Scanner scanner)
+            throws QuitException {
         System.out.println("\nNo station with this name was found !");
         System.out.println("But possibilites found. Choose one from the list below:");
         return chooseAStation(m, possibilities, scanner);
@@ -330,9 +333,7 @@ public class TerminalApplication {
         System.out.print("\u001B[32mEnter your position : \u001B[0m");
         while (latitude == null) {
             System.out.print("\u001B[32mLatitude : \u001B[0m");
-            // how do they want to travel
             try {
-                // we convert string to int
                 latitude = Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Veuillez renseigner un double");
@@ -340,51 +341,47 @@ public class TerminalApplication {
         }
         while (longitude == null) {
             System.out.print("\u001B[32mLongitude : \u001B[0m");
-            // how do they want to travel
             try {
-                // we convert string to int
                 longitude = Double.parseDouble(scanner.nextLine());
             } catch (NumberFormatException e) {
                 System.out.println("Veuillez renseigner un double");
             }
         }
-        // we add the station to the map
         m.addStation(latitude, longitude, name);
     }
 
     /**
-     * Find a route between 2 points
-     *
+     * Find a route between two points
      * @param m                  the map
      * @param chosen_1           the first station
      * @param chosen_2           the second station
-     * @param localpositionStart if we start from a localisation and not from a station
-     * @param localpositionDest  if we're going to a localisation and not to a station
-     * @param preference         our preference for the itinerary
+     * @param localpositionStart if we start from a localisation and not from a
+     *                           station
+     * @param localpositionDest  if we're going to a localisation and not to a
+     *                           station
+     * @param preference         0: shortest distance, 1: best time, 2: closest in
+     *                           the tree
+     * @param i                  the itinerary
      */
-    private static void findRoute(Map m, ArrayList<Station> chosen_1, ArrayList<Station> chosen_2, boolean localpositionStart, boolean localpositionDest, int preference, Itinerary i) {
-        // we search for all stations that we can go by feet within a certain perimeter (dist from start to dest)
+    private static void findRoute(Map m, ArrayList<Station> chosen_1, ArrayList<Station> chosen_2,
+            boolean localpositionStart, boolean localpositionDest, int preference, Itinerary i) {
         if (localpositionStart) {
             m.walkToBestStation(chosen_1.get(0), true, chosen_2.get(0).getLocation());
         }
-        // we add the neighbors for the destination station
         if (localpositionDest) {
             m.walkToBestStation(chosen_2.get(0), false, chosen_1.get(0).getLocation());
         }
 
-        // get the shortest way depending on the preference
         LocalTime timeWeLeft = LocalTime.now();
         HashMap<Station, Line> route = i.shortestMultiplePaths(chosen_1, chosen_2, preference, timeWeLeft);
-        // We'll add verifications here to check if the names are valid (I don't know if it's necessary?)
-        // If we add verifications, we'll set station1 or station2's colors to green or red whether they exist or not
-        // We add the method (the algorithm) to look for the path
         if (route == null) {
-            System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.get(0).getName() + "\u001B[0m to \u001B[31m" + chosen_2.get(0).getName() + "\u001B[0m");
+            System.out.println("Looks like there is no route to go from \u001B[31m" + chosen_1.get(0).getName()
+                    + "\u001B[0m to \u001B[31m" + chosen_2.get(0).getName() + "\u001B[0m");
         } else {
-            System.out.println("Route to go from \u001B[31m" + chosen_1.get(0).getName() + "\u001B[0m to \u001B[31m" + chosen_2.get(0).getName() + "\u001B[0m :\n");
+            System.out.println("Route to go from \u001B[31m" + chosen_1.get(0).getName() + "\u001B[0m to \u001B[31m"
+                    + chosen_2.get(0).getName() + "\u001B[0m :\n");
             System.out.println(showPath(route, timeWeLeft, i));
         }
-        // if we added temporary station, we remove them of the list of stations
         if (localpositionStart) {
             m.removeStation(chosen_1.get(0));
         }
@@ -397,10 +394,11 @@ public class TerminalApplication {
     /**
      * Show the shortest way to go from a station to another
      *
-     * @param res        Res of the algorithm
-     * @param timeWeLeft the time we left
-     * @param itinerary  the itinerary
-     * @return a string of the stations and line in order
+     * @param res        result of the algorithm
+     * @param timeWeLeft the time we left at
+     * @param itinerary  the itinerary that contains all the data we need
+     *                   (distances, times, etc...)
+     * @return a string of the stations and lines in order
      */
     private static String showPath(HashMap<Station, Line> res, LocalTime timeWeLeft, Itinerary itinerary) {
         ArrayList<Station> stationRes = new ArrayList<>();
@@ -409,12 +407,10 @@ public class TerminalApplication {
         if (res == null) {
             path.append("Il n'existe aucun chemin");
         } else {
-            // pour remettre dans le bon sens si c'est dans le mauvais
             for (java.util.Map.Entry<Station, Line> r : res.entrySet()) {
                 stationRes.add(0, r.getKey());
                 lineRes.add(0, r.getValue());
             }
-            // afficher le chemin du depart jusqu'a dest
             int i = 0;
             String downArrow = "↓";
 
@@ -426,12 +422,18 @@ public class TerminalApplication {
             path.append(blue_bold).append("Heure de départ: ").append(timeWeLeft).append("\n");
             while (i < stationRes.size()) {
                 if (i == 0) {
-                    MutableTriple<Double, Integer, Long> distCountTimeFromDestination = itinerary.getDistCountTimeToStart().get(stationRes.get(stationRes.size() - 1));
+                    MutableTriple<Double, Integer, Long> distCountTimeFromDestination = itinerary
+                            .getDistCountTimeToStart().get(stationRes.get(stationRes.size() - 1));
                     Duration d = Duration.ZERO;
                     d = d.plusMillis(distCountTimeFromDestination.getRight());
-                    path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distCountTimeFromDestination.getLeft()).append("km.\n");
+                    path.append(yellow_bold).append("-- Trajet :     ").append(d.toMinutes() + 1).append("min. ")
+                            .append(normalColor).append("~ ").append(yellow_bold)
+                            .append(distCountTimeFromDestination.getLeft()).append("km.\n");
                     distTime = itinerary.getDistTimeForALine(stationRes, lineRes, i);
-                    path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(distTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(distTime.getLeft()).append("km.\n");
+                    path.append(purple_bold).append("Ligne ").append(lineRes.get(1).getLineNameWithoutVariant())
+                            .append(": ").append("     ").append(yellow_bold).append(distTime.getRight())
+                            .append("min. ").append(normalColor).append("~ ").append(yellow_bold)
+                            .append(distTime.getLeft()).append("km.\n");
                     LocalTime horaire = itinerary.getItineraryTimes().get(stationRes.get(i));
                     path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName());
                     if (horaire != null && !lineRes.get(i).getName().equals("--MARCHE--")) {
@@ -441,9 +443,14 @@ public class TerminalApplication {
                 } else {
                     if (i != 1) {
                         if (lineRes.get(i) != null && !lineRes.get(i).getName().equals(lineRes.get(i - 1).getName())) {
-                            MutablePair<Double, Long> tempDistTime = itinerary.getDistTimeForALine(stationRes, lineRes, i - 1);
-                            path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getLineNameWithoutVariant()).append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight()).append("min. ").append(normalColor).append("~ ").append(yellow_bold).append(tempDistTime.getLeft()).append("km.\n");
-                            path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i - 1).getName());
+                            MutablePair<Double, Long> tempDistTime = itinerary.getDistTimeForALine(stationRes, lineRes,
+                                    i - 1);
+                            path.append(purple_bold).append("Ligne ").append(lineRes.get(i).getLineNameWithoutVariant())
+                                    .append(": ").append("     ").append(yellow_bold).append(tempDistTime.getRight())
+                                    .append("min. ").append(normalColor).append("~ ").append(yellow_bold)
+                                    .append(tempDistTime.getLeft()).append("km.\n");
+                            path.append(purple_bold).append("|     ").append(blue_bold)
+                                    .append(stationRes.get(i - 1).getName());
                             LocalTime horaire = itinerary.getItineraryTimes().get(stationRes.get(i - 1));
                             if (horaire != null && !Objects.equals(lineRes.get(i).getName(), "--MARCHE--")) {
                                 path.append(" - ").append(horaire);
@@ -453,14 +460,18 @@ public class TerminalApplication {
                     }
                     if (i + 1 < stationRes.size()) {
                         if (lineRes.get(i) != null && !lineRes.get(i).getName().equals(lineRes.get(i + 1).getName())) {
-                            path.append(purple_bold).append(downArrow).append("     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+                            path.append(purple_bold).append(downArrow).append("     ").append(blue_bold)
+                                    .append(stationRes.get(i).getName()).append("\n");
                         } else {
-                            path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
+                            path.append(purple_bold).append("|         ").append(blue_bold).append("| ")
+                                    .append(normalColor).append(stationRes.get(i).getName()).append("\n");
                         }
                     } else if (i + 1 == stationRes.size()) {
-                        path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName()).append("\n");
+                        path.append(purple_bold).append("|     ").append(blue_bold).append(stationRes.get(i).getName())
+                                .append("\n");
                     } else {
-                        path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor).append(stationRes.get(i).getName()).append("\n");
+                        path.append(purple_bold).append("|         ").append(blue_bold).append("| ").append(normalColor)
+                                .append(stationRes.get(i).getName()).append("\n");
                     }
                 }
                 i++;
@@ -469,31 +480,26 @@ public class TerminalApplication {
         return path.toString();
     }
 
-
     /**
      * Search all schedules for a station in a line
-     *
+     * @throws QuitException
      * @param m       the map we use for data
      * @param scanner the scanner for terminal
      */
     private static void searchSchedule(Map m, Scanner scanner) throws QuitException {
 
-        // demande la station
         ArrayList<Station> stationChoice = askChoiceStation(scanner, m);
 
-        // Afficher les lignes
         ArrayList<String> linesNames = printLines(stationChoice);
 
-        // demande la ligne
         List<String> lineChoice = askChoiceLine(scanner, linesNames);
 
-        // afficher les horaires de la station
         printSchedules(m, lineChoice, stationChoice);
     }
 
     /**
      * Ask the choice of the station
-     *
+     * @throws QuitException
      * @param scanner the scanner for terminal
      * @param m       the map
      * @return the station
@@ -512,7 +518,8 @@ public class TerminalApplication {
                 choiceIsOk = true;
             } else {
                 ArrayList<Station> list_2 = similar_names(StringUtils.stripAccents(choice), m.getStations());
-                if (!list_2.isEmpty()) return multi_choice_similar(m, list_2, scanner);
+                if (!list_2.isEmpty())
+                    return multi_choice_similar(m, list_2, scanner);
                 System.out.println("Try again !");
             }
 
@@ -539,7 +546,7 @@ public class TerminalApplication {
     /**
      * Print all possibles lines and return all the line names
      *
-     * @param stations les stations dont nous voulons voir les lignes qu'elles désservent
+     * @param stations the stations for which we want to see the lines they serve
      * @return all the lines names
      */
     private static ArrayList<String> printLines(ArrayList<Station> stations) {
@@ -568,7 +575,7 @@ public class TerminalApplication {
 
     /**
      * Ask the choice of the line
-     *
+     * @throws QuitException
      * @param scanner    the scanner for terminal
      * @param linesNames all the name's lines
      * @return the choice of the line
@@ -614,7 +621,7 @@ public class TerminalApplication {
     }
 
     /**
-     * print all the schedules for a station and a line
+     * Print all the schedules for a station and a line
      *
      * @param m         the map
      * @param lineNames names of the line (because of variants it's a list)
@@ -643,9 +650,9 @@ public class TerminalApplication {
 
         }
 
-        System.out.println("\n\u001B[34mFor the Station \"" + stations.get(0).getName() + "\" on the Line " + lineNames.get(0).split("\\.")[0] + ", we have theses schedules :\u001B[0m");
+        System.out.println("\n\u001B[34mFor the Station \"" + stations.get(0).getName() + "\" on the Line "
+                + lineNames.get(0).split("\\.")[0] + ", we have theses schedules :\u001B[0m");
 
-        // trier les horaires
         schedules.sort((o1, o2) -> {
             if (o1.isBefore(o2)) {
                 return -1;
@@ -668,5 +675,4 @@ public class TerminalApplication {
         System.out.println();
 
     }
-
 }

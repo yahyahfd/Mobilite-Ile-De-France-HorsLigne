@@ -9,7 +9,7 @@ import java.time.Duration;
 public class NeighborData {
 
     /**
-     * The line to be used to reach this station 
+     * The line to be used to reach this station
      * from our starting station.
      */
     private Line line;
@@ -22,14 +22,14 @@ public class NeighborData {
 
     /**
      * The distance between our starting station
-     * and this station. 
+     * and this station.
      */
     private final Double distance;
 
     /**
      * Constructor for oNeighborData.
      * 
-     * @param line The line used to reach this station
+     * @param line     The line used to reach this station
      * @param duration The time it takes to reach this station
      * @param distance The distance to travel to reach this station
      */
@@ -39,18 +39,16 @@ public class NeighborData {
         this.distance = distance;
     }
 
-    public void setLine(Line line) {
-        this.line = line;
-    }
-
     /**
      * Compares <code>nData</code> to the NeighborData Object it's called on.
      * 
      * @param nData a NeighborData
-     * @return <code>true</code> if <code>nData</code> corresponds fully to <code>this</code>, false otherwise
+     * @return <code>true</code> if <code>nData</code> corresponds fully to
+     *         <code>this</code>, false otherwise
      */
-    public boolean compareNeighborData(NeighborData nData){
-        return nData.duration.equals(this.duration) && nData.distance.equals(this.distance) && nData.line.equals(this.line);
+    public boolean compareNeighborData(NeighborData nData) {
+        return nData.duration.equals(this.duration) && nData.distance.equals(this.distance)
+                && nData.line.equals(this.line);
     }
 
     /**
@@ -74,19 +72,18 @@ public class NeighborData {
     /**
      * Getter for duration that converts it to milliseconds.
      * 
-     * @return <code>duration<code> in milliseconds
+     * @return duration in milliseconds
      */
-    public Long getMillisDuration(){
+    public Long getMillisDuration() {
         return duration.toMillis();
     }
-    
+
     /**
      * Getter for distance.
      * 
-     * @return <code>distance<code>
+     * @return distance
      */
     public Double getDistance() {
         return distance;
     }
-
 }

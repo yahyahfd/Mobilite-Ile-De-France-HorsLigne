@@ -1,14 +1,19 @@
 package fr.uparis.beryllium.model;
 
 import org.junit.jupiter.api.Test;
-
 import static org.junit.jupiter.api.Assertions.assertEquals;
 
+/**
+ * Map testing class
+ * @see Map
+ */
 class MapTest {
 
+    /**
+     * Test for walkToBestStation
+     */
     @Test
     void walkToBestStation() {
-        // Given
         Line walkingLine = new Line("--MARCHE--");
         Map m = Map.getMapInstance();
         m.addStation(48.84268433479670,2.2928472203679453, "LocalPosition");
@@ -20,10 +25,8 @@ class MapTest {
         Station station1 = m.getStations().get(1);
         Station dest = m.getStations().get(2);
         
-        // When
         m.walkToBestStation(start, true, dest.getLocation());
 
-        // Assert
         System.out.println(start.getNextStations().keySet());
         assertEquals(2, start.getNextStations().size());
         assert (start.getNextStations().get(station1).get(0).getLine().getName().equals(walkingLine.getName()));
