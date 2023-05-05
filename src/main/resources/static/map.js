@@ -397,6 +397,9 @@ form.addEventListener("submit", function (event) {
     .catch((error) => {
       // Bad syntax or empty inputs
       console.log(error);
+      if(schedules.style.display == "none") {
+        schedules.style.display = "block";
+      }
       errorMessage.style.display = "block";
       errorMessage.textContent =
         "An error occurred. You cannot search for a route to the same station.";

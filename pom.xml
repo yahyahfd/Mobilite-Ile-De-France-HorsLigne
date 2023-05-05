@@ -99,7 +99,7 @@
                                         <limit>
                                             <counter>METHOD</counter>
                                             <value>COVEREDRATIO</value>
-                                            <minimum>0.0</minimum>
+                                            <minimum>0.75</minimum>
                                         </limit>
                                     </limits>
                                 </rule>
@@ -107,6 +107,13 @@
                         </configuration>
                     </execution>
                 </executions>
+                <configuration>
+                    <excludes>
+                        <exclude> fr/uparis/beryllium/HorsLigne* </exclude>
+                        <exclude> fr/uparis/beryllium/TerminalApplication* </exclude>
+                        <exclude> fr/uparis/beryllium/exceptions/* </exclude>
+                    </excludes>
+                </configuration>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

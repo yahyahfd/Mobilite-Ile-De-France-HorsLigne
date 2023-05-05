@@ -86,7 +86,7 @@ public class MapController {
       @RequestParam String time,
       HttpServletResponse response) throws FormatException {
     try {
-      LocalTime timeWeLeft = LocalTime.now();
+      LocalTime timeWeLeft = null;
       if (shortestPath == null) {
         ArrayList<Station> start = map.getStationsByName(depart);
         ArrayList<Station> dest = map.getStationsByName(arrivee);
