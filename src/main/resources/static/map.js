@@ -466,7 +466,7 @@ function getColorByLineName(lineName) {
 function getLinesLogoColor(lines) {
   var result = "";
   lines.split("<br>").forEach((line) => {
-    if (line != "--MARCHE--") {
+    if (line != null && line != "--MARCHE--" && line != "") {
       result +=
         '<br> <i class="fa-solid fa-train fa-beat fa-xl" style="color: ' +
         getColorByLineName(line) +
